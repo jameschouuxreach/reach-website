@@ -1,0 +1,17 @@
+---
+/** 內頁頁首：H1＋簡短導言 */
+interface Props {
+  title: string;
+  intro?: string;
+}
+
+const { title, intro } = Astro.props;
+---
+
+<section class="border-b border-line bg-page">
+  <div class="container-site py-16 md:py-24">
+    <h1 class="heading-section max-w-3xl">{title}</h1>
+    {intro && <p class="mt-5 max-w-2xl text-lg leading-relaxed text-ink-secondary">{intro}</p>}
+    <slot />
+  </div>
+</section>

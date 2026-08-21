@@ -1,0 +1,93 @@
+---
+import { SITE_NAME, SITE_NAME_EN } from '../config';
+
+const FOOTER_NAV = [
+  { path: '/services/', label: '服務內容' },
+  { path: '/cases/', label: '專案實例' },
+  { path: '/about/', label: '關於致遠' },
+  { path: '/insights/', label: '致遠觀點' },
+] as const;
+
+const FOOTER_AUDIENCE = [
+  { path: '/public-sector/', label: '政府與公共服務' },
+  { path: '/business/', label: '企業與服務團隊' },
+] as const;
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line bg-surface">
+  <div class="container-site py-12 md:py-16">
+    <div class="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div>
+        <a href="/" class="inline-flex min-h-11 items-center gap-3">
+          <img src="/images/reach-logo.png" alt="" width="44" height="44" class="h-11 w-11" loading="lazy" />
+          <span class="flex flex-col">
+            <span class="font-bold text-ink">{SITE_NAME}</span>
+            <span class="text-sm text-ink-muted">{SITE_NAME_EN}</span>
+          </span>
+        </a>
+        <p class="mt-4 max-w-xs text-sm leading-relaxed text-ink-muted">
+          正式聯絡資訊（email、電話、地址與社群連結）待補。
+        </p>
+      </div>
+
+      <nav aria-label="網站導覽">
+        <h2 class="text-sm font-bold text-ink">網站導覽</h2>
+        <ul class="mt-3 space-y-1">
+          {
+            FOOTER_NAV.map((item) => (
+              <li>
+                <a
+                  href={item.path}
+                  class="inline-flex min-h-11 items-center text-sm text-ink-secondary transition-colors duration-200 hover:text-ink hover:underline"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav aria-label="客群入口">
+        <h2 class="text-sm font-bold text-ink">合作對象</h2>
+        <ul class="mt-3 space-y-1">
+          {
+            FOOTER_AUDIENCE.map((item) => (
+              <li>
+                <a
+                  href={item.path}
+                  class="inline-flex min-h-11 items-center text-sm text-ink-secondary transition-colors duration-200 hover:text-ink hover:underline"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav aria-label="聯絡">
+        <h2 class="text-sm font-bold text-ink">聯絡</h2>
+        <ul class="mt-3 space-y-1">
+          <li>
+            <a
+              href="/contact/"
+              class="inline-flex min-h-11 items-center text-sm text-ink-secondary transition-colors duration-200 hover:text-ink hover:underline"
+            >
+              聯絡我們
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div
+      class="mt-10 flex flex-col gap-2 border-t border-line pt-6 text-sm text-ink-muted md:flex-row md:items-center md:justify-between"
+    >
+      <p>© {year} {SITE_NAME} {SITE_NAME_EN}</p>
+      <p>隱私權政策（待補）</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+
+const prepareItems = [
+  { label: '組織／服務名稱', hint: '你所屬的機關、公司或團隊，以及要討論的服務或產品。' },
+  { label: '目前遇到的問題', hint: '簡單描述現況與困擾即可，不需要完整的需求文件。' },
+  { label: '期望時程', hint: '預計啟動與完成的時間，或重要的里程碑。' },
+  { label: '聯絡方式', hint: '方便我們回覆你的 email 或電話。' },
+];
+---
+
+<BaseLayout
+  title="聯絡我們"
+  description="與致遠體驗設計聊聊你的需求。合作前可先準備組織名稱、目前問題、期望時程與聯絡方式。"
+>
+  <PageHero
+    title="與我們聊聊你的需求"
+    intro="不需要準備完整的需求文件，先聊聊你觀察到的現象與困擾，我們一起找到改變的起點。"
+  />
+
+  <section class="container-site py-16 md:py-24">
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.1fr]">
+      <div data-reveal>
+        <h2 class="heading-sub">合作前可以先準備</h2>
+        <ul class="mt-6 space-y-5">
+          {
+            prepareItems.map((item, index) => (
+              <li class="flex gap-4">
+                <span class="font-bold text-brand" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div>
+                  <h3 class="font-bold">{item.label}</h3>
+                  <p class="mt-1 text-sm leading-relaxed text-ink-secondary">{item.hint}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-8 text-sm text-ink-muted">
+          正式 email、電話與地址確認後將公布於本頁。
+        </p>
+      </div>
+
+      <div class="card p-6 md:p-8" data-reveal>
+        <h2 class="text-lg font-bold">聯絡表單（示意）</h2>
+        <p class="mt-2 text-sm text-ink-muted">表單服務尚未啟用，以下為視覺原型，暫時無法送出。</p>
+        <form class="mt-6 space-y-5" aria-label="聯絡表單原型（尚未啟用）">
+          <div class="flex flex-col gap-2">
+            <label for="contact-org" class="text-sm font-semibold">組織／服務名稱</label>
+            <input
+              type="text"
+              id="contact-org"
+              name="org"
+              disabled
+              class="min-h-11 rounded-lg border border-line-strong bg-page px-4 text-ink disabled:cursor-not-allowed"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="contact-problem" class="text-sm font-semibold">目前遇到的問題</label>
+            <textarea
+              id="contact-problem"
+              name="problem"
+              rows="4"
+              disabled
+              class="rounded-lg border border-line-strong bg-page px-4 py-3 text-ink disabled:cursor-not-allowed"
+            ></textarea>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="contact-schedule" class="text-sm font-semibold">期望時程</label>
+            <input
+              type="text"
+              id="contact-schedule"
+              name="schedule"
+              disabled
+              class="min-h-11 rounded-lg border border-line-strong bg-page px-4 text-ink disabled:cursor-not-allowed"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="contact-email" class="text-sm font-semibold">聯絡方式</label>
+            <input
+              type="text"
+              id="contact-email"
+              name="contact"
+              disabled
+              class="min-h-11 rounded-lg border border-line-strong bg-page px-4 text-ink disabled:cursor-not-allowed"
+            />
+          </div>
+          <button
+            type="button"
+            disabled
+            class="btn-primary w-full opacity-50 disabled:cursor-not-allowed"
+          >
+            表單尚未啟用
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

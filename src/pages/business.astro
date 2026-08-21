@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import ContactCta from '../components/ContactCta.astro';
+import CaseCard from '../components/CaseCard.astro';
+import { CASES } from '../data/cases';
+
+// 相關案例：合作金庫、好齡居
+const relatedCases = CASES.filter((c) => ['合作金庫銀行', '好齡居'].includes(c.name));
+
+const painPoints = [
+  {
+    title: '看得到現象，找不到原因',
+    body: '數據顯示流失與抱怨，但團隊難以確定問題發生在體驗的哪一個環節。',
+  },
+  {
+    title: '部門各自優化，整體卻沒有變好',
+    body: '每個單位都在改善自己的環節，使用者感受到的卻仍是斷裂的服務。',
+  },
+  {
+    title: '重大決策缺乏依據',
+    body: '要投入的資源不小，卻只能憑經驗與直覺判斷方向，風險難以評估。',
+  },
+];
+---
+
+<BaseLayout
+  title="企業與服務團隊"
+  description="致遠體驗設計協助企業從使用者、服務流程與組織全局中找出關鍵施力點，讓體驗改善轉為商業價值。"
+>
+  <PageHero
+    title="找對問題，讓體驗改善轉為商業價值"
+    intro="從使用者、服務流程與組織全局中找出關鍵施力點，讓重大決策建立在理解之上。"
+  />
+
+  <section class="container-site py-16 md:py-24" data-reveal>
+    <h2 class="heading-sub">企業常見的體驗與決策難題</h2>
+    <div class="mt-6 grid gap-5 md:grid-cols-3">
+      {
+        painPoints.map((point) => (
+          <div class="card p-6">
+            <h3 class="text-lg font-bold">{point.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-ink-secondary">{point.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="border-y border-line bg-surface" data-reveal>
+    <div class="container-site py-16 md:py-24">
+      <h2 class="heading-sub">如何從全局釐清關鍵問題</h2>
+      <p class="mt-4 max-w-2xl text-ink-secondary">
+        我們把使用者旅程、服務流程與組織分工放在同一張圖上檢視，找出真正牽動成效的環節，再評估投入的優先順序，讓改善資源用在對的地方。
+      </p>
+    </div>
+  </section>
+
+  <section class="container-site py-16 md:py-24" data-reveal>
+    <h2 class="heading-sub">對應的服務方式</h2>
+    <p class="mt-4 max-w-2xl text-ink-secondary">
+      正式服務分類與說明規劃中。服務方式將對應上述難題，涵蓋研究、全局梳理與多方協作。
+    </p>
+  </section>
+
+  <section class="border-t border-line bg-page" data-reveal>
+    <div class="container-site py-16 md:py-24">
+      <h2 class="heading-sub">相關案例</h2>
+      <div class="mt-6 grid gap-5 sm:grid-cols-2">
+        {relatedCases.map((item) => <CaseCard {...item} />)}
+      </div>
+    </div>
+  </section>
+
+  <ContactCta />
+</BaseLayout>

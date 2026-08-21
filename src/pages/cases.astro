@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import ContactCta from '../components/ContactCta.astro';
+import CaseCard from '../components/CaseCard.astro';
+import { CASES } from '../data/cases';
+---
+
+<BaseLayout
+  title="專案實例"
+  description="致遠體驗設計的專案實例：合作金庫、好齡居、桃園卡與綜合所得稅報稅系統等公共與企業服務改善經驗。"
+>
+  <PageHero
+    title="專案實例"
+    intro="我們與政府機關及企業團隊合作，處理真實情境中的複雜問題。案例內容陸續整理中。"
+  />
+
+  <section class="container-site py-16 md:py-24">
+    <h2 class="sr-only">案例列表</h2>
+    <div class="mb-8 flex flex-wrap gap-2" data-reveal>
+      {/* 篩選為預留位置，正式案例資料建立後啟用（v1 不實作） */}
+      {
+        ['全部', '政府與公共服務', '企業與服務團隊'].map((tag) => (
+          <span class="rounded-full border border-line bg-surface px-4 py-1.5 text-sm text-ink-muted">{tag}</span>
+        ))
+      }
+      <span class="self-center text-xs text-ink-muted">（篩選功能將於案例內容建立後啟用）</span>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2" data-reveal>
+      {CASES.map((item) => <CaseCard {...item} />)}
+    </div>
+  </section>
+
+  <ContactCta />
+</BaseLayout>

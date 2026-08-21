@@ -1,0 +1,15 @@
+---
+/** 文字 CTA：#084BD8＋右箭頭；hover/focus 時箭頭右移 */
+interface Props {
+  href: string;
+  label: string;
+  ariaLabel?: string;
+}
+
+const { href, label, ariaLabel } = Astro.props;
+---
+
+<a href={href} class="text-cta" aria-label={ariaLabel}>
+  {label}
+  <span class="cta-arrow" aria-hidden="true">→</span>
+</a>

@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import ContactCta from '../components/ContactCta.astro';
+---
+
+<BaseLayout
+  title="關於致遠"
+  description="認識致遠體驗設計：我們的品牌哲學「從複雜，致清晰」、團隊組成與合作方式。"
+>
+  <PageHero
+    title="關於致遠"
+    intro="致遠體驗設計陪伴政府與企業，從複雜的情境中找出清晰可行的方向。"
+  />
+
+  <section class="container-site py-16 md:py-24" data-reveal>
+    <h2 class="heading-sub">致／遠的品牌哲學</h2>
+    <p class="mt-4 max-w-2xl text-ink-secondary">
+      「<span class="font-bold text-brand">致</span>」是抵達清晰的過程，「<span class="font-bold text-brand">遠</span>」是走得更深、更廣、更遠的承諾。品牌故事完整內容整理中。
+    </p>
+  </section>
+
+  <section class="container-site pb-16 md:pb-24" data-reveal>
+    <div class="grid gap-5 md:grid-cols-2">
+      <div class="card p-6">
+        <h2 class="text-lg font-bold">團隊</h2>
+        <p class="mt-3 text-sm text-ink-muted">團隊介紹整理中，正式成員資訊確認後補上。</p>
+      </div>
+      <div class="card p-6">
+        <h2 class="text-lg font-bold">合作方式</h2>
+        <p class="mt-3 text-sm text-ink-muted">合作流程與方式說明整理中。</p>
+      </div>
+    </div>
+  </section>
+
+  <ContactCta />
+</BaseLayout>

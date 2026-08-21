@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import ContactCta from '../components/ContactCta.astro';
+import CaseCard from '../components/CaseCard.astro';
+import { CASES } from '../data/cases';
+
+// 相關案例：桃園卡、綜合所得稅報稅系統
+const relatedCases = CASES.filter((c) => ['桃園卡', '綜合所得稅報稅系統'].includes(c.name));
+
+const painPoints = [
+  {
+    title: '標案流程的限制',
+    body: '需求在招標前就已定案，執行中卻發現與民眾實際情境有落差，調整空間有限。',
+  },
+  {
+    title: '跨單位協作的成本',
+    body: '一項服務往往橫跨多個機關與承辦單位，權責與資訊分散，整合困難。',
+  },
+  {
+    title: '既有系統的包袱',
+    body: '新服務必須與既有系統銜接，理想的體驗設計常在技術與制度限制中被迫妥協。',
+  },
+];
+---
+
+<BaseLayout
+  title="政府與公共服務"
+  description="致遠體驗設計深耕數位公共服務，熟悉政府標案、跨單位協作與既有系統限制，協助機關找到以民眾為本的可行改善方向。"
+>
+  <PageHero
+    title="深耕數位公共服務，始終以民眾為本"
+    intro="我們熟悉政府標案、跨單位協作與既有系統限制，在民眾需要、政策目標與執行現實之間，找到真正可行的改善方向。"
+  />
+
+  <section class="container-site py-16 md:py-24" data-reveal>
+    <h2 class="heading-sub">政府數位服務常見的落地難題</h2>
+    <div class="mt-6 grid gap-5 md:grid-cols-3">
+      {
+        painPoints.map((point) => (
+          <div class="card p-6">
+            <h3 class="text-lg font-bold">{point.title}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-ink-secondary">{point.body}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="border-y border-line bg-surface" data-reveal>
+    <div class="container-site py-16 md:py-24">
+      <h2 class="heading-sub">我們如何理解民眾與機關的運作</h2>
+      <p class="mt-4 max-w-2xl text-ink-secondary">
+        我們同時走進民眾的使用情境與機關的作業現場：理解民眾在服務中真正卡住的地方，也理解承辦人員面對的制度、系統與人力現實，讓改善方向在兩端都站得住。
+      </p>
+    </div>
+  </section>
+
+  <section class="container-site py-16 md:py-24" data-reveal>
+    <h2 class="heading-sub">對應的服務方式</h2>
+    <p class="mt-4 max-w-2xl text-ink-secondary">
+      正式服務分類與說明規劃中。服務方式將對應上述難題，涵蓋研究、全局梳理與跨單位協作。
+    </p>
+  </section>
+
+  <section class="border-t border-line bg-page" data-reveal>
+    <div class="container-site py-16 md:py-24">
+      <h2 class="heading-sub">相關案例</h2>
+      <div class="mt-6 grid gap-5 sm:grid-cols-2">
+        {relatedCases.map((item) => <CaseCard {...item} />)}
+      </div>
+    </div>
+  </section>
+
+  <ContactCta />
+</BaseLayout>

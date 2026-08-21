@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import ContactCta from '../components/ContactCta.astro';
+---
+
+<BaseLayout
+  title="致遠觀點"
+  description="致遠體驗設計對使用者研究、服務設計與數位轉型的觀察與思考。"
+>
+  <PageHero
+    title="致遠觀點"
+    intro="關於研究、設計與組織協作的觀察與思考，文章陸續整理中。"
+  />
+
+  <section class="container-site py-16 md:py-24" data-reveal>
+    <div class="mb-6 flex flex-wrap gap-2" aria-hidden="true">
+      {
+        ['全部', '使用者研究', '服務設計', '數位轉型'].map((tag) => (
+          <span class="rounded-full border border-line bg-surface px-4 py-1.5 text-sm text-ink-muted">{tag}</span>
+        ))
+      }
+    </div>
+    <p class="mb-6 text-sm text-ink-muted">分類為預留結構，文章上線後啟用。</p>
+    <div class="grid gap-5 md:grid-cols-3">
+      {
+        [1, 2, 3].map(() => (
+          <div class="card overflow-hidden">
+            <div class="media-placeholder aspect-[16/9] rounded-none border-x-0 border-t-0">
+              文章封面圖（待補）
+            </div>
+            <div class="p-6">
+              <h2 class="text-lg font-bold text-ink-muted">文章整理中</h2>
+              <p class="mt-2 text-sm text-ink-muted">正式文章標題與內容確認後上線。</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <ContactCta />
+</BaseLayout>

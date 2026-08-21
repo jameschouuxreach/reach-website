@@ -1,0 +1,36 @@
+/* 品牌 Design Tokens：唯一色彩依據（來源：致遠官網-v1-Claude-Code開發規格.md §7.1） */
+:root {
+  --reach-blue-50: #F2F6FF;
+  --reach-blue-100: #E2EBFF;
+  --reach-blue-200: #BED1FF;
+  --reach-blue-300: #8EB0FF;
+  --reach-blue-400: #4F86FF;
+  --reach-blue-500: #0B5CFF;
+  --reach-blue-600: #084BD8;
+  --reach-blue-700: #063AA8;
+  --reach-blue-800: #062D7A;
+  --reach-blue-900: #071F4F;
+
+  --neutral-0: #FFFFFF;
+  --neutral-50: #F7F8FA;
+  --neutral-100: #F0F2F5;
+  --neutral-200: #E1E5EA;
+  --neutral-300: #C8CED6;
+  --neutral-400: #929AA6;
+  --neutral-500: #6B7280;
+  --neutral-600: #555D68;
+  --neutral-700: #353B45;
+  --neutral-900: #171A1F;
+  --neutral-950: #0E1116;
+
+  --color-page: var(--neutral-50);
+  --color-surface: var(--neutral-0);
+  --color-surface-accent: var(--reach-blue-50);
+  --color-text: var(--neutral-900);
+  --color-text-secondary: var(--neutral-600);
+  --color-text-muted: var(--neutral-500);
+  --color-border: var(--neutral-200);
+  --color-brand: var(--reach-blue-500);
+  --color-link: var(--reach-blue-600);
+  --color-dark-section: var(--neutral-950);
+}

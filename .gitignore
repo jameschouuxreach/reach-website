@@ -1,0 +1,18 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+*.log
+
+# environment
+.env
+.env.*
+
+# macOS（exFAT 外接碟會產生 AppleDouble 檔）
+.DS_Store
+._*

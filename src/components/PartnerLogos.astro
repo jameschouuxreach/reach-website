@@ -1,0 +1,67 @@
+---
+/**
+ * 合作對象 Logo 牆：僅使用已提供的真實 Logo（合作客戶logo.pdf）。
+ * 灰階呈現，hover 恢復原色（選配）；每個 Logo 皆有可讀 alt。
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { PARTNER_COMPANIES, PARTNER_GOVERNMENT } from '../data/partners';
+
+const logoModules = import.meta.glob<{ default: ImageMetadata }>('../assets/partners/*.png', {
+  eager: true,
+});
+
+function logoFor(slug: string): ImageMetadata {
+  const entry = logoModules[`../assets/partners/${slug}.png`];
+  if (!entry) throw new Error(`缺少 Logo 素材：${slug}`);
+  return entry.default;
+}
+
+const groups = [
+  { label: '合作企業', items: PARTNER_COMPANIES },
+  { label: '合作政府單位', items: PARTNER_GOVERNMENT },
+];
+---
+
+<div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
+  {
+    groups.map((group) => (
+      <div>
+        <h3 class="border-b border-line pb-3 text-sm font-bold text-ink-secondary">{group.label}</h3>
+        <ul class="mt-8 grid grid-cols-2 items-center gap-x-10 gap-y-8 sm:grid-cols-3">
+          {group.items.map((partner) => (
+            <li class="partner-logo flex items-center">
+              <Picture
+                src={logoFor(partner.slug)}
+                formats={['webp']}
+                fallbackFormat="png"
+                alt={partner.name}
+                class="h-9 w-auto max-w-full object-contain md:h-10"
+                loading="lazy"
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .partner-logo :global(img) {
+    filter: grayscale(1);
+    opacity: 0.72;
+    transition: filter 200ms ease, opacity 200ms ease;
+  }
+
+  .partner-logo:hover :global(img) {
+    filter: none;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partner-logo :global(img) {
+      transition: none;
+    }
+  }
+</style>

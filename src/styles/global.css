@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+@import './tokens.css';
+@import './components.css';
+@import './motion.css';
+
+/*
+ * Tailwind 主題一律引用 tokens.css 的既有 CSS 變數（inline 參照，不另建數值）。
+ * 色彩只允許品牌 Token；Tailwind 預設調色盤整組停用，避免散落非品牌色。
+ */
+@theme inline {
+  --color-*: initial;
+  --font-*: initial;
+
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Noto Sans TC',
+    'Microsoft JhengHei', sans-serif;
+
+  --color-white: var(--neutral-0);
+  --color-page: var(--neutral-50);
+  --color-surface: var(--neutral-0);
+  --color-accent: var(--reach-blue-50);
+  --color-accent-100: var(--reach-blue-100);
+  --color-accent-200: var(--reach-blue-200);
+  --color-focus: var(--reach-blue-300);
+  --color-emphasis: var(--reach-blue-400);
+  --color-brand: var(--reach-blue-500);
+  --color-link: var(--reach-blue-600);
+  --color-brand-deep: var(--reach-blue-700);
+  --color-ink: var(--neutral-900);
+  --color-ink-secondary: var(--neutral-600);
+  --color-ink-muted: var(--neutral-500);
+  --color-ink-soft: var(--neutral-400);
+  --color-line: var(--neutral-200);
+  --color-line-strong: var(--neutral-300);
+  --color-dark: var(--neutral-950);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--color-page);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 0.93rem + 0.3vw, 1.125rem); /* 手機 16px → 桌機 18px */
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-text);
+    font-weight: 700;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: var(--reach-blue-100);
+  }
+}

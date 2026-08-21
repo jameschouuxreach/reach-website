@@ -1,0 +1,14 @@
+---
+/** 左上角區塊標籤：中文＋英文（研究報告式索引）。輸出 h2 維持標題階層。 */
+interface Props {
+  zh: string;
+  en: string;
+}
+
+const { zh, en } = Astro.props;
+---
+
+<h2 class="flex items-baseline gap-3">
+  <span class="text-base font-bold text-ink">{zh}</span>
+  <span class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted" aria-hidden="true">{en}</span>
+</h2>

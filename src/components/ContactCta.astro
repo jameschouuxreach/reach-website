@@ -1,0 +1,72 @@
+---
+/**
+ * 最終聯絡 CTA（首頁與內頁共用）。
+ * 底色採品牌藍深階（Blue 700）：AI 主張是全站唯一大面積「深色（Neutral 950）」區塊，
+ * 故此區依規格 §7.2「品牌藍或深色底」選用品牌藍系。
+ */
+---
+
+<section class="cta-band">
+  <div class="container-site py-20 text-center md:py-28" data-reveal>
+    <h2 class="heading-section text-white">與我們聊聊你的需求，一起找到改變的起點</h2>
+    <div class="mt-9 flex justify-center">
+      <a href="/contact/" class="btn-on-blue">
+        聯絡我們
+        <span class="cta-arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-band {
+    background-color: var(--reach-blue-700);
+  }
+
+  .btn-on-blue {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    background-color: var(--neutral-0);
+    color: var(--reach-blue-700);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 200ms ease, transform 200ms ease;
+  }
+
+  .btn-on-blue:hover {
+    background-color: var(--reach-blue-50);
+  }
+
+  .btn-on-blue:active {
+    transform: translateY(1px);
+  }
+
+  .btn-on-blue:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 3px;
+  }
+
+  .btn-on-blue .cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  .btn-on-blue:hover .cta-arrow,
+  .btn-on-blue:focus-visible .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-on-blue,
+    .btn-on-blue .cta-arrow {
+      transition: none;
+    }
+    .btn-on-blue:hover .cta-arrow,
+    .btn-on-blue:focus-visible .cta-arrow {
+      transform: none;
+    }
+  }
+</style>

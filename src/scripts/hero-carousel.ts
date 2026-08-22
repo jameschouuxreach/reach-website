@@ -13,6 +13,8 @@ const DWELL_MS = 3200;
 const BRAND_DWELL_MS = 5200;
 /** 與 index.astro 的 --hc-dur 保持一致 */
 const SLIDE_MS = 680;
+/** 與 index.astro 的 --hc-fly-dur 保持一致（幕 3→4 合併飛行） */
+const FLY_MS = 950;
 
 export function initHeroCarousel(): void {
   const root = document.querySelector<HTMLElement>('[data-hc]');
@@ -104,28 +106,31 @@ export function initHeroCarousel(): void {
     const cloneZhi = makeClone('致', zhiFrom);
     const cloneYuan = makeClone('遠', yuanFrom);
 
-    // 原字立即隱形（改由 clone 呈現），其餘文字淡出
+    // 原字立即隱形（改由 clone 呈現）
     zhi!.classList.add('is-ghost');
     yuanSource.classList.add('is-ghost');
+
+    // 淡出、合併飛行、右欄切換「同時」啟動（強制 reflow 後套 transform）
+    void cloneZhi.offsetWidth;
     line1!.classList.add('is-faded');
     line2!.classList.add('is-faded');
-    await wait(300);
-
-    // 強制 reflow 後啟動位移
-    void cloneZhi.offsetWidth;
     cloneZhi.style.transform = `translate(${zhiTo.left - zhiFrom.left}px, ${zhiTo.top - zhiFrom.top}px)`;
     cloneYuan.style.transform = `translate(${yuanTo.left - yuanFrom.left}px, ${yuanTo.top - yuanFrom.top}px)`;
     slideTo(3);
-    await wait(620);
 
+    // 飛行進行到約 44% 時，「體驗設計」開始滑入（與合併同時進行）
+    await wait(420);
+    brandRest!.classList.add('is-current');
+
+    // 飛行落地：實體「致遠」浮現、移除飛行字
+    await wait(FLY_MS - 420);
     brand!.classList.add('is-shown');
-    await wait(140);
+    await wait(180);
     cloneZhi.remove();
     cloneYuan.remove();
 
-    // 「體驗設計」滑入
-    brandRest!.classList.add('is-current');
-    await wait(SLIDE_MS);
+    // 等「體驗設計」完全就位
+    await wait(120);
   }
 
   /** 第四幕結束：整體淡出、還原為第一幕、淡入 */

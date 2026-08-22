@@ -5,14 +5,14 @@
  */
 interface Props {
   name: string;
-  tag: string;
+  /** 客戶類別（v1.7b 版式上不顯示，保留資料欄位） */
+  tag?: string;
   types?: string[];
   mediaNote?: string;
 }
 
 const {
   name,
-  tag,
   types = ['案例整理中'],
   mediaNote = '需要素材：專案代表圖或研究現場照片',
 } = Astro.props;
@@ -22,8 +22,7 @@ const {
   <div class="media-placeholder aspect-[16/10] rounded-xl">
     {mediaNote}
   </div>
-  <p class="mt-5 text-sm text-ink-secondary">{tag}</p>
-  <h3 class="mt-1.5 text-xl font-bold md:text-2xl">{name}</h3>
+  <h3 class="mt-6 text-xl font-bold md:text-2xl">{name}</h3>
   <p class="mt-4 flex flex-wrap gap-2">
     {
       types.map((type) => (

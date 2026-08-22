@@ -27,7 +27,7 @@ import { CASES } from '../data/cases';
       <span class="self-center text-xs text-ink-muted">（篩選功能將於案例內容建立後啟用）</span>
     </div>
 
-    <div class="grid gap-5 sm:grid-cols-2" data-reveal>
+    <div class="grid gap-x-8 gap-y-14 sm:grid-cols-2" data-reveal>
       {CASES.map((item) => <CaseCard {...item} />)}
     </div>
   </section>

@@ -88,7 +88,7 @@ const positioning = [
 
           {/* 輪播動畫層：Reach 固定不動；詞組與中文句垂直滑動輪替（舊字上滑出、新字下方進） */}
           <div class="hc-anim hc-right-anim" aria-hidden="true">
-            <p class="hc-en"><span class="hc-reach">Reach</span></p>
+            <p class="hc-en"><span class="text-brand">Reach</span></p>
             <div class="hc-en hc-slide" data-hc-phrase>
               <span class="hc-slide-item is-current">deeper understanding</span>
               <span class="hc-slide-item">the bigger picture</span>
@@ -422,16 +422,6 @@ const positioning = [
   /* ---- 右欄（v1.1.2：三行結構 Reach／詞組／中文句，與左欄 H1 等高）---- */
   .hc-right-anim {
     gap: 0.25rem;
-  }
-
-  /* 前三幕 Reach 為黑色；第四幕收束為品牌名時轉品牌藍（呼應 Logo） */
-  .hc-reach {
-    color: var(--color-text);
-    transition: color 500ms ease;
-  }
-
-  :global([data-hc].is-brand) .hc-reach {
-    color: var(--color-brand);
   }
 
   .hc-right-anim > * {

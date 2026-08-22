@@ -95,10 +95,10 @@ const positioning = [
               <span class="hc-slide-item">lasting change</span>
               <span class="hc-slide-item">Experience</span>
             </div>
-            <div class="hc-zh hc-slide" data-hc-zh>
-              <span class="hc-slide-item is-current">讓決策源自理解</span>
-              <span class="hc-slide-item">讓全局清晰可見</span>
-              <span class="hc-slide-item">讓改變真實發生</span>
+            <div class="hc-en hc-slide hc-line3" data-hc-zh>
+              <span class="hc-slide-item hc-zh-item is-current">讓決策源自理解</span>
+              <span class="hc-slide-item hc-zh-item">讓全局清晰可見</span>
+              <span class="hc-slide-item hc-zh-item">讓改變真實發生</span>
               <span class="hc-slide-item">Design</span>
             </div>
           </div>
@@ -449,55 +449,39 @@ const positioning = [
     margin: 0;
   }
 
-  .hc-zh {
+  /* 第三行：與第二行的距離（v1.4 依業主目測回饋），隨主標字級縮放 */
+  .hc-line3 {
+    margin-block-start: calc(var(--hero-fs, 2.5rem) * 0.05);
+  }
+
+  /* 幕 1–3 的中文句：維持原字級與字重，於等高字槽內垂直置中 */
+  .hc-zh-item {
     font-size: 1.375rem;
-    line-height: 1.2;
+    line-height: calc(1.9375rem * 1.15);
     font-weight: 400;
     color: var(--color-text-secondary);
-    /* 拉開與第二行的距離（v1.4，依業主目測回饋），隨主標字級縮放 */
-    margin-block-start: calc(var(--hero-fs, 2.5rem) * 0.1);
   }
 
-  /* 由主標字級推導；英文係數採階梯式放大（欄寬在中間寬度收窄較快，
-     階梯確保最長詞組 deeper understanding 不被字槽裁切）。
-     高度預算：2×1.2×0.68＋1.35×0.43＝2.2125F ≤ 左欄 2.24F，等高恆成立 */
+  /* 由主標字級推導；v1.5 右欄三行等大（Reach／詞組／Design 同字級 0.63）。
+     高度預算：3×1.15×0.63F＋0.05F margin＋8px gaps ≤ 左欄 2.24F＋12px，全寬度等高恆成立；
+     0.63 同時保證最長詞組 deeper understanding 於各寬度不被字槽裁切（實測餘裕 ≥ 23px） */
   @media (min-width: 768px) {
     .hc-en {
-      font-size: calc(var(--hero-fs) * 0.64);
+      font-size: calc(var(--hero-fs) * 0.63);
     }
 
-    .hc-zh {
+    .hc-zh-item {
       font-size: calc(var(--hero-fs) * 0.42);
+      line-height: calc(var(--hero-fs) * 0.63 * 1.15);
     }
   }
 
-  @media (min-width: 1024px) {
-    .hc-en {
-      font-size: calc(var(--hero-fs) * 0.66);
-    }
-  }
-
-  @media (min-width: 1280px) {
-    .hc-en {
-      font-size: calc(var(--hero-fs) * 0.7);
-    }
-  }
-
-  @media (min-width: 1440px) {
-    .hc-en {
-      font-size: calc(var(--hero-fs) * 0.72);
-    }
-  }
 
   /* 垂直滑動字槽：舊字上滑出、新字自下方進（機制同 Animate UI「Rotating Text」，原生實作） */
   .hc-slide {
     position: relative;
     overflow: hidden;
     height: 1.15em;
-  }
-
-  .hc-zh.hc-slide {
-    height: 1.2em;
   }
 
   .hc-slide-item {

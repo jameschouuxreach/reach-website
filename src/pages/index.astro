@@ -312,8 +312,9 @@ const positioning = [
 
   @media (min-width: 768px) {
     .hero-grid {
-      --hero-lead: clamp(0rem, 3.5vw, 3.5rem);
-      grid-template-columns: 1.15fr 1fr;
+      /* 前導內距隨寬度遞增（768 起約 17px → 1440 約 71px），推左標靠中間 */
+      --hero-lead: clamp(0rem, 8vw - 2.75rem, 5rem);
+      grid-template-columns: 1fr 1fr;
       gap: 3rem;
     }
 
@@ -468,17 +469,26 @@ const positioning = [
     color: var(--color-text-secondary);
   }
 
-  /* 由主標字級推導；v1.5 右欄三行等大（Reach／詞組／Design 同字級 0.63）。
-     高度預算：3×1.15×0.63F＋0.05F margin＋8px gaps ≤ 左欄 2.24F＋12px，全寬度等高恆成立；
-     0.63 同時保證最長詞組 deeper understanding 於各寬度不被字槽裁切（實測餘裕 ≥ 23px） */
+  /* 由主標字級推導；v1.9 右欄字級盡量貼近左欄（md 0.68、lg+ 0.75）。
+     右塊自然高度略高於左欄兩行，由 grid align-items:center 互相垂直置中。 */
   @media (min-width: 768px) {
     .hc-en {
-      font-size: calc(var(--hero-fs) * 0.63);
+      font-size: calc(var(--hero-fs) * 0.68);
     }
 
     .hc-zh-item {
-      font-size: calc(var(--hero-fs) * 0.42);
-      line-height: calc(var(--hero-fs) * 0.63 * 1.15);
+      font-size: calc(var(--hero-fs) * 0.44);
+      line-height: calc(var(--hero-fs) * 0.68 * 1.15);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hc-en {
+      font-size: calc(var(--hero-fs) * 0.75);
+    }
+
+    .hc-zh-item {
+      line-height: calc(var(--hero-fs) * 0.75 * 1.15);
     }
   }
 

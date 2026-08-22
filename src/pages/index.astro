@@ -243,10 +243,10 @@ const positioning = [
   <section class="bg-surface">
     <div class="container-site py-16 md:py-24">
       <div class="flex flex-wrap items-baseline justify-between gap-4" data-reveal>
-        <h2 class="heading-sub">精選案例</h2>
+        <SectionLabel zh="我們的經驗" en="OUR EXPERIENCE" />
         <TextLink href="/cases/" label="所有案例" />
       </div>
-      <div class="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4" data-reveal>
+      <div class="mt-10 grid gap-5 sm:grid-cols-2" data-reveal>
         {CASES.map((item) => <CaseCard {...item} />)}
       </div>
     </div>

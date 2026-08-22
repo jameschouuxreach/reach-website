@@ -33,9 +33,9 @@ const positioning = [
   description="致遠體驗設計透過研究、全局梳理與多方協作，陪政府與企業從複雜走向清晰，找出可落地的改善方向。"
   isHome
 >
-  {/* ---- 2. Hero ---- */}
+  {/* ---- 2. Hero：滿版海報式（自帶內距，不用 1160px 版心；其他區塊維持版心）---- */}
   <section class="bg-page">
-    <div class="container-site py-20 md:py-24 lg:py-28">
+    <div class="hero-band">
       <h1 class="heading-hero" data-reveal>
         <span class="block">從複雜，<span class="text-brand">致</span>清晰</span>
         <span class="mt-3 block"
@@ -280,6 +280,23 @@ const positioning = [
 </BaseLayout>
 
 <style>
+  /* ---- 滿版 Hero：內距約 80px（5.5vw 封頂），桌機高度撐到視窗高扣掉 header ---- */
+  .hero-band {
+    padding-inline: clamp(1.25rem, 5.5vw, 5rem);
+    padding-block: 5rem 4rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero-band {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* header 桌機高 72px；svh 避免行動瀏覽器網址列造成跳動 */
+      min-height: calc(100svh - 4.5rem);
+      padding-block: 3rem;
+    }
+  }
+
   /* Hero 可互動詞：品牌藍文字；選中同步具備淡藍底色＋底線（不只靠顏色） */
   .hero-value-btn {
     font: inherit;

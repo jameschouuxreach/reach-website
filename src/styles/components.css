@@ -11,8 +11,9 @@
 
   /* ---- 字級（規格 §7.3）---- */
   .heading-hero {
-    /* 手機 44px → 桌機 80px，行高 1.05–1.15 */
-    font-size: clamp(2.75rem, 1.55rem + 4.9vw, 5rem);
+    /* 手機 44px → 桌機 88px（規格上限），行高 1.05–1.15；
+       係數對齊滿版 Hero 的內距，確保第二行 12 個全形字在 1024px 以上不折行 */
+    font-size: clamp(2.75rem, 7vw - 4px, 5.5rem);
     line-height: 1.12;
     font-weight: 700;
     letter-spacing: -0.01em;

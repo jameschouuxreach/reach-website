@@ -15,8 +15,9 @@ const FIRST_DWELL_MS = 1500;
 const BRAND_DWELL_MS = 5200;
 /** 與 index.astro 的 --hc-dur 保持一致 */
 const SLIDE_MS = 850;
-/** 與 index.astro 的 --hc-fly-dur 保持一致（幕 3→4 合併飛行） */
-const FLY_MS = 1500;
+/** 與 index.astro 的 --hc-fly-dur 保持一致（幕 3→4 合併飛行）。
+ *  與 SLIDE_MS 同值：致遠合併與右欄切至 Experience／Design 同始同終。 */
+const FLY_MS = 850;
 /** 合併完成後，整行「致遠」水平滑回置中的時長（與 CSS .hc-brand transition 同步） */
 const GLIDE_MS = 700;
 /** 最終停留位置：0.5＝左欄正中，越大越靠頁面中間 */

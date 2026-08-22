@@ -302,7 +302,7 @@ const positioning = [
     /* 字槽滑動：時長與緩動（開頭漸快、結尾漸慢 easeInOutQuint）在此統一調整；
        SLIDE_MS in hero-carousel.ts 需與 --hc-dur 同步 */
     --hc-dur: 850ms;
-    --hc-fly-dur: 1500ms; /* 幕3→4 致遠合併飛行 */
+    --hc-fly-dur: 850ms; /* 幕3→4 致遠合併飛行：與 --hc-dur 同步（與右欄切換同始同終） */
     --hc-fly-ease: cubic-bezier(0.65, 0, 0.35, 1); /* 飛行用 easeInOutCubic：中段較緩 */
     --hc-ease: cubic-bezier(0.83, 0, 0.17, 1);
     display: grid;
@@ -423,7 +423,7 @@ const positioning = [
     position: absolute;
     margin: 0;
     color: var(--color-brand);
-    transition: transform var(--hc-fly-dur, 1500ms) var(--hc-fly-ease, cubic-bezier(0.65, 0, 0.35, 1));
+    transition: transform var(--hc-fly-dur, 850ms) var(--hc-fly-ease, cubic-bezier(0.65, 0, 0.35, 1));
     will-change: transform;
     pointer-events: none;
   }

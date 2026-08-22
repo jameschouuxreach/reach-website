@@ -135,6 +135,7 @@ export function initHeroCarousel(): void {
     cloneZhi.style.transform = `translate(${zhiTo.left - zhiFrom.left}px, ${zhiTo.top - zhiFrom.top}px)`;
     cloneYuan.style.transform = `translate(${yuanTo.left - yuanFrom.left}px, ${yuanTo.top - yuanFrom.top}px)`;
     slideTo(3);
+    root!.classList.add('is-brand'); // Reach 轉品牌藍
 
     // 飛行進行到約 44% 時，「體驗設計」開始滑入（與合併同時進行）
     await wait(REST_DELAY_MS);
@@ -165,6 +166,7 @@ export function initHeroCarousel(): void {
     leftItems[2]!.classList.remove('is-ghost');
     line1!.classList.remove('is-faded');
     line2!.classList.remove('is-faded');
+    root!.classList.remove('is-brand');
     snapTo(0);
 
     await wait(80);

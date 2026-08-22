@@ -19,6 +19,8 @@ const SLIDE_MS = 850;
 const FLY_MS = 1500;
 /** 合併完成後，整行「致遠」水平滑回置中的時長（與 CSS .hc-brand transition 同步） */
 const GLIDE_MS = 700;
+/** 最終停留位置：0.5＝左欄正中，越大越靠頁面中間 */
+const BRAND_CENTER_BIAS = 0.65;
 
 export function initHeroCarousel(): void {
   const root = document.querySelector<HTMLElement>('[data-hc]');
@@ -102,10 +104,13 @@ export function initHeroCarousel(): void {
     const zhiFrom = glyphRect(zhi!);
     const yuanFrom = glyphRect(yuanSource);
 
-    // 將品牌行水平對齊「致」的原始 x：合併位移只剩垂直分量
+    // 將品牌行水平對齊「致」的原始 x：合併位移只剩垂直分量。
+    // 需先暫停 transition 再歸零，否則上一輪殘留的 translateX 會在此刻播出一段殘影。
+    brand!.style.transition = 'none';
     brand!.style.transform = 'none';
     brand!.style.insetInlineStart = `${zhiFrom.left - stageRect.left}px`;
     void brand!.offsetWidth;
+    brand!.style.transition = '';
 
     const zhiTo = glyphRect(brandZhi!);
     const yuanTo = glyphRect(brandYuan!);
@@ -152,7 +157,8 @@ export function initHeroCarousel(): void {
     // 整行滑回置中，途中「體驗設計」滑入
     const h1Rect = stage!.getBoundingClientRect();
     const brandRect = brand!.getBoundingClientRect();
-    const deltaX = (h1Rect.width - brandRect.width) / 2 - (brandRect.left - h1Rect.left);
+    const deltaX =
+      (h1Rect.width - brandRect.width) * BRAND_CENTER_BIAS - (brandRect.left - h1Rect.left);
     brand!.style.transform = `translateX(${deltaX}px)`;
     await wait(260);
     brandRest!.classList.add('is-current');
@@ -165,6 +171,11 @@ export function initHeroCarousel(): void {
     await wait(460);
 
     brand!.classList.remove('is-shown');
+    brand!.style.transition = 'none';
+    brand!.style.transform = 'none';
+    brand!.style.insetInlineStart = '0px';
+    void brand!.offsetWidth;
+    brand!.style.transition = '';
     brandRest!.classList.add('no-anim');
     brandRest!.classList.remove('is-current');
     void brandRest!.offsetWidth;

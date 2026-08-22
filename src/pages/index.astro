@@ -379,10 +379,12 @@ const positioning = [
 
   /* 第四幕品牌行：疊在第一行位置，等致遠合併後顯示 */
   .hc-brand {
+    /* 最終幕品牌名：於左欄區塊內水平＋垂直置中 */
     position: absolute;
-    top: 0;
-    /* absolute 以 padding box 定位，需補上與 h1 相同的前導內距 */
-    inset-inline-start: var(--hero-lead, 0rem);
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     white-space: nowrap;
     pointer-events: none;
   }

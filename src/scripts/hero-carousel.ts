@@ -88,14 +88,21 @@ export function initHeroCarousel(): void {
     }
   }
 
+  /** 量字形實際渲染範圍（Range）：不受元素是 inline 或 flex item 影響 */
+  function glyphRect(el: HTMLElement): DOMRect {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    return range.getBoundingClientRect();
+  }
+
   /** 幕 3→4：致、遠合併，「體驗設計」自下方滑入 */
   async function morphToBrand(): Promise<void> {
     const yuanSource = leftItems[2]!;
     const stageRect = stage!.getBoundingClientRect();
-    const zhiFrom = zhi!.getBoundingClientRect();
-    const yuanFrom = yuanSource.getBoundingClientRect();
-    const zhiTo = brandZhi!.getBoundingClientRect();
-    const yuanTo = brandYuan!.getBoundingClientRect();
+    const zhiFrom = glyphRect(zhi!);
+    const yuanFrom = glyphRect(yuanSource);
+    const zhiTo = glyphRect(brandZhi!);
+    const yuanTo = glyphRect(brandYuan!);
 
     const makeClone = (text: string, from: DOMRect): HTMLElement => {
       const el = document.createElement('span');

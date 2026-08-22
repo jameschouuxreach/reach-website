@@ -24,7 +24,7 @@ const isActive = (path: string) =>
     class="container-site flex h-16 items-center justify-between gap-4 md:grid md:h-[72px] md:grid-cols-[1fr_auto_1fr]"
   >
     {/* 左：公司名稱（致遠＝品牌色） */}
-    <a href="/" class="flex min-h-11 items-center text-base font-bold tracking-wide text-ink">
+    <a href="/" class="flex min-h-11 items-center text-xl font-bold tracking-wide text-ink">
       <span><span class="text-brand">致遠</span>體驗設計</span>
     </a>
 
@@ -50,7 +50,10 @@ const isActive = (path: string) =>
 
     {/* 右：聯絡我們 CTA */}
     <div class="hidden justify-end md:flex">
-      <a href="/contact/" class="btn-primary px-5 py-2 text-[15px]">聯絡我們</a>
+      <a href="/contact/" class="btn-primary nav-cta rounded-full px-6 py-2 text-[15px]">
+        聯絡我們
+        <span class="cta-arrow" aria-hidden="true">→</span>
+      </a>
     </div>
 
     <button
@@ -100,12 +103,34 @@ const isActive = (path: string) =>
           </a>
         ))
       }
-      <a href="/contact/" class="btn-primary mt-3 w-full">聯絡我們</a>
+      <a href="/contact/" class="btn-primary nav-cta mt-3 w-full rounded-full">
+        聯絡我們
+        <span class="cta-arrow" aria-hidden="true">→</span>
+      </a>
     </nav>
   </div>
 </header>
 
 <style>
+  .nav-cta .cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  .nav-cta:hover .cta-arrow,
+  .nav-cta:focus-visible .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-cta .cta-arrow {
+      transition: none;
+    }
+    .nav-cta:hover .cta-arrow,
+    .nav-cta:focus-visible .cta-arrow {
+      transform: none;
+    }
+  }
+
   /* 當前頁：底線＋字重，不只用顏色 */
   .nav-link[aria-current='page']::after {
     content: '';

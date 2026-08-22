@@ -28,20 +28,54 @@ export function initHeroCarousel(): void {
   const brandYuan = root.querySelector<HTMLElement>('[data-hc-brand-yuan]');
   const brandRest = root.querySelector<HTMLElement>('[data-hc-brand-rest]');
   const brandCaret = root.querySelector<HTMLElement>('[data-hc-brand-caret]');
-  const pairs = Array.from(root.querySelectorAll<HTMLElement>('[data-hc-pair]'));
+  const phraseItems = Array.from(
+    root.querySelectorAll<HTMLElement>('[data-hc-phrase] .hc-slide-item'),
+  );
+  const zhItems = Array.from(root.querySelectorAll<HTMLElement>('[data-hc-zh] .hc-slide-item'));
 
   if (
     !stage || !line1 || !line2 || !zhi || !slot || !caret ||
     !brand || !brandZhi || !brandYuan || !brandRest || !brandCaret ||
-    pairs.length !== 4
+    phraseItems.length !== 4 || zhItems.length !== 4
   ) {
     return;
   }
 
   const wait = (ms: number) => new Promise<void>((res) => window.setTimeout(res, ms));
 
-  function setPair(index: number): void {
-    pairs.forEach((pair, i) => pair.classList.toggle('is-current', i === index));
+  /** 右欄字槽切換：舊字上滑出、新字自下方滑入（Reach 固定不動） */
+  function slideTo(index: number): void {
+    for (const items of [phraseItems, zhItems]) {
+      items.forEach((el, i) => {
+        if (i === index) {
+          el.classList.remove('is-leaving', 'no-anim');
+          el.classList.add('is-current');
+        } else if (el.classList.contains('is-current')) {
+          el.classList.remove('is-current');
+          el.classList.add('is-leaving');
+          window.setTimeout(() => {
+            // 離場後無動畫地歸位到下方待命
+            el.classList.add('no-anim');
+            el.classList.remove('is-leaving');
+            void el.offsetWidth;
+            el.classList.remove('no-anim');
+          }, 460);
+        }
+      });
+    }
+  }
+
+  /** 直接定位到某一幕（重置用，不播動畫） */
+  function snapTo(index: number): void {
+    for (const items of [phraseItems, zhItems]) {
+      items.forEach((el, i) => {
+        el.classList.add('no-anim');
+        el.classList.toggle('is-current', i === index);
+        el.classList.remove('is-leaving');
+        void el.offsetWidth;
+        el.classList.remove('no-anim');
+      });
+    }
   }
 
   /** 幕 1–3 的打字刪改：刪掉現有字 → 停頓 → 打上新字 */
@@ -88,7 +122,7 @@ export function initHeroCarousel(): void {
     void cloneZhi.offsetWidth;
     cloneZhi.style.transform = `translate(${zhiTo.left - zhiFrom.left}px, ${zhiTo.top - zhiFrom.top}px)`;
     cloneYuan.style.transform = `translate(${yuanTo.left - yuanFrom.left}px, ${yuanTo.top - yuanFrom.top}px)`;
-    setPair(3);
+    slideTo(3);
     await wait(620);
 
     brand!.classList.add('is-shown');
@@ -118,7 +152,7 @@ export function initHeroCarousel(): void {
     caret!.classList.remove('is-hidden');
     line1!.classList.remove('is-faded');
     line2!.classList.remove('is-faded');
-    setPair(0);
+    snapTo(0);
 
     await wait(80);
     root!.classList.remove('is-resetting');
@@ -128,10 +162,10 @@ export function initHeroCarousel(): void {
   async function run(): Promise<void> {
     for (;;) {
       await wait(DWELL_MS); // 第一幕
-      setPair(1);
+      slideTo(1);
       await swapChar('廣');
       await wait(DWELL_MS); // 第二幕
-      setPair(2);
+      slideTo(2);
       await swapChar('遠');
       await wait(DWELL_MS); // 第三幕
       await morphToBrand();

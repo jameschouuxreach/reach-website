@@ -21,25 +21,8 @@ html.js [data-reveal].is-visible {
   transform: none;
 }
 
-/* ---- Hero 說明切換（180–240ms、opacity＋translateY 4px）---- */
-.hero-value-panel {
-  transition: opacity 220ms ease, transform 220ms ease;
-}
-
-.hero-value-panel.is-swapping {
-  opacity: 0;
-  transform: translateY(4px);
-}
-
 @media (prefers-reduced-motion: reduce) {
   html.js [data-reveal] {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
-  .hero-value-panel,
-  .hero-value-panel.is-swapping {
     opacity: 1;
     transform: none;
     transition: none;

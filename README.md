@@ -23,7 +23,7 @@ npm run preview    # 預覽 build 結果
 
 - `src/config.ts`：**網域集中設定（TODO）**。正式網域確認後改 `SITE_URL` 並把 `SITE_URL_CONFIRMED` 設為 `true`，canonical／og:url／sitemap／robots 會同時生效。
 - `src/styles/`：`tokens.css`（品牌 Token）→ `global.css`（Tailwind 入口）→ `components.css`（按鈕／卡片／字級）→ `motion.css`（進場與切換動畫、reduced-motion 降級）
-- `src/scripts/`：`hero-values.ts`（更深／更廣／更遠互動）、`reach-scroll.ts`（Reach sticky scroll，IntersectionObserver sentinel 實作）、`reveal.ts`（區塊進場）
+- `src/scripts/`：`hero-carousel.ts`（Hero 四幕輪播：打字機刪改＋致遠 FLIP 合併＋無限循環）、`reveal.ts`（區塊進場）
 - `src/data/`：`cases.ts`（四個案例，順序鎖定）、`partners.ts`（14 個合作 Logo 清單）
 - `src/assets/partners/`：合作 Logo（自 `合作客戶logo.pdf` 裁切），build 時由 astro:assets 產出 WebP＋PNG fallback，前端以灰階呈現、hover 恢復原色
 
@@ -39,6 +39,15 @@ npm run preview    # 預覽 build 結果
 
 1. 客群分流卡底色：§5.4 明定「兩張卡片預設樣式完全相同（皆白底），不以底色區分」；§7.2 表格寫「一張白底、一張極淡藍底」。採 §5.4（條文較細且附理由）。
 2. 最終聯絡 CTA 底色：§7.2 允許「品牌藍或深色底」，但 §5.2 明定 AI 主張是「全站唯一大面積深色區塊」，故最終 CTA 採品牌藍系（Blue 700 `#063AA8`），未用深色中性底。
+
+## v1.1 調整（2026-08-22，經業主口頭指示覆蓋規格書對應條文）
+
+1. Hero 改滿版海報式（自帶約 80px 內距，其餘區塊維持 1160px 版心）。
+2. Hero 改四幕自動輪播，取代原 hover 互動：幕 1–3 左欄打字機刪改「深→廣→遠」（閃爍游標），右欄同步顯示 Reach 句＋對應中文句（無卡片）；幕 3→4「致」「遠」FLIP 合併成「致遠」後打字補上「體驗設計」，右欄收束 Reach better experiences；第四幕停留後淡出，回第一幕無限循環。
+3. Reach 品牌動態自第 7 區併入 Hero；第 7 區「信任與合作」保留合作 Logo 牆。
+4. 主標字級 ×0.8（桌機 88 → 70px，手機守規格下限 40px）、字重 700 → 500；右欄中文句字重 400。
+5. 英文文案維持規格鎖定版（Reach lasting change／Reach better experiences）。
+6. 覆蓋的規格條文：首頁九區塊順序（Reach 位置）、Hero 互動要求（hover／keyboard 切換）、§8「禁止持續無限動畫」（輪播無限循環）。降級不變：`prefers-reduced-motion` 與無 JS 時顯示完整靜態版（全三詞主標＋四句 Reach），螢幕閱讀器一律讀固定完整文案（動畫層 aria-hidden）。
 
 ## 待補素材（正式上線前）
 

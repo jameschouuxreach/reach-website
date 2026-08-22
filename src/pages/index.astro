@@ -107,6 +107,20 @@ const positioning = [
     </div>
   </section>
 
+  {/* ---- 2.5 AI 主張（v1.6：移至 Hero 下方，品牌藍底取代深色底）---- */}
+  <section class="bg-brand">
+    <div class="container-site py-20 text-center md:py-28" data-reveal>
+      <h2 class="heading-section mx-auto max-w-4xl text-white">
+        AI 讓產出<span class="ai-em">更快速</span>，我們讓成果<span class="ai-em">更精準</span>
+      </h2>
+      <p class="mx-auto mt-6 max-w-2xl leading-loose text-white/90">
+        AI 能快速產出，但產出的價值仍取決於對問題的理解深度。<br
+          class="hidden md:inline"
+        />我們結合 AI 的效率、使用者研究與全局判斷，讓成果真正回應需求。
+      </p>
+    </div>
+  </section>
+
   {/* ---- 3. Why We Do／我們的使命 ---- */}
   <section class="border-t border-line">
     <div class="container-site pt-16 md:pt-24">
@@ -127,21 +141,6 @@ const positioning = [
       </div>
     </div>
 
-    {/* AI 主張：全站唯一大面積深色區塊 */}
-    <div class="bg-dark">
-      <div class="container-site py-20 text-center md:py-28" data-reveal>
-        <h3 class="heading-section mx-auto max-w-4xl text-white">
-          AI 讓產出<span class="text-emphasis">更快速</span>，我們讓成果<span class="text-emphasis"
-            >更精準</span
-          >
-        </h3>
-        <p class="mx-auto mt-6 max-w-2xl leading-loose text-white/85">
-          AI 能快速產出，但產出的價值仍取決於對問題的理解深度。<br
-            class="hidden md:inline"
-          />我們結合 AI 的效率、使用者研究與全局判斷，讓成果真正回應需求。
-        </p>
-      </div>
-    </div>
   </section>
 
   {/* ---- 4. What We Do／我們的服務 ---- */}
@@ -270,6 +269,11 @@ const positioning = [
 </BaseLayout>
 
 <style>
+  /* AI 主張（品牌藍底）強調詞：Blue 200 於 #0B5CFF 上對比 3.45:1（大字 AA） */
+  .ai-em {
+    color: var(--reach-blue-200);
+  }
+
   /* ---- 滿版 Hero：內距約 80px（5.5vw 封頂），桌機高度撐到視窗高扣掉 header ---- */
   .hero-band {
     padding-inline: clamp(1.25rem, 5.5vw, 5rem);

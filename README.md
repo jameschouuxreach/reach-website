@@ -49,7 +49,8 @@ npm run preview    # 預覽 build 結果
 5. 英文文案維持規格鎖定版（Reach lasting change／Reach better experiences）。
 6. v1.2（同日）：左欄打字機效果統一改為垂直滑動字槽（含第四幕「體驗設計」滑入，游標移除）；滑動時長 680ms、easeInOutQuint（--hc-dur／--hc-ease 集中可調，需與 hero-carousel.ts 的 SLIDE_MS 同步）；右欄改三行結構（Reach 固定／詞組／中文句）與左欄 H1 精確等高（grid stretch＋字級由 --hero-fs 階梯係數推導）；右欄左緣加 1px 分隔線（高度＝文字區塊高度）。動畫機制參考 Animate UI「Rotating Text」primitive，以原生 CSS/TS 重寫。
 7. v1.3（同日）：左欄再減重（主標 70→66px）並加前導內距（md+ 約 27–54px，--hero-lead）；右欄字級係數反向補償維持英文 ~48px；幕 3→4 改為並行動畫——其他字淡出（650ms）、致遠合併飛行（950ms）、「體驗設計」滑入（飛行 44% 時啟動）與右欄切換同時進行，總長約 1.1 秒。
-8. 覆蓋的規格條文：首頁九區塊順序（Reach 位置）、Hero 互動要求（hover／keyboard 切換）、§8「禁止持續無限動畫」（輪播無限循環）。降級不變：`prefers-reduced-motion` 與無 JS 時顯示完整靜態版（全三詞主標＋四句 Reach），螢幕閱讀器一律讀固定完整文案（動畫層 aria-hidden）。
+8. v1.6（2026-08-22）：AI 主張區塊自「我們的使命」內移出，改置於 Hero 正下方為獨立區塊；底色由 Neutral 950 深色改為品牌藍 #0B5CFF（白字、強調詞 Blue 200，對比符合 AA）。全站不再有大面積深色區（覆蓋規格 §5.2「唯一深色區」與首頁區塊順序條款）。
+9. 覆蓋的規格條文：首頁九區塊順序（Reach 位置）、Hero 互動要求（hover／keyboard 切換）、§8「禁止持續無限動畫」（輪播無限循環）。降級不變：`prefers-reduced-motion` 與無 JS 時顯示完整靜態版（全三詞主標＋四句 Reach），螢幕閱讀器一律讀固定完整文案（動畫層 aria-hidden）。
 
 ## 待補素材（正式上線前）
 

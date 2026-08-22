@@ -20,12 +20,15 @@ const isActive = (path: string) =>
 ---
 
 <header class="sticky top-0 z-40 border-b border-line bg-white/95">
-  <div class="container-site flex h-16 items-center justify-between gap-4 md:h-[72px]">
-    <a href="/" class="flex min-h-11 items-center gap-3">
-      <img src="/images/reach-logo.png" alt="" width="40" height="40" class="h-10 w-10" />
-      <span class="text-base font-bold tracking-wide text-ink">{SITE_NAME}</span>
+  <div
+    class="container-site flex h-16 items-center justify-between gap-4 md:grid md:h-[72px] md:grid-cols-[1fr_auto_1fr]"
+  >
+    {/* 左：公司名稱（致遠＝品牌色） */}
+    <a href="/" class="flex min-h-11 items-center text-base font-bold tracking-wide text-ink">
+      <span><span class="text-brand">致遠</span>體驗設計</span>
     </a>
 
+    {/* 中：主要導覽（置中） */}
     <nav aria-label="主要導覽" class="hidden items-center gap-1 md:flex">
       {
         NAV_ITEMS.map((item) => (
@@ -43,8 +46,12 @@ const isActive = (path: string) =>
           </a>
         ))
       }
-      <a href="/contact/" class="btn-primary ml-3 px-5 py-2 text-[15px]">聯絡我們</a>
     </nav>
+
+    {/* 右：聯絡我們 CTA */}
+    <div class="hidden justify-end md:flex">
+      <a href="/contact/" class="btn-primary px-5 py-2 text-[15px]">聯絡我們</a>
+    </div>
 
     <button
       type="button"

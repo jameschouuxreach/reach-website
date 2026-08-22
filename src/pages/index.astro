@@ -295,8 +295,8 @@ const positioning = [
     --hero-lead: 0rem;
     /* 字槽滑動：時長與緩動（開頭漸快、結尾漸慢 easeInOutQuint）在此統一調整；
        SLIDE_MS in hero-carousel.ts 需與 --hc-dur 同步 */
-    --hc-dur: 680ms;
-    --hc-fly-dur: 950ms; /* 幕3→4 致遠合併飛行 */
+    --hc-dur: 850ms;
+    --hc-fly-dur: 1200ms; /* 幕3→4 致遠合併飛行 */
     --hc-ease: cubic-bezier(0.83, 0, 0.17, 1);
     display: grid;
     gap: 2.75rem;
@@ -355,7 +355,7 @@ const positioning = [
 
   /* ---- 左欄動畫層 ---- */
   .hc-line {
-    transition: opacity 650ms ease;
+    transition: opacity 850ms ease;
   }
 
   .hc-line.is-faded {

@@ -10,11 +10,15 @@
  */
 
 const DWELL_MS = 3200;
+/** 第一幕縮短停留：讓訪客一進站就看見第一次切換 */
+const FIRST_DWELL_MS = 1500;
 const BRAND_DWELL_MS = 5200;
 /** 與 index.astro 的 --hc-dur 保持一致 */
-const SLIDE_MS = 680;
+const SLIDE_MS = 850;
 /** 與 index.astro 的 --hc-fly-dur 保持一致（幕 3→4 合併飛行） */
-const FLY_MS = 950;
+const FLY_MS = 1200;
+/** 「體驗設計」於飛行進行約 44% 時開始滑入 */
+const REST_DELAY_MS = Math.round(FLY_MS * 0.44);
 
 export function initHeroCarousel(): void {
   const root = document.querySelector<HTMLElement>('[data-hc]');
@@ -126,11 +130,11 @@ export function initHeroCarousel(): void {
     slideTo(3);
 
     // 飛行進行到約 44% 時，「體驗設計」開始滑入（與合併同時進行）
-    await wait(420);
+    await wait(REST_DELAY_MS);
     brandRest!.classList.add('is-current');
 
     // 飛行落地：實體「致遠」浮現、移除飛行字
-    await wait(FLY_MS - 420);
+    await wait(FLY_MS - REST_DELAY_MS);
     brand!.classList.add('is-shown');
     await wait(180);
     cloneZhi.remove();
@@ -162,8 +166,10 @@ export function initHeroCarousel(): void {
   }
 
   async function run(): Promise<void> {
+    let firstCycle = true;
     for (;;) {
-      await wait(DWELL_MS); // 第一幕
+      await wait(firstCycle ? FIRST_DWELL_MS : DWELL_MS); // 第一幕
+      firstCycle = false;
       slideTo(1);
       await wait(DWELL_MS); // 第二幕
       slideTo(2);

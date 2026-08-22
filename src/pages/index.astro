@@ -296,7 +296,8 @@ const positioning = [
     /* 字槽滑動：時長與緩動（開頭漸快、結尾漸慢 easeInOutQuint）在此統一調整；
        SLIDE_MS in hero-carousel.ts 需與 --hc-dur 同步 */
     --hc-dur: 850ms;
-    --hc-fly-dur: 1200ms; /* 幕3→4 致遠合併飛行 */
+    --hc-fly-dur: 1500ms; /* 幕3→4 致遠合併飛行 */
+    --hc-fly-ease: cubic-bezier(0.65, 0, 0.35, 1); /* 飛行用 easeInOutCubic：中段較緩 */
     --hc-ease: cubic-bezier(0.83, 0, 0.17, 1);
     display: grid;
     gap: 2.75rem;
@@ -413,7 +414,7 @@ const positioning = [
     position: absolute;
     margin: 0;
     color: var(--color-brand);
-    transition: transform var(--hc-fly-dur, 950ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1));
+    transition: transform var(--hc-fly-dur, 1500ms) var(--hc-fly-ease, cubic-bezier(0.65, 0, 0.35, 1));
     will-change: transform;
     pointer-events: none;
   }
@@ -454,10 +455,8 @@ const positioning = [
     margin-block-start: calc(var(--hero-fs, 2.5rem) * 0.05);
   }
 
-  /* 幕 1–3 的中文句：維持原字級與字重，於等高字槽內垂直置中 */
+  /* 幕 1–3 的中文句：字級同英文（繼承 .hc-en 容器），字重維持 400 */
   .hc-zh-item {
-    font-size: 1.375rem;
-    line-height: calc(1.9375rem * 1.15);
     font-weight: 400;
     color: var(--color-text-secondary);
   }
@@ -468,11 +467,6 @@ const positioning = [
   @media (min-width: 768px) {
     .hc-en {
       font-size: calc(var(--hero-fs) * 0.63);
-    }
-
-    .hc-zh-item {
-      font-size: calc(var(--hero-fs) * 0.42);
-      line-height: calc(var(--hero-fs) * 0.63 * 1.15);
     }
   }
 

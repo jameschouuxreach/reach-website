@@ -16,7 +16,7 @@ const BRAND_DWELL_MS = 5200;
 /** 與 index.astro 的 --hc-dur 保持一致 */
 const SLIDE_MS = 850;
 /** 與 index.astro 的 --hc-fly-dur 保持一致（幕 3→4 合併飛行） */
-const FLY_MS = 1200;
+const FLY_MS = 1500;
 /** 「體驗設計」於飛行進行約 44% 時開始滑入 */
 const REST_DELAY_MS = Math.round(FLY_MS * 0.44);
 

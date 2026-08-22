@@ -96,10 +96,17 @@ export function initHeroCarousel(): void {
     const makeClone = (text: string, from: DOMRect): HTMLElement => {
       const el = document.createElement('span');
       el.className = 'hc-clone';
-      el.textContent = text;
+      const inner = document.createElement('span');
+      inner.textContent = text;
+      el.appendChild(inner);
       el.style.left = `${from.left - stageRect.left}px`;
       el.style.top = `${from.top - stageRect.top}px`;
       stage!.appendChild(el);
+      // 像素級校正：clone 是絕對定位盒，行高會讓字形在盒內位置與行內原字不同
+      // （實測偏 ~3px）。以內層字形實測位置校正外框，起飛與落地皆與實體字重合。
+      const innerRect = inner.getBoundingClientRect();
+      el.style.left = `${from.left - stageRect.left + (from.left - innerRect.left)}px`;
+      el.style.top = `${from.top - stageRect.top + (from.top - innerRect.top)}px`;
       return el;
     };
 

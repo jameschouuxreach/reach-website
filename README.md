@@ -47,7 +47,8 @@ npm run preview    # 預覽 build 結果
 3. Reach 品牌動態自第 7 區併入 Hero；第 7 區「信任與合作」保留合作 Logo 牆。
 4. 主標字級 ×0.8（桌機 88 → 70px，手機守規格下限 40px）、字重 700 → 500；右欄中文句字重 400。
 5. 英文文案維持規格鎖定版（Reach lasting change／Reach better experiences）。
-6. 覆蓋的規格條文：首頁九區塊順序（Reach 位置）、Hero 互動要求（hover／keyboard 切換）、§8「禁止持續無限動畫」（輪播無限循環）。降級不變：`prefers-reduced-motion` 與無 JS 時顯示完整靜態版（全三詞主標＋四句 Reach），螢幕閱讀器一律讀固定完整文案（動畫層 aria-hidden）。
+6. v1.2（同日）：左欄打字機效果統一改為垂直滑動字槽（含第四幕「體驗設計」滑入，游標移除）；滑動時長 680ms、easeInOutQuint（--hc-dur／--hc-ease 集中可調，需與 hero-carousel.ts 的 SLIDE_MS 同步）；右欄改三行結構（Reach 固定／詞組／中文句）與左欄 H1 精確等高（grid stretch＋字級由 --hero-fs 階梯係數推導）；右欄左緣加 1px 分隔線（高度＝文字區塊高度）。動畫機制參考 Animate UI「Rotating Text」primitive，以原生 CSS/TS 重寫。
+7. 覆蓋的規格條文：首頁九區塊順序（Reach 位置）、Hero 互動要求（hover／keyboard 切換）、§8「禁止持續無限動畫」（輪播無限循環）。降級不變：`prefers-reduced-motion` 與無 JS 時顯示完整靜態版（全三詞主標＋四句 Reach），螢幕閱讀器一律讀固定完整文案（動畫層 aria-hidden）。
 
 ## 待補素材（正式上線前）
 

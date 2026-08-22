@@ -279,6 +279,7 @@ const positioning = [
   .hero-band {
     padding-inline: clamp(1.25rem, 5.5vw, 5rem);
     padding-block: 5rem 4rem;
+    overflow-x: clip; /* 垂直合併期間品牌行的隱形佔位盒可能超出，夾住避免水平捲動 */
   }
 
   @media (min-width: 768px) {
@@ -386,14 +387,16 @@ const positioning = [
 
   /* 第四幕品牌行：疊在第一行位置，等致遠合併後顯示 */
   .hc-brand {
-    /* 最終幕品牌名：於左欄區塊內水平＋垂直置中 */
+    /* 最終幕品牌名：垂直置中；水平位置由 JS 對齊「致」原始 x（垂直合併），
+       合併完成後以 transform 整行滑回置中 */
     position: absolute;
-    inset: 0;
+    inset-block: 0;
+    inset-inline-start: 0;
     display: flex;
     align-items: center;
-    justify-content: center;
     white-space: nowrap;
     pointer-events: none;
+    transition: transform 700ms var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1));
   }
 
   .hc-brand .hc-brand-char {

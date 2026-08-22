@@ -17,8 +17,8 @@ const BRAND_DWELL_MS = 5200;
 const SLIDE_MS = 850;
 /** 與 index.astro 的 --hc-fly-dur 保持一致（幕 3→4 合併飛行） */
 const FLY_MS = 1500;
-/** 「體驗設計」於飛行進行約 44% 時開始滑入 */
-const REST_DELAY_MS = Math.round(FLY_MS * 0.44);
+/** 合併完成後，整行「致遠」水平滑回置中的時長（與 CSS .hc-brand transition 同步） */
+const GLIDE_MS = 700;
 
 export function initHeroCarousel(): void {
   const root = document.querySelector<HTMLElement>('[data-hc]');
@@ -95,12 +95,18 @@ export function initHeroCarousel(): void {
     return range.getBoundingClientRect();
   }
 
-  /** 幕 3→4：致、遠合併，「體驗設計」自下方滑入 */
+  /** 幕 3→4：致、遠「純垂直」合併（致↓遠↑），整行滑回置中後「體驗設計」滑入 */
   async function morphToBrand(): Promise<void> {
     const yuanSource = leftItems[2]!;
     const stageRect = stage!.getBoundingClientRect();
     const zhiFrom = glyphRect(zhi!);
     const yuanFrom = glyphRect(yuanSource);
+
+    // 將品牌行水平對齊「致」的原始 x：合併位移只剩垂直分量
+    brand!.style.transform = 'none';
+    brand!.style.insetInlineStart = `${zhiFrom.left - stageRect.left}px`;
+    void brand!.offsetWidth;
+
     const zhiTo = glyphRect(brandZhi!);
     const yuanTo = glyphRect(brandYuan!);
 
@@ -136,19 +142,21 @@ export function initHeroCarousel(): void {
     cloneYuan.style.transform = `translate(${yuanTo.left - yuanFrom.left}px, ${yuanTo.top - yuanFrom.top}px)`;
     slideTo(3);
 
-    // 飛行進行到約 44% 時，「體驗設計」開始滑入（與合併同時進行）
-    await wait(REST_DELAY_MS);
-    brandRest!.classList.add('is-current');
-
-    // 飛行落地：實體「致遠」浮現、移除飛行字
-    await wait(FLY_MS - REST_DELAY_MS);
+    // 垂直合併落地：實體「致遠」浮現、移除飛行字
+    await wait(FLY_MS);
     brand!.classList.add('is-shown');
     await wait(180);
     cloneZhi.remove();
     cloneYuan.remove();
 
-    // 等「體驗設計」完全就位
-    await wait(120);
+    // 整行滑回置中，途中「體驗設計」滑入
+    const h1Rect = stage!.getBoundingClientRect();
+    const brandRect = brand!.getBoundingClientRect();
+    const deltaX = (h1Rect.width - brandRect.width) / 2 - (brandRect.left - h1Rect.left);
+    brand!.style.transform = `translateX(${deltaX}px)`;
+    await wait(260);
+    brandRest!.classList.add('is-current');
+    await wait(Math.max(SLIDE_MS, GLIDE_MS - 260) + 80);
   }
 
   /** 第四幕結束：整體淡出、還原為第一幕、淡入 */

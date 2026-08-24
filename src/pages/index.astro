@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionLabel from '../components/SectionLabel.astro';
+import MissionScrollStory from '../components/MissionScrollStory.astro';
 import TextLink from '../components/TextLink.astro';
 import AudienceCard from '../components/AudienceCard.astro';
 import CaseCard from '../components/CaseCard.astro';
@@ -123,27 +124,8 @@ const positioning = [
     </div>
   </section>
 
-  {/* ---- 3. Why We Do／我們的使命 ---- */}
-  <section class="border-t border-line bg-page">
-    <div class="container-site pt-16 md:pt-24">
-      <SectionLabel zh="我們的使命" en="WHY WE DO" />
-
-      <div class="mt-10 grid gap-5 pb-16 sm:grid-cols-2 md:pb-24 lg:grid-cols-3">
-        {
-          positioning.map((item, i) => (
-            <div class="card p-7" data-reveal style={`--reveal-delay: ${i * 90}ms`}>
-              <p class="text-sm font-bold text-brand" aria-hidden="true">
-                {item.index}
-              </p>
-              <h3 class="mt-3 text-xl font-bold">{item.title}</h3>
-              <p class="mt-3 leading-relaxed text-ink-secondary">{item.body}</p>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-
-  </section>
+  {/* ---- 3. Why We Do／我們的使命（捲動敘事版，見 MissionScrollStory） ---- */}
+  <MissionScrollStory items={positioning} />
 
   {/* ---- 4. What We Do／我們的服務 ---- */}
   <section class="border-t border-line bg-page">

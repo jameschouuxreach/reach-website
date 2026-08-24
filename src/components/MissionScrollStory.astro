@@ -1,0 +1,383 @@
+---
+/**
+ * 我們的使命：滿版品牌藍捲動敘事（規格：致遠官網-v1-使命區捲動敘事-增量修改規格.md）。
+ * 左欄三段定位正常捲動；右欄 sticky SVG 隨捲動進度雙向變化（mission-scroll.ts 驅動）。
+ * 三階段：外圍虛線弧段順時針延長成實線 → 八條連線同步生成 → 中心圓、外圍圓各自由圓心填滿。
+ * 無 JS／reduced-motion：CSS 預設即為最終完整狀態；行動版與 reduced-motion 改為三段靜態圖。
+ */
+interface MissionItem {
+  index: string;
+  title: string;
+  body: string;
+}
+
+interface Props {
+  items: MissionItem[];
+}
+
+const { items } = Astro.props;
+if (items.length !== 3) {
+  throw new Error(`MissionScrollStory 需要恰好 3 個項目，收到 ${items.length} 個`);
+}
+
+// ---- SVG 固定幾何（建置時計算，不在 scroll frame 重算）----
+const CX = 400;
+const CY = 400;
+const CENTER_R = 64;
+const OUTER_R = 42;
+const ORBIT_R = 245;
+const SEGMENTS = 12; // 每個外圍圓 12 段 30° 弧段
+
+const round = (n: number) => Math.round(n * 100) / 100;
+
+const rings = Array.from({ length: 8 }, (_, i) => {
+  const angle = ((-90 + i * 45) * Math.PI) / 180;
+  const dx = Math.cos(angle);
+  const dy = Math.sin(angle);
+  return {
+    cx: round(CX + dx * ORBIT_R),
+    cy: round(CY + dy * ORBIT_R),
+    lineX1: round(CX + dx * CENTER_R),
+    lineY1: round(CY + dy * CENTER_R),
+    lineX2: round(CX + dx * (ORBIT_R - OUTER_R)),
+    lineY2: round(CY + dy * (ORBIT_R - OUTER_R)),
+  };
+});
+
+/** 每段 30° 弧段：起點固定、順時針（SVG y 軸向下，角度遞增即順時針） */
+function arcSegments(cx: number, cy: number): string[] {
+  return Array.from({ length: SEGMENTS }, (_, s) => {
+    const a0 = ((s * 30 - 90) * Math.PI) / 180;
+    const a1 = (((s + 1) * 30 - 90) * Math.PI) / 180;
+    const x0 = round(cx + OUTER_R * Math.cos(a0));
+    const y0 = round(cy + OUTER_R * Math.sin(a0));
+    const x1 = round(cx + OUTER_R * Math.cos(a1));
+    const y1 = round(cy + OUTER_R * Math.sin(a1));
+    return `M ${x0} ${y0} A ${OUTER_R} ${OUTER_R} 0 0 1 ${x1} ${y1}`;
+  });
+}
+
+// 行動版／reduced-motion 三段靜態終態
+const staticFigures = [
+  { links: false, fill: false }, // 第一段：虛線轉實線完成
+  { links: true, fill: false }, // 第二段：中空圓＋八條連線
+  { links: true, fill: true }, // 第三段：實心圓＋八條連線
+];
+---
+
+<section data-mission-story class="ms-section">
+  <div class="container-site ms-inner">
+    {/* 反白版區塊標籤（維持 h2 階層；不共用 SectionLabel 以免動到共用元件） */}
+    <h2 class="ms-label">
+      <span class="ms-label-zh">我們的使命</span>
+      <span class="ms-label-en" aria-hidden="true">WHY WE DO</span>
+    </h2>
+
+    <div class="ms-grid">
+      <div class="ms-left">
+        {
+          items.map((item, i) => (
+            <article data-mission-panel={i} class:list={['ms-panel', i === 0 && 'is-active']}>
+              <p class="ms-index" aria-hidden="true">
+                {item.index}
+              </p>
+              <h3 class="ms-title">{item.title}</h3>
+              <p class="ms-body">{item.body}</p>
+
+              {/* 行動版／reduced-motion：對應階段的靜態圖 */}
+              <div class="ms-fig-wrap" aria-hidden="true">
+                <svg viewBox="0 0 800 800" class="ms-fig" aria-hidden="true" focusable="false">
+                  <circle
+                    cx={CX}
+                    cy={CY}
+                    r={CENTER_R}
+                    class={staticFigures[i].fill ? 'msf-solid' : 'msf-outline'}
+                  />
+                  {staticFigures[i].links &&
+                    rings.map((r) => (
+                      <line x1={r.lineX1} y1={r.lineY1} x2={r.lineX2} y2={r.lineY2} class="msf-line" />
+                    ))}
+                  {rings.map((r) => (
+                    <circle
+                      cx={r.cx}
+                      cy={r.cy}
+                      r={OUTER_R}
+                      class={staticFigures[i].fill ? 'msf-solid' : 'msf-outline'}
+                    />
+                  ))}
+                </svg>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="ms-right">
+        <div class="ms-sticky">
+          {/* 主 SVG：裝飾性視覺；CSS 預設值＝最終完整狀態（無 JS／初載可讀） */}
+          <svg viewBox="0 0 800 800" data-mission-svg class="ms-svg" aria-hidden="true" focusable="false">
+            {/* 中心圓：白色實線中空 */}
+            <circle cx={CX} cy={CY} r={CENTER_R} class="ms-center" />
+
+            {/* 八條連線：中心圓外緣 → 外圍圓內緣 */}
+            {
+              rings.map((r) => (
+                <line
+                  x1={r.lineX1}
+                  y1={r.lineY1}
+                  x2={r.lineX2}
+                  y2={r.lineY2}
+                  pathLength="1"
+                  class="ms-link"
+                />
+              ))
+            }
+
+            {/* 外圍圓弧段：8 圈 × 12 段（第一階段主效果） */}
+            <g class="ms-arcs">
+              {
+                rings.map((r) =>
+                  arcSegments(r.cx, r.cy).map((d) => <path d={d} pathLength="1" class="ms-arc" />),
+                )
+              }
+            </g>
+
+            {/* 外圍完整實線圓：第一階段收尾淡入，消除弧段接縫 */}
+            <g class="ms-ringfulls">
+              {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-ringfull" />)}
+            </g>
+
+            {/* 填色圓：中心與八個外圍，各自由自身圓心 scale 填滿 */}
+            <circle cx={CX} cy={CY} r={CENTER_R} class="ms-fill ms-fill-center" />
+            {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-fill ms-fill-outer" />)}
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---- 區塊 ---- */
+  .ms-section {
+    background-color: var(--reach-blue-500);
+  }
+
+  .ms-inner {
+    padding-block: 4rem 3rem;
+  }
+
+  @media (min-width: 769px) {
+    .ms-inner {
+      padding-block: 6rem 4rem;
+    }
+  }
+
+  /* ---- 反白版區塊標籤 ---- */
+  .ms-label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .ms-label-zh {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--neutral-0);
+  }
+
+  .ms-label-en {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.9);
+  }
+
+  /* ---- 左欄文字 ---- */
+  .ms-index {
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgb(255 255 255 / 0.75); /* 規格範圍 65–75% 取上限（對比考量） */
+  }
+
+  .ms-title {
+    margin-top: 0.75rem;
+    font-size: clamp(2.25rem, 4vw, 4.5rem);
+    line-height: 1.15;
+    font-weight: 700;
+    color: var(--neutral-0);
+  }
+
+  .ms-body {
+    margin-top: 1.25rem;
+    font-size: clamp(1.125rem, 1rem + 0.35vw, 1.25rem);
+    line-height: 1.8;
+    color: rgb(255 255 255 / 0.88); /* 規格範圍 82–88% 取上限（對比考量） */
+    max-width: 30em;
+  }
+
+  /* 當前段落 opacity 1；其他 0.5（只做 opacity 過渡，不移動、不縮放） */
+  .ms-panel {
+    transition: opacity 220ms ease;
+  }
+
+  @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    :global(html.js) .ms-panel {
+      opacity: 0.5;
+    }
+
+    :global(html.js) .ms-panel.is-active {
+      opacity: 1;
+    }
+  }
+
+  /* ---- 桌機兩欄＋sticky ---- */
+  @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    .ms-grid {
+      display: grid;
+      grid-template-columns: 48fr 52fr;
+    }
+
+    .ms-panel {
+      min-height: 78vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .ms-right {
+      position: relative;
+    }
+
+    .ms-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ms-svg {
+      width: min(100%, 720px);
+      height: auto;
+      max-height: 88vh;
+    }
+
+    .ms-fig-wrap {
+      display: none;
+    }
+  }
+
+  /* ---- 行動版（≤768px）與 reduced-motion：取消兩欄與 sticky，改三段靜態圖 ---- */
+  @media (max-width: 768px), (prefers-reduced-motion: reduce) {
+    .ms-grid {
+      display: block;
+    }
+
+    .ms-right {
+      display: none;
+    }
+
+    .ms-panel {
+      padding-block: 2.5rem;
+      opacity: 1;
+    }
+
+    .ms-panel + .ms-panel {
+      border-top: 1px solid rgb(255 255 255 / 0.22);
+    }
+
+    .ms-fig-wrap {
+      margin-top: 2rem;
+    }
+
+    .ms-fig {
+      display: block;
+      width: min(300px, 72%);
+      height: auto;
+      margin-inline: auto;
+    }
+  }
+
+  /* ---- 主 SVG 元素狀態（CSS 變數預設＝最終完整狀態；JS 逐幀覆寫） ---- */
+  .ms-svg {
+    --ms-arc: 1;
+    --ms-ringfull: 1;
+    --ms-line: 1;
+    --ms-fill-center: 1;
+    --ms-fill-outer: 1;
+  }
+
+  .ms-center {
+    fill: none;
+    stroke: var(--neutral-0);
+    stroke-width: 4;
+  }
+
+  .ms-link {
+    stroke: var(--neutral-0);
+    stroke-width: 4;
+    stroke-linecap: butt;
+    stroke-dasharray: var(--ms-line) 1;
+  }
+
+  .ms-arc {
+    fill: none;
+    stroke: var(--neutral-0);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: var(--ms-arc) 1;
+    stroke-dashoffset: 0;
+  }
+
+  /* 收尾：完整實線圓淡入時，分段弧線同步淡出（同一變數驅動，保證同步） */
+  .ms-arcs {
+    opacity: calc(1 - var(--ms-ringfull));
+  }
+
+  .ms-ringfull {
+    fill: none;
+    stroke: var(--neutral-0);
+    stroke-width: 4;
+    opacity: var(--ms-ringfull);
+  }
+
+  .ms-fill {
+    fill: var(--neutral-0);
+    stroke: none;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .ms-fill-center {
+    transform: scale(var(--ms-fill-center));
+  }
+
+  .ms-fill-outer {
+    transform: scale(var(--ms-fill-outer));
+  }
+
+  /* ---- 行動版靜態圖樣式 ---- */
+  .msf-outline {
+    fill: none;
+    stroke: var(--neutral-0);
+    stroke-width: 4;
+  }
+
+  .msf-solid {
+    fill: var(--neutral-0);
+    stroke: none;
+  }
+
+  .msf-line {
+    stroke: var(--neutral-0);
+    stroke-width: 4;
+  }
+</style>
+
+<script>
+  import '../scripts/mission-scroll';
+</script>

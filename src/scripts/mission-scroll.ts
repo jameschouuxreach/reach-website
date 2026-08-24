@@ -32,6 +32,7 @@ export function initMissionScroll(): void {
   const svg = root.querySelector<SVGSVGElement>('[data-mission-svg]');
   const slot = root.querySelector<HTMLElement>('.msp-slot');
   const items = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-item]'));
+  const tabs = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-tab]'));
   if (!svg || !slot || items.length !== 3) return;
 
   // ---- SVG 狀態（三段各一個 0–1 進度值） ----
@@ -54,6 +55,10 @@ export function initMissionScroll(): void {
     items.forEach((el, i) => {
       el.classList.toggle('is-current', i === index);
       el.classList.toggle('is-above', i < index);
+    });
+    tabs.forEach((tab, i) => {
+      tab.classList.toggle('is-active', i === index);
+      tab.setAttribute('aria-selected', String(i === index));
     });
   }
 
@@ -88,6 +93,7 @@ export function initMissionScroll(): void {
 
   // ---- 鎖定與步進狀態機 ----
   let point: 1 | 2 | 3 = 1; // 目前停留的點
+  let experienceDone = false; // 首次完整走完並向下離開後，不再鎖定（自由捲動）
   let locked = false;
   let lockedAt = 0; // 鎖定時間戳（鎖定初期的漂移一律夾回）
   let arrived = false; // 第一段是否已自動播放
@@ -162,8 +168,9 @@ export function initMissionScroll(): void {
         tween((v) => (p3 = v), p3, 1, STAGE_MS);
         return 'consume';
       }
-      // 第三點再向下：放行離開
+      // 第三點再向下：放行離開；首次體驗完成，之後不再鎖定
       locked = false;
+      experienceDone = true;
       return 'release';
     }
     // 向上
@@ -183,6 +190,37 @@ export function initMissionScroll(): void {
     locked = false;
     return 'release';
   }
+
+  // ---- Tabs：自由切換三點（補間至該點完成狀態） ----
+  const STATE_TARGETS: Array<[number, number, number]> = [
+    [1, 0, 0],
+    [1, 1, 0],
+    [1, 1, 1],
+  ];
+
+  function goToPoint(target: 1 | 2 | 3): void {
+    point = target;
+    swapTo(target - 1);
+    const from: [number, number, number] = [p1, p2, p3];
+    const to = STATE_TARGETS[target - 1];
+    tween(
+      (v) => {
+        p1 = from[0] + (to[0] - from[0]) * v;
+        p2 = from[1] + (to[1] - from[1]) * v;
+        p3 = from[2] + (to[2] - from[2]) * v;
+      },
+      0,
+      1,
+      700,
+    );
+  }
+
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => {
+      arrived = true; // 手動切換視同已看過進場
+      if ((i + 1) as 1 | 2 | 3 !== point) goToPoint((i + 1) as 1 | 2 | 3);
+    });
+  });
 
   // ---- 滾輪（鎖定期間非 passive 以便 preventDefault） ----
   window.addEventListener(
@@ -254,6 +292,8 @@ export function initMissionScroll(): void {
       if (touchMode) return;
 
       if (!locked) {
+        // 首次完整體驗結束後不再鎖定：區塊如一般內容自由捲動（tabs 仍可切換）
+        if (experienceDone) return;
         // 向下跨過鎖定點 → 鎖定（暴力滑動也會被夾回對齊）；
         // ±2px 容差帶：放行離開時起點就在對齊點上，不得立即誤判回鎖
         if (goingDown && prevY < lockY - 2 && y >= lockY - 2) {

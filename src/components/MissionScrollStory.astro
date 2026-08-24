@@ -176,7 +176,9 @@ const staticFigures = [
   /* ---- 變體切換：預設後備版；桌機＋JS＋允許動態時改釘住版 ---- */
   .msp-desktop {
     display: none;
-    height: 100vh; /* v4 步進制：單屏區塊，鎖定後以手勢逐步推進 */
+    /* 路線 B：鎖定時區塊頂端對齊導覽列底部，高度＝視窗高 − 導覽列（桌機 72px，
+       與 SiteHeader md:h-[72px] 對應；實際鎖定位置由腳本量測 header 高度） */
+    height: calc(100vh - 72px);
   }
 
   @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {

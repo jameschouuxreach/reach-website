@@ -96,17 +96,20 @@ export function initMissionScroll(): void {
   let lastWheelTs = 0;
   let accum = 0; // 滾動累積量（正＝向下）
   let cooldownUntil = 0;
-  let sectionTop = 0;
+  let lockY = 0; // 鎖定捲動位置＝區塊頂 − 導覽列高（區塊頂對齊導覽列底部）
 
   function measure(): void {
     // 取整：瀏覽器捲動位置為整數，小數邊界會讓「跨越」判定在對齊點附近抖動誤觸
-    sectionTop = Math.round(root!.getBoundingClientRect().top + window.scrollY);
+    const sectionTop = Math.round(root!.getBoundingClientRect().top + window.scrollY);
+    const header = document.querySelector<HTMLElement>('header');
+    const headerH = header ? Math.round(header.offsetHeight) : 72;
+    lockY = sectionTop - headerH;
   }
   measure();
   window.addEventListener('resize', measure);
 
   const alignToSection = () =>
-    window.scrollTo({ top: sectionTop, behavior: 'instant' as ScrollBehavior });
+    window.scrollTo({ top: lockY, behavior: 'instant' as ScrollBehavior });
 
   function resetAll(): void {
     point = 1;
@@ -251,19 +254,19 @@ export function initMissionScroll(): void {
       if (touchMode) return;
 
       if (!locked) {
-        // 向下跨過區塊頂端 → 鎖定（暴力滑動也會被夾回對齊）；
+        // 向下跨過鎖定點 → 鎖定（暴力滑動也會被夾回對齊）；
         // ±2px 容差帶：放行離開時起點就在對齊點上，不得立即誤判回鎖
-        if (goingDown && prevY < sectionTop - 2 && y >= sectionTop - 2) {
+        if (goingDown && prevY < lockY - 2 && y >= lockY - 2) {
           engageLock();
           return;
         }
-        // 自下方向上跨過區塊頂端 → 以完成狀態鎖定（反向逐步倒退）
-        if (!goingDown && prevY > sectionTop + 2 && y <= sectionTop + 2) {
+        // 自下方向上跨過鎖定點 → 以完成狀態鎖定（反向逐步倒退）
+        if (!goingDown && prevY > lockY + 2 && y <= lockY + 2) {
           engageLockFromBelow();
           return;
         }
         // 回到區塊上方一段距離 → 重置以便重看
-        if (y < sectionTop - window.innerHeight * 0.9 && arrived) {
+        if (y < lockY - window.innerHeight * 0.9 && arrived) {
           resetAll();
         }
         return;
@@ -272,7 +275,7 @@ export function initMissionScroll(): void {
       // 鎖定中：頁面若仍被移動——
       // 滾輪已全數 preventDefault，殘餘位移多半是鎖定前事件的飛行中動畫 → 夾回；
       // 只有「長時間無滾輪事件＋大幅位移」（捲軸拖曳）才視為使用者接管、靜默解鎖
-      const drift = Math.abs(y - sectionTop);
+      const drift = Math.abs(y - lockY);
       if (drift <= 1) return;
       const now = performance.now();
       const wheelRecent = now - lastWheelTs < 1200;

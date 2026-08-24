@@ -1,12 +1,12 @@
 /**
- * 使命區捲動敘事（v2）：
- * - Motion `scroll()`（offset 含進場段），scroll-linked、雙向可逆。
- * - 三階段時間窗由「實測段落中心」動態推算：每段動畫在該段文字滑到畫面正中前完成並停住，
- *   文字置中期間右側維持該段最終示意圖。
- * - 階段一自「完全沒有外圍圓」開始：弧段 0 → 虛線 → 接近實線，收尾完整圓淡入去接縫。
- * - 中心圓自始即為實心（無中心填色動畫）；第三階段僅八個外圍圓同步填滿。
- * - 每幀僅更新主 SVG 上 4 個 CSS 變數與 active panel；幾何與時間窗不在 scroll frame 重算。
- * - prefers-reduced-motion 或行動版：不註冊 observer（CSS 呈現靜態終態）。
+ * 使命區釘住式捲動敘事（v3）：
+ * - Motion `scroll()` 以 260vh 跑道（[data-msp]）取得 0–1 進度；區塊釘住後才開始動畫。
+ * - 三階段固定進度窗；左側字幕輪替門檻＝右側該階段起點（同時開始），
+ *   階段窗結束後才到下一個門檻（等右邊動畫做完）。
+ * - 字幕輪替為 Hero 式垂直滑動（CSS transition 觸發式）：向下換幕舊字上滑出、新字自下方進；
+ *   反向捲動時自然反轉（已看過的字幕停在上方待命位）。
+ * - 右側 SVG 僅逐幀更新 4 個 CSS 變數；第一點文字與中心實心圓為初始靜態，無進場動畫。
+ * - prefers-reduced-motion／行動版／無 JS：顯示後備靜態版，不註冊 observer。
  */
 import { scroll } from 'motion';
 
@@ -15,91 +15,59 @@ function segmentProgress(progress: number, start: number, end: number): number {
   return Math.min(1, Math.max(0, (progress - start) / (end - start)));
 }
 
-const ENTRY_START = 0.03; // 區塊剛開始進場後不久，階段一即開演
-const HOLD_BEFORE = 0.05; // 每段文字到達正中前，動畫需提前完成的緩衝
-const HOLD_AFTER = 0.07; // 文字離開正中後，下一階段才開始
+// ---- 三階段進度窗（釘住區間 0–1）----
+const ARC_START = 0.06;
+const ARC_END = 0.3; // 階段一：外圍圓 無→虛線→實線（左側停留第一點）
+const STAGE2_AT = 0.4; // 門檻：字幕換第二點＋連線動畫同時開始
+const LINE_END = 0.62;
+const STAGE3_AT = 0.72; // 門檻：字幕換第三點＋外圍填滿同時開始
+const FILL_END = 0.92;
 const ARC_GROW_PORTION = 0.95; // 階段一內部：前 95% 弧段延長，後 5% 完整圓淡入
 
-interface StageWindows {
-  arc: [number, number];
-  line: [number, number];
-  fill: [number, number];
-  panelBounds: [number, number]; // active panel 切換界線（段落中心的中點）
-}
-
 export function initMissionScroll(): void {
-  const section = document.querySelector<HTMLElement>('[data-mission-story]');
-  if (!section) return;
+  const runway = document.querySelector<HTMLElement>('[data-msp]');
+  if (!runway) return;
 
-  // reduced-motion／行動版：CSS 已呈現靜態終態，不註冊 scroll observer
+  // reduced-motion／行動版：後備靜態版已由 CSS 呈現，不註冊 scroll observer
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!window.matchMedia('(min-width: 769px)').matches) return;
 
-  const svg = section.querySelector<SVGSVGElement>('[data-mission-svg]');
-  const panels = Array.from(section.querySelectorAll<HTMLElement>('[data-mission-panel]'));
-  if (!svg || panels.length !== 3) return;
+  const svg = runway.querySelector<SVGSVGElement>('[data-mission-svg]');
+  const items = Array.from(runway.querySelectorAll<HTMLElement>('[data-msp-item]'));
+  if (!svg || items.length !== 3) return;
 
-  let windows: StageWindows | null = null;
-  let lastProgress = 0;
-  let activePanel = -1;
+  let activeItem = 0;
 
-  /** 量測段落中心 → 推算三階段時間窗（初始化與 resize 時執行，不在 scroll frame） */
-  function measure(): void {
-    const viewportH = window.innerHeight;
-    const sectionTop = section!.getBoundingClientRect().top + window.scrollY;
-    const total = section!.offsetHeight;
-
-    // offset ['start end','end end'] 下，progress = (scrollY + vh − sectionTop) / total；
-    // 段落中心與畫面正中重合時 progress = (段落中心相對位置 + vh/2) / total
-    const centers = panels.map((panel) => {
-      const rect = panel.getBoundingClientRect();
-      const centerRel = rect.top + window.scrollY - sectionTop + rect.height / 2;
-      return (centerRel + viewportH / 2) / total;
-    }) as [number, number, number];
-
-    const clampEnd = (v: number) => Math.min(v, 0.98);
-    windows = {
-      arc: [ENTRY_START, Math.max(clampEnd(centers[0] - HOLD_BEFORE), ENTRY_START + 0.1)],
-      line: [centers[0] + HOLD_AFTER, clampEnd(centers[1] - HOLD_BEFORE)],
-      fill: [centers[1] + HOLD_AFTER, clampEnd(centers[2] - HOLD_BEFORE)],
-      panelBounds: [(centers[0] + centers[1]) / 2, (centers[1] + centers[2]) / 2],
-    };
+  /** 字幕輪替：目前項顯示；已看過的項停在上方待命（反向捲動時自然從上滑回） */
+  function swapTo(index: number): void {
+    activeItem = index;
+    items.forEach((el, i) => {
+      el.classList.toggle('is-current', i === index);
+      el.classList.toggle('is-above', i < index);
+    });
   }
 
   function update(progress: number): void {
-    lastProgress = progress;
-    if (!windows) return;
-
-    const arcPhase = segmentProgress(progress, windows.arc[0], windows.arc[1]);
+    const arcPhase = segmentProgress(progress, ARC_START, ARC_END);
     const arcGrow = Math.min(arcPhase / ARC_GROW_PORTION, 1);
     const ringfull = segmentProgress(arcPhase, ARC_GROW_PORTION, 1);
 
     const style = svg!.style;
     style.setProperty('--ms-arc', String(arcGrow));
     style.setProperty('--ms-ringfull', String(ringfull));
-    style.setProperty('--ms-line', String(segmentProgress(progress, windows.line[0], windows.line[1])));
-    style.setProperty('--ms-fill-outer', String(segmentProgress(progress, windows.fill[0], windows.fill[1])));
+    style.setProperty('--ms-line', String(segmentProgress(progress, STAGE2_AT, LINE_END)));
+    style.setProperty('--ms-fill-outer', String(segmentProgress(progress, STAGE3_AT, FILL_END)));
 
-    const index =
-      progress < windows.panelBounds[0] ? 0 : progress < windows.panelBounds[1] ? 1 : 2;
-    if (index !== activePanel) {
-      activePanel = index;
-      panels.forEach((panel, i) => panel.classList.toggle('is-active', i === index));
-    }
+    const index = progress < STAGE2_AT ? 0 : progress < STAGE3_AT ? 1 : 2;
+    if (index !== activeItem) swapTo(index);
   }
 
-  measure();
-  // 先以進度 0 覆寫 CSS 的最終態預設值，避免初載閃現完成狀態
+  // 先以進度 0 覆寫 CSS 的最終態預設值（初始：僅中心實心圓＋第一點文字）
   update(0);
 
   const cleanup = scroll((progress: number) => update(progress), {
-    target: section,
-    offset: ['start end', 'end end'],
-  });
-
-  window.addEventListener('resize', () => {
-    measure();
-    update(lastProgress);
+    target: runway,
+    offset: ['start start', 'end end'],
   });
 
   window.addEventListener('pagehide', () => cleanup(), { once: true });

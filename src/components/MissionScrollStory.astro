@@ -1,9 +1,11 @@
 ---
 /**
- * 我們的使命：滿版品牌藍捲動敘事（規格：致遠官網-v1-使命區捲動敘事-增量修改規格.md）。
- * 左欄三段定位正常捲動；右欄 sticky SVG 隨捲動進度雙向變化（mission-scroll.ts 驅動）。
- * 三階段：外圍虛線弧段順時針延長成實線 → 八條連線同步生成 → 中心圓、外圍圓各自由圓心填滿。
- * 無 JS／reduced-motion：CSS 預設即為最終完整狀態；行動版與 reduced-motion 改為三段靜態圖。
+ * 我們的使命：釘住式捲動敘事（v3）。
+ * - 桌機＋JS：260vh 跑道內一個 100vh sticky 畫面；區塊滑到定位後釘住，
+ *   繼續捲動驅動三階段。左側字幕以 Hero 式垂直滑動輪替（第一點初始即顯示，無進場動畫）；
+ *   每次輪替與右側該階段動畫同一進度門檻同時開始，階段窗結束後才輪到下一點。
+ * - 右側 SVG 初始只有中心實心白圓；三階段：外圍圓 無→虛線→實線 → 八條連線 → 外圍圓填滿。
+ * - 行動版／reduced-motion／無 JS：改為三段靜態排列（文字＋對應終態圖）。
  */
 interface MissionItem {
   index: string;
@@ -57,118 +59,193 @@ function arcSegments(cx: number, cy: number): string[] {
   });
 }
 
-// 行動版／reduced-motion 三段靜態終態
+// 後備版三段靜態終態
 const staticFigures = [
-  { links: false, fill: false }, // 第一段：虛線轉實線完成
-  { links: true, fill: false }, // 第二段：中空圓＋八條連線
-  { links: true, fill: true }, // 第三段：實心圓＋八條連線
+  { links: false, fill: false }, // 第一段：外圍實線圈
+  { links: true, fill: false }, // 第二段：連線完成
+  { links: true, fill: true }, // 第三段：全實心
 ];
 ---
 
 <section data-mission-story class="ms-section">
-  <div class="container-site ms-inner">
-    <div class="ms-grid">
-      <div class="ms-left">
-        {/* 反白版區塊標籤（維持 h2 階層；不共用 SectionLabel 以免動到共用元件） */}
+  {/* ---- 桌機＋JS：釘住式敘事 ---- */}
+  <div class="msp-desktop" data-msp>
+    <div class="msp-pin">
+      <div class="container-site msp-frame">
         <h2 class="ms-label">
           <span class="ms-label-zh">我們的使命</span>
           <span class="ms-label-en" aria-hidden="true">WHY WE DO</span>
         </h2>
-        {
-          items.map((item, i) => (
-            <article data-mission-panel={i} class:list={['ms-panel', i === 0 && 'is-active']}>
-              <p class="ms-index" aria-hidden="true">
-                {item.index}
-              </p>
-              <h3 class="ms-title">{item.title}</h3>
-              <p class="ms-body">{item.body}</p>
 
-              {/* 行動版／reduced-motion：對應階段的靜態圖 */}
-              <div class="ms-fig-wrap" aria-hidden="true">
-                <svg viewBox="0 0 800 800" class="ms-fig" aria-hidden="true" focusable="false">
-                  <circle cx={CX} cy={CY} r={CENTER_R} class="msf-solid" />
-                  {staticFigures[i].links &&
-                    rings.map((r) => (
-                      <line x1={r.lineX1} y1={r.lineY1} x2={r.lineX2} y2={r.lineY2} class="msf-line" />
-                    ))}
-                  {rings.map((r) => (
-                    <circle
-                      cx={r.cx}
-                      cy={r.cy}
-                      r={OUTER_R}
-                      class={staticFigures[i].fill ? 'msf-solid' : 'msf-outline'}
-                    />
-                  ))}
-                </svg>
-              </div>
-            </article>
-          ))
-        }
-      </div>
-
-      <div class="ms-right">
-        <div class="ms-sticky">
-          {/* 主 SVG：裝飾性視覺；CSS 預設值＝最終完整狀態（無 JS／初載可讀） */}
-          <svg viewBox="0 0 800 800" data-mission-svg class="ms-svg" aria-hidden="true" focusable="false">
-            {/* 中心圓：自始即為白色實心（v2 調整） */}
-            <circle cx={CX} cy={CY} r={CENTER_R} class="ms-center" />
-
-            {/* 八條連線：中心圓外緣 → 外圍圓內緣 */}
+        <div class="msp-grid">
+          {/* 左：字幕輪替槽（Hero 式垂直滑動；第一點初始即顯示） */}
+          <div class="msp-slot">
             {
-              rings.map((r) => (
-                <line
-                  x1={r.lineX1}
-                  y1={r.lineY1}
-                  x2={r.lineX2}
-                  y2={r.lineY2}
-                  pathLength="1"
-                  class="ms-link"
-                />
+              items.map((item, i) => (
+                <article class:list={['msp-item', i === 0 && 'is-current']} data-msp-item>
+                  <p class="ms-index" aria-hidden="true">
+                    {item.index}
+                  </p>
+                  <h3 class="ms-title">{item.title}</h3>
+                  <p class="ms-body">{item.body}</p>
+                </article>
               ))
             }
+          </div>
 
-            {/* 外圍圓弧段：8 圈 × 12 段（第一階段主效果） */}
-            <g class="ms-arcs">
+          {/* 右：SVG（初始只有中心實心圓） */}
+          <div class="msp-figure">
+            <svg viewBox="0 0 800 800" data-mission-svg class="ms-svg" aria-hidden="true" focusable="false">
+              <circle cx={CX} cy={CY} r={CENTER_R} class="ms-center" />
               {
-                rings.map((r) =>
-                  arcSegments(r.cx, r.cy).map((d) => <path d={d} pathLength="1" class="ms-arc" />),
-                )
+                rings.map((r) => (
+                  <line
+                    x1={r.lineX1}
+                    y1={r.lineY1}
+                    x2={r.lineX2}
+                    y2={r.lineY2}
+                    pathLength="1"
+                    class="ms-link"
+                  />
+                ))
               }
-            </g>
-
-            {/* 外圍完整實線圓：第一階段收尾淡入，消除弧段接縫 */}
-            <g class="ms-ringfulls">
-              {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-ringfull" />)}
-            </g>
-
-            {/* 外圍填色圓：各自由自身圓心 scale 填滿（第三階段） */}
-            {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-fill ms-fill-outer" />)}
-          </svg>
+              <g class="ms-arcs">
+                {
+                  rings.map((r) =>
+                    arcSegments(r.cx, r.cy).map((d) => <path d={d} pathLength="1" class="ms-arc" />),
+                  )
+                }
+              </g>
+              <g class="ms-ringfulls">
+                {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-ringfull" />)}
+              </g>
+              {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-fill ms-fill-outer" />)}
+            </svg>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  {/* ---- 後備版（行動版／reduced-motion／無 JS）：三段靜態排列 ---- */}
+  <div class="msp-fallback">
+    <div class="container-site msp-fb-inner">
+      <h2 class="ms-label">
+        <span class="ms-label-zh">我們的使命</span>
+        <span class="ms-label-en" aria-hidden="true">WHY WE DO</span>
+      </h2>
+      {
+        items.map((item, i) => (
+          <article class="ms-fb-panel">
+            <p class="ms-index" aria-hidden="true">
+              {item.index}
+            </p>
+            <h3 class="ms-title">{item.title}</h3>
+            <p class="ms-body">{item.body}</p>
+            <div class="ms-fig-wrap" aria-hidden="true">
+              <svg viewBox="0 0 800 800" class="ms-fig" aria-hidden="true" focusable="false">
+                <circle cx={CX} cy={CY} r={CENTER_R} class="msf-solid" />
+                {staticFigures[i].links &&
+                  rings.map((r) => (
+                    <line x1={r.lineX1} y1={r.lineY1} x2={r.lineX2} y2={r.lineY2} class="msf-line" />
+                  ))}
+                {rings.map((r) => (
+                  <circle
+                    cx={r.cx}
+                    cy={r.cy}
+                    r={OUTER_R}
+                    class={staticFigures[i].fill ? 'msf-solid' : 'msf-outline'}
+                  />
+                ))}
+              </svg>
+            </div>
+          </article>
+        ))
+      }
     </div>
   </div>
 </section>
 
 <style>
-  /* ---- 區塊 ---- */
   .ms-section {
     background-color: var(--reach-blue-500);
   }
 
-  .ms-inner {
-    padding-block: 0;
+  /* ---- 變體切換：預設後備版；桌機＋JS＋允許動態時改釘住版 ---- */
+  .msp-desktop {
+    display: none;
+    height: 260vh; /* 跑道：釘住後的可捲動距離＝160vh */
   }
 
-  .ms-left {
-    padding-block: 4rem 3rem;
-  }
-
-  @media (min-width: 769px) {
-    .ms-left {
-      /* 底部 12vh：讓第三段文字能在 sticky 解除前滑到畫面正中 */
-      padding-block: 6rem 12vh;
+  @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    :global(html.js) .msp-desktop {
+      display: block;
     }
+
+    :global(html.js) .msp-fallback {
+      display: none;
+    }
+  }
+
+  /* ---- 釘住式版面 ---- */
+  .msp-pin {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .msp-frame {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-block: 5rem 3rem;
+  }
+
+  .msp-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 48fr 52fr;
+    align-items: center;
+    min-height: 0;
+  }
+
+  /* 左：字幕輪替槽（同格堆疊＋遮罩；只做垂直位移＋淡入淡出） */
+  .msp-slot {
+    display: grid;
+    overflow: hidden;
+  }
+
+  .msp-item {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(110%);
+    transition:
+      transform 850ms cubic-bezier(0.83, 0, 0.17, 1),
+      opacity 600ms ease;
+  }
+
+  .msp-item.is-above {
+    transform: translateY(-110%);
+  }
+
+  .msp-item.is-current {
+    opacity: 1;
+    transform: none;
+  }
+
+  .msp-figure {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .ms-svg {
+    width: min(100%, 640px);
+    height: auto;
+    max-height: 74vh;
   }
 
   /* ---- 反白版區塊標籤 ---- */
@@ -192,12 +269,12 @@ const staticFigures = [
     color: rgb(255 255 255 / 0.9);
   }
 
-  /* ---- 左欄文字 ---- */
+  /* ---- 文字樣式（兩個變體共用） ---- */
   .ms-index {
     font-size: 0.875rem;
     font-weight: 600;
     letter-spacing: 0.08em;
-    color: rgb(255 255 255 / 0.75); /* 規格範圍 65–75% 取上限（對比考量） */
+    color: rgb(255 255 255 / 0.75);
   }
 
   .ms-title {
@@ -212,92 +289,8 @@ const staticFigures = [
     margin-top: 1.25rem;
     font-size: clamp(1.125rem, 1rem + 0.35vw, 1.25rem);
     line-height: 1.8;
-    color: rgb(255 255 255 / 0.88); /* 規格範圍 82–88% 取上限（對比考量） */
+    color: rgb(255 255 255 / 0.88);
     max-width: 30em;
-  }
-
-  /* 當前段落 opacity 1；其他 0.5（只做 opacity 過渡，不移動、不縮放） */
-  .ms-panel {
-    transition: opacity 220ms ease;
-  }
-
-  @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
-    :global(html.js) .ms-panel {
-      opacity: 0.5;
-    }
-
-    :global(html.js) .ms-panel.is-active {
-      opacity: 1;
-    }
-  }
-
-  /* ---- 桌機兩欄＋sticky ---- */
-  @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
-    .ms-grid {
-      display: grid;
-      grid-template-columns: 48fr 52fr;
-    }
-
-    .ms-panel {
-      min-height: 78vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .ms-right {
-      position: relative;
-    }
-
-    .ms-sticky {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .ms-svg {
-      width: min(100%, 720px);
-      height: auto;
-      max-height: 88vh;
-    }
-
-    .ms-fig-wrap {
-      display: none;
-    }
-  }
-
-  /* ---- 行動版（≤768px）與 reduced-motion：取消兩欄與 sticky，改三段靜態圖 ---- */
-  @media (max-width: 768px), (prefers-reduced-motion: reduce) {
-    .ms-grid {
-      display: block;
-    }
-
-    .ms-right {
-      display: none;
-    }
-
-    .ms-panel {
-      padding-block: 2.5rem;
-      opacity: 1;
-    }
-
-    .ms-panel + .ms-panel {
-      border-top: 1px solid rgb(255 255 255 / 0.22);
-    }
-
-    .ms-fig-wrap {
-      margin-top: 2rem;
-    }
-
-    .ms-fig {
-      display: block;
-      width: min(300px, 72%);
-      height: auto;
-      margin-inline: auto;
-    }
   }
 
   /* ---- 主 SVG 元素狀態（CSS 變數預設＝最終完整狀態；JS 逐幀覆寫） ---- */
@@ -352,7 +345,30 @@ const staticFigures = [
     transform: scale(var(--ms-fill-outer));
   }
 
-  /* ---- 行動版靜態圖樣式 ---- */
+  /* ---- 後備版 ---- */
+  .msp-fb-inner {
+    padding-block: 4rem 3rem;
+  }
+
+  .ms-fb-panel {
+    padding-block: 2.5rem;
+  }
+
+  .ms-fb-panel + .ms-fb-panel {
+    border-top: 1px solid rgb(255 255 255 / 0.22);
+  }
+
+  .ms-fig-wrap {
+    margin-top: 2rem;
+  }
+
+  .ms-fig {
+    display: block;
+    width: min(300px, 72%);
+    height: auto;
+    margin-inline: auto;
+  }
+
   .msf-outline {
     fill: none;
     stroke: var(--neutral-0);

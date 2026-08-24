@@ -52,9 +52,10 @@ const positioning = [
             <span class="hc-line block" data-hc-line1
               >從複雜，<span class="text-brand" data-hc-zhi>致</span>清晰</span
             >
+            {/* 深不預設 is-current：首次載入由腳本滑入（與換幕同一轉場） */}
             <span class="hc-line mt-3 block" data-hc-line2
               >陪你走得更<span class="hc-slot text-brand" data-hc-left
-                ><span class="hc-slide-item is-current">深</span><span class="hc-slide-item">廣</span
+                ><span class="hc-slide-item">深</span><span class="hc-slide-item">廣</span
                 ><span class="hc-slide-item">遠</span></span
               ></span
             >
@@ -86,17 +87,18 @@ const positioning = [
             <p class="hc-en-static"><span class="text-brand">Reach</span> better experiences</p>
           </div>
 
-          {/* 輪播動畫層：Reach 固定不動；詞組與中文句垂直滑動輪替（舊字上滑出、新字下方進） */}
+          {/* 輪播動畫層：Reach 與主標同步一開始就顯示、固定不動；詞組與中文句垂直滑動輪替
+              （舊字上滑出、新字下方進），首幕兩行不預設 is-current，由腳本進場滑入 */}
           <div class="hc-anim hc-right-anim" aria-hidden="true">
             <p class="hc-en"><span class="text-brand">Reach</span></p>
             <div class="hc-en hc-slide" data-hc-phrase>
-              <span class="hc-slide-item is-current">deeper understanding</span>
+              <span class="hc-slide-item">deeper understanding</span>
               <span class="hc-slide-item">the bigger picture</span>
               <span class="hc-slide-item">change that matters</span>
               <span class="hc-slide-item">Experience</span>
             </div>
             <div class="hc-en hc-slide hc-line3" data-hc-zh>
-              <span class="hc-slide-item hc-zh-item is-current">讓決策源自理解</span>
+              <span class="hc-slide-item hc-zh-item">讓決策源自理解</span>
               <span class="hc-slide-item hc-zh-item">讓全局清晰可見</span>
               <span class="hc-slide-item hc-zh-item">讓改變真實發生</span>
               <span class="hc-slide-item">Design</span>
@@ -216,7 +218,8 @@ const positioning = [
 
       {/* 政府／企業客群分流（v1.8：併入我們的服務區塊） */}
       <div class="mt-20 md:mt-28" data-reveal>
-        <h3 class="heading-sub max-w-xl">解法因情境而異，核心始終如一</h3>
+        <SectionLabel zh="我們與誰合作" en="WHO WE WORK WITH" />
+        <h3 class="heading-sub mt-10 max-w-xl">解法因情境而異，核心始終如一</h3>
         <p class="mt-5 max-w-xl leading-loose text-ink-secondary">
           面對不同的目標、限制與協作方式，我們找出合適的切入點，讓解法符合情境，也能真正落地。
         </p>

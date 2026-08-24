@@ -2,15 +2,19 @@
  * Hero 四幕輪播（v1.2）：
  * - 全部轉場統一為垂直滑動字槽（機制同 Animate UI「Rotating Text」primitive，原生重寫）：
  *   舊字上滑出、新字自下方滑入；時長與緩動由 CSS 變數 --hc-dur／--hc-ease 控制。
+ * - 進場（首次載入與每輪重置後皆播放）：主標與「Reach」直接顯示；左欄「深」與右欄詞組、
+ *   中文句自下方滑入（與換幕同一轉場），這些字槽在標記中不預設 is-current，由本腳本補上。
  * - 幕 1–3：左欄「深→廣→遠」與右欄詞組、中文句同步滑動；右欄「Reach」固定不動。
  * - 幕 3→4：「致」「遠」以 FLIP 位移合併成「致遠」，「體驗設計」自下方滑入。
- * - 第四幕停留後淡出重置，回第一幕無限循環。
+ * - 第四幕停留後淡出重置：字槽歸回待命（空槽），淡入後重播進場滑入，無限循環。
  * - prefers-reduced-motion 或無 JS：CSS 直接顯示靜態完整版，本腳本不啟動。
  * - 僅使用 opacity／transform；字槽固定尺寸，無 layout shift。
  */
 
 const DWELL_MS = 3200;
-/** 第一幕縮短停留：讓訪客一進站就看見第一次切換 */
+/** 每輪重置淡入後、進場滑入前的小拍（首次載入不留空拍，直接滑入） */
+const REENTER_DELAY_MS = 350;
+/** 第一幕縮短停留（自進場完成起算）：讓訪客一進站就看見第一次切換 */
 const FIRST_DWELL_MS = 1500;
 const BRAND_DWELL_MS = 5200;
 /** 與 index.astro 的 --hc-dur 保持一致 */
@@ -50,6 +54,9 @@ export function initHeroCarousel(): void {
   }
 
   const wait = (ms: number) => new Promise<void>((res) => window.setTimeout(res, ms));
+  /** 等兩個影格：確保待命狀態先渲染過，之後補上的 is-current 才會觸發 transition */
+  const nextFrame = () =>
+    new Promise<void>((res) => requestAnimationFrame(() => requestAnimationFrame(() => res())));
 
   /** 單一字槽的滑動切換 */
   function slideGroup(items: HTMLElement[], index: number): void {
@@ -78,7 +85,7 @@ export function initHeroCarousel(): void {
     slideGroup(zhItems, index);
   }
 
-  /** 直接定位到某一幕（重置用，不播動畫） */
+  /** 直接定位到某一幕（重置用，不播動畫）；index 為 -1 時全部歸回下方待命（空槽） */
   function snapTo(index: number): void {
     for (const items of [leftItems, phraseItems, zhItems]) {
       items.forEach((el, i) => {
@@ -185,7 +192,8 @@ export function initHeroCarousel(): void {
     leftItems[2]!.classList.remove('is-ghost');
     line1!.classList.remove('is-faded');
     line2!.classList.remove('is-faded');
-    snapTo(0);
+    // 歸回待命（空槽）而非直接放好第一幕：淡入後由 run() 重播進場滑入
+    snapTo(-1);
 
     await wait(80);
     root!.classList.remove('is-resetting');
@@ -195,6 +203,16 @@ export function initHeroCarousel(): void {
   async function run(): Promise<void> {
     let firstCycle = true;
     for (;;) {
+      // 進場：「深」與右欄詞組、中文句自下方滑入第一幕（首次載入與每輪重置後皆播放）。
+      // 首次載入不留空拍，直接滑入；重置淡入後留一小拍再滑
+      if (firstCycle) {
+        await nextFrame();
+      } else {
+        await wait(REENTER_DELAY_MS);
+      }
+      slideTo(0);
+      await wait(SLIDE_MS);
+
       await wait(firstCycle ? FIRST_DWELL_MS : DWELL_MS); // 第一幕
       firstCycle = false;
       slideTo(1);

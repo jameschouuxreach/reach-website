@@ -18,6 +18,7 @@ const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2
 const STAGE1_MS = 1100; // 外圍圓 無→虛線→實線（自動播放）
 const STAGE_MS = 900; // 連線／填滿
 const STEP_COOLDOWN_MS = 450; // 每步之後的冷卻：吞掉慣性尾巴、避免連跳
+const ENGAGE_COOLDOWN_MS = 800; // 進場／回鎖冷卻：抵達的同一次甩動整串不得步進
 const ACCUM_THRESHOLD = 100; // 累積位移達此值＝一步（滑鼠一格 tick 即達標）
 const ACCUM_MIN_DELTA = 15; // 小於此值的事件不累積（過濾慣性尾巴的微小殘餘）
 const ARC_GROW_PORTION = 0.95; // 階段一內部：前 95% 弧段延長，後 5% 完整圓淡入
@@ -79,7 +80,7 @@ export function initMissionScroll(): void {
         rafId = requestAnimationFrame(frame);
       } else {
         animating = false;
-        lastStepTs = performance.now(); // 動畫結束重啟冷卻：吃掉期間的慣性尾巴
+        cooldownUntil = performance.now() + STEP_COOLDOWN_MS; // 動畫結束重啟冷卻：吃掉期間的慣性
       }
     };
     rafId = requestAnimationFrame(frame);
@@ -94,7 +95,7 @@ export function initMissionScroll(): void {
   let lastY = window.scrollY;
   let lastWheelTs = 0;
   let accum = 0; // 滾動累積量（正＝向下）
-  let lastStepTs = 0;
+  let cooldownUntil = 0;
   let sectionTop = 0;
 
   function measure(): void {
@@ -119,6 +120,8 @@ export function initMissionScroll(): void {
   function engageLock(): void {
     locked = true;
     lockedAt = performance.now();
+    accum = 0;
+    cooldownUntil = lockedAt + ENGAGE_COOLDOWN_MS; // 抵達的同一次滑動不得立即步進
     alignToSection();
     if (!arrived) {
       arrived = true;
@@ -130,6 +133,8 @@ export function initMissionScroll(): void {
   function engageLockFromBelow(): void {
     locked = true;
     lockedAt = performance.now();
+    accum = 0;
+    cooldownUntil = lockedAt + ENGAGE_COOLDOWN_MS; // 同一次上滑不得直接退回第二點，需再滑一次
     arrived = true;
     point = 3;
     p1 = p2 = p3 = 1;
@@ -186,7 +191,7 @@ export function initMissionScroll(): void {
       if (!locked) return;
 
       // 動畫播放中或冷卻期：吞掉並清空累積
-      if (animating || now - lastStepTs < STEP_COOLDOWN_MS) {
+      if (animating || now < cooldownUntil) {
         accum = 0;
         event.preventDefault();
         return;
@@ -205,7 +210,7 @@ export function initMissionScroll(): void {
 
       const dir: 1 | -1 = accum > 0 ? 1 : -1;
       accum = 0;
-      lastStepTs = now;
+      cooldownUntil = now + STEP_COOLDOWN_MS;
       const decision = step(dir);
       if (decision === 'consume') event.preventDefault();
       // release：不阻擋此事件，讓頁面自然離開

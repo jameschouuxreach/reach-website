@@ -72,9 +72,6 @@ const staticFigures = [
 <section data-mission-story class="ms-section">
   {/* ---- 桌機＋JS：釘住式敘事 ---- */}
   <div class="msp-desktop" data-msp>
-    {/* 捲動閘門：任何慣性滑動都必停於動畫起點／終點（scroll-snap-stop: always） */}
-    <div class="msp-snap msp-snap-start" aria-hidden="true"></div>
-    <div class="msp-snap msp-snap-end" aria-hidden="true"></div>
     <div class="msp-pin">
       <div class="container-site msp-frame">
         <h2 class="ms-label">
@@ -179,27 +176,7 @@ const staticFigures = [
   /* ---- 變體切換：預設後備版；桌機＋JS＋允許動態時改釘住版 ---- */
   .msp-desktop {
     display: none;
-    position: relative;
-    height: 320vh; /* 跑道：釘住後可捲動 220vh；兩端 ~15% 為閘門磁場＝首尾停留區 */
-  }
-
-  /* 捲動閘門哨點：start 對齊跑道頂（t=0）、end 對齊跑道底（t=1） */
-  .msp-snap {
-    position: absolute;
-    inset-inline: 0;
-    height: 1px;
-  }
-
-  .msp-snap-start {
-    top: 0;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
-
-  .msp-snap-end {
-    bottom: 0;
-    scroll-snap-align: end;
-    scroll-snap-stop: always;
+    height: 100vh; /* v4 步進制：單屏區塊，鎖定後以手勢逐步推進 */
   }
 
   @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
@@ -212,11 +189,9 @@ const staticFigures = [
     }
   }
 
-  /* ---- 釘住式版面 ---- */
+  /* ---- 版面（100vh 單屏） ---- */
   .msp-pin {
-    position: sticky;
-    top: 0;
-    height: 100vh;
+    height: 100%;
     overflow: hidden;
   }
 
@@ -257,6 +232,10 @@ const staticFigures = [
   .msp-item.is-current {
     opacity: 1;
     transform: none;
+  }
+
+  .msp-slot.no-anim .msp-item {
+    transition: none;
   }
 
   .msp-figure {
@@ -412,16 +391,6 @@ const staticFigures = [
     stroke: var(--neutral-0);
     stroke-width: 3.2;
     stroke-linecap: round;
-  }
-</style>
-
-<style is:global>
-  /* 捲動閘門（路線 A）：proximity＋snap-stop:always 哨點。
-     僅桌機＋允許動態時啟用；行動版與 reduced-motion 不設閘門。 */
-  @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
-    html.js {
-      scroll-snap-type: y proximity;
-    }
   }
 </style>
 

@@ -17,9 +17,9 @@ const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2
 
 const STAGE1_MS = 1100; // 外圍圓 無→虛線→實線（自動播放）
 const STAGE_MS = 900; // 連線／填滿
-const GESTURE_GAP_MS = 350; // 事件間隔超過此值視為新手勢
-const SPIKE_MIN_DELTA = 40; // 力道突增判定：絕對值下限
-const SPIKE_RATIO = 2; // 力道突增判定：較前一事件放大倍數（慣性尾巴中的新手勢）
+const STEP_COOLDOWN_MS = 450; // 每步之後的冷卻：吞掉慣性尾巴、避免連跳
+const ACCUM_THRESHOLD = 100; // 累積位移達此值＝一步（滑鼠一格 tick 即達標）
+const ACCUM_MIN_DELTA = 15; // 小於此值的事件不累積（過濾慣性尾巴的微小殘餘）
 const ARC_GROW_PORTION = 0.95; // 階段一內部：前 95% 弧段延長，後 5% 完整圓淡入
 
 export function initMissionScroll(): void {
@@ -79,11 +79,7 @@ export function initMissionScroll(): void {
         rafId = requestAnimationFrame(frame);
       } else {
         animating = false;
-        if (pendingDir !== 0) {
-          const dir = pendingDir;
-          pendingDir = 0;
-          step(dir);
-        }
+        lastStepTs = performance.now(); // 動畫結束重啟冷卻：吃掉期間的慣性尾巴
       }
     };
     rafId = requestAnimationFrame(frame);
@@ -97,9 +93,8 @@ export function initMissionScroll(): void {
   let touchMode = false; // 偵測到觸控即停用鎖定
   let lastY = window.scrollY;
   let lastWheelTs = 0;
-  let prevAbsDelta = 0;
-  let lastWheelDir: 1 | -1 | 0 = 0;
-  let pendingDir: 1 | -1 | 0 = 0; // 動畫中收到的新手勢排隊一步
+  let accum = 0; // 滾動累積量（正＝向下）
+  let lastStepTs = 0;
   let sectionTop = 0;
 
   function measure(): void {
@@ -187,32 +182,33 @@ export function initMissionScroll(): void {
     (event: WheelEvent) => {
       if (touchMode) return;
       const now = performance.now();
-      const absDelta = Math.abs(event.deltaY);
-      const gapNew = now - lastWheelTs > GESTURE_GAP_MS;
-      // 慣性尾巴（衰減中）出現力道突增＝使用者的新滑動
-      const spikeNew = absDelta >= SPIKE_MIN_DELTA && absDelta > prevAbsDelta * SPIKE_RATIO;
-      const dirNew =
-        prevAbsDelta > 0 && Math.sign(event.deltaY) !== 0 && lastWheelDir !== 0 &&
-        Math.sign(event.deltaY) !== lastWheelDir;
       lastWheelTs = now;
-      prevAbsDelta = absDelta;
-      lastWheelDir = event.deltaY > 0 ? 1 : event.deltaY < 0 ? -1 : lastWheelDir;
-
       if (!locked) return;
 
-      const isNewGesture = gapNew || spikeNew || dirNew;
-      if (!isNewGesture) {
+      // 動畫播放中或冷卻期：吞掉並清空累積
+      if (animating || now - lastStepTs < STEP_COOLDOWN_MS) {
+        accum = 0;
         event.preventDefault();
         return;
       }
-      const dir: 1 | -1 = event.deltaY > 0 ? 1 : -1;
-      if (animating) {
-        pendingDir = dir;
+
+      // 累積位移：小殘餘不計；方向改變即重置
+      if (Math.abs(event.deltaY) >= ACCUM_MIN_DELTA) {
+        if (Math.sign(event.deltaY) !== Math.sign(accum)) accum = 0;
+        accum += event.deltaY;
+      }
+
+      if (Math.abs(accum) < ACCUM_THRESHOLD) {
         event.preventDefault();
         return;
       }
+
+      const dir: 1 | -1 = accum > 0 ? 1 : -1;
+      accum = 0;
+      lastStepTs = now;
       const decision = step(dir);
       if (decision === 'consume') event.preventDefault();
+      // release：不阻擋此事件，讓頁面自然離開
     },
     { passive: false },
   );
@@ -269,15 +265,14 @@ export function initMissionScroll(): void {
       }
 
       // 鎖定中：頁面若仍被移動——
-      // 1) 鎖定初期（<700ms）的漂移＝鎖定前滾輪的飛行中捲動，一律夾回
-      // 2) 近期有滾輪事件（<400ms）＝滾輪殘餘，一律夾回
-      // 3) 其餘大幅位移（捲軸拖曳）＝使用者接管，靜默解鎖
+      // 滾輪已全數 preventDefault，殘餘位移多半是鎖定前事件的飛行中動畫 → 夾回；
+      // 只有「長時間無滾輪事件＋大幅位移」（捲軸拖曳）才視為使用者接管、靜默解鎖
       const drift = Math.abs(y - sectionTop);
       if (drift <= 1) return;
       const now = performance.now();
-      const wheelRecent = now - lastWheelTs < 400;
+      const wheelRecent = now - lastWheelTs < 1200;
       const justLocked = now - lockedAt < 700;
-      if (justLocked || wheelRecent || drift <= 120) {
+      if (justLocked || wheelRecent || drift <= 250) {
         alignToSection();
       } else {
         locked = false;

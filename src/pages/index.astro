@@ -255,9 +255,31 @@ const positioning = [
 </BaseLayout>
 
 <style>
-  /* AI 主張強調詞：與標題同為黑字（保留 hook 以便日後調整） */
+  /* AI 主張強調詞：淡藍螢光筆畫記，進場時由左至右掃過（兩詞依序） */
   .ai-em {
     color: var(--color-text);
+    background-image: linear-gradient(var(--reach-blue-100), var(--reach-blue-100));
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: 0 50%;
+    padding-inline: 0.06em;
+    margin-inline: -0.03em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .ai-em {
+      background-size: 0% 100%;
+      transition: background-size 550ms cubic-bezier(0.65, 0, 0.35, 1);
+      transition-delay: 250ms;
+    }
+
+    :global(html.js) .ai-em:last-of-type {
+      transition-delay: 700ms; /* 第二個詞接續畫線 */
+    }
+
+    :global(html.js) [data-reveal].is-visible .ai-em {
+      background-size: 100% 100%;
+    }
   }
 
   /* ---- 滿版 Hero：內距約 80px（5.5vw 封頂），桌機高度撐到視窗高扣掉 header ---- */

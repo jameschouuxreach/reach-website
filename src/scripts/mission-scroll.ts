@@ -16,12 +16,14 @@ function segmentProgress(progress: number, start: number, end: number): number {
 }
 
 // ---- 三階段進度窗（釘住區間 0–1）----
-const ARC_START = 0.06;
-const ARC_END = 0.3; // 階段一：外圍圓 無→虛線→實線（左側停留第一點）
-const STAGE2_AT = 0.4; // 門檻：字幕換第二點＋連線動畫同時開始
-const LINE_END = 0.62;
-const STAGE3_AT = 0.72; // 門檻：字幕換第三點＋外圍填滿同時開始
-const FILL_END = 0.92;
+// 兩端各 ~15% 為 snap 閘門磁場（實測 Chrome proximity ≈ vh/3），
+// 階段窗全部排在自由區 [0.18, 0.80]，磁場區即首尾停留定格區
+const ARC_START = 0.18;
+const ARC_END = 0.36; // 階段一：外圍圓 無→虛線→實線（左側停留第一點）
+const STAGE2_AT = 0.46; // 門檻：字幕換第二點＋連線動畫同時開始
+const LINE_END = 0.6;
+const STAGE3_AT = 0.68; // 門檻：字幕換第三點＋外圍填滿同時開始
+const FILL_END = 0.8; // 之後為完成停留區（含出口磁場）
 const ARC_GROW_PORTION = 0.95; // 階段一內部：前 95% 弧段延長，後 5% 完整圓淡入
 
 export function initMissionScroll(): void {

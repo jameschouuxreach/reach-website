@@ -29,6 +29,8 @@ const CENTER_R = 64;
 const OUTER_R = 42;
 const ORBIT_R = 245;
 const SEGMENTS = 12; // 每個外圍圓 12 段 30° 弧段
+const STROKE = 3.2;
+const CAP_INSET = STROKE / 2; // 圓角端點內縮：讓 round cap 剛好停在圓周
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
@@ -39,10 +41,10 @@ const rings = Array.from({ length: 8 }, (_, i) => {
   return {
     cx: round(CX + dx * ORBIT_R),
     cy: round(CY + dy * ORBIT_R),
-    lineX1: round(CX + dx * CENTER_R),
-    lineY1: round(CY + dy * CENTER_R),
-    lineX2: round(CX + dx * (ORBIT_R - OUTER_R)),
-    lineY2: round(CY + dy * (ORBIT_R - OUTER_R)),
+    lineX1: round(CX + dx * (CENTER_R + CAP_INSET)),
+    lineY1: round(CY + dy * (CENTER_R + CAP_INSET)),
+    lineX2: round(CX + dx * (ORBIT_R - OUTER_R - CAP_INSET)),
+    lineY2: round(CY + dy * (ORBIT_R - OUTER_R - CAP_INSET)),
   };
 });
 
@@ -70,6 +72,9 @@ const staticFigures = [
 <section data-mission-story class="ms-section">
   {/* ---- 桌機＋JS：釘住式敘事 ---- */}
   <div class="msp-desktop" data-msp>
+    {/* 捲動閘門：任何慣性滑動都必停於動畫起點／終點（scroll-snap-stop: always） */}
+    <div class="msp-snap msp-snap-start" aria-hidden="true"></div>
+    <div class="msp-snap msp-snap-end" aria-hidden="true"></div>
     <div class="msp-pin">
       <div class="container-site msp-frame">
         <h2 class="ms-label">
@@ -174,7 +179,27 @@ const staticFigures = [
   /* ---- 變體切換：預設後備版；桌機＋JS＋允許動態時改釘住版 ---- */
   .msp-desktop {
     display: none;
-    height: 260vh; /* 跑道：釘住後的可捲動距離＝160vh */
+    position: relative;
+    height: 320vh; /* 跑道：釘住後可捲動 220vh；兩端 ~15% 為閘門磁場＝首尾停留區 */
+  }
+
+  /* 捲動閘門哨點：start 對齊跑道頂（t=0）、end 對齊跑道底（t=1） */
+  .msp-snap {
+    position: absolute;
+    inset-inline: 0;
+    height: 1px;
+  }
+
+  .msp-snap-start {
+    top: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .msp-snap-end {
+    bottom: 0;
+    scroll-snap-align: end;
+    scroll-snap-stop: always;
   }
 
   @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
@@ -309,22 +334,25 @@ const staticFigures = [
   .ms-link {
     stroke: var(--neutral-0);
     stroke-width: 3.2;
-    stroke-linecap: butt;
+    stroke-linecap: round;
     stroke-dasharray: var(--ms-line) 1;
+    /* 圓角端點在長度 0 時會是一顆圓點：長度趨近 0 時整條透明 */
+    opacity: min(calc(var(--ms-line) * 25), 1);
   }
 
   .ms-arc {
     fill: none;
     stroke: var(--neutral-0);
     stroke-width: 3.2;
-    stroke-linecap: butt; /* 從 0 長度開始時不留 round cap 圓點 */
+    stroke-linecap: round;
     stroke-dasharray: var(--ms-arc) 1;
     stroke-dashoffset: 0;
   }
 
-  /* 收尾：完整實線圓淡入時，分段弧線同步淡出（同一變數驅動，保證同步） */
+  /* 收尾：完整實線圓淡入時，分段弧線同步淡出；
+     另以長度門檻處理 round cap 在 0 長度時的殘留圓點（96 顆小點→透明） */
   .ms-arcs {
-    opacity: calc(1 - var(--ms-ringfull));
+    opacity: min(calc(1 - var(--ms-ringfull)), calc(var(--ms-arc) * 25), 1);
   }
 
   .ms-ringfull {
@@ -383,6 +411,17 @@ const staticFigures = [
   .msf-line {
     stroke: var(--neutral-0);
     stroke-width: 3.2;
+    stroke-linecap: round;
+  }
+</style>
+
+<style is:global>
+  /* 捲動閘門（路線 A）：proximity＋snap-stop:always 哨點。
+     僅桌機＋允許動態時啟用；行動版與 reduced-motion 不設閘門。 */
+  @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    html.js {
+      scroll-snap-type: y proximity;
+    }
   }
 </style>
 

@@ -30,10 +30,11 @@ export function initMissionScroll(): void {
   if (!window.matchMedia('(min-width: 769px)').matches) return;
 
   const svg = root.querySelector<SVGSVGElement>('[data-mission-svg]');
-  const slot = root.querySelector<HTMLElement>('.msp-slot');
-  const items = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-item]'));
+  const slots = Array.from(root.querySelectorAll<HTMLElement>('.msp-slot'));
+  const titleItems = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-title]'));
+  const bodyItems = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-body]'));
   const tabs = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-tab]'));
-  if (!svg || !slot || items.length !== 3) return;
+  if (!svg || slots.length === 0 || titleItems.length !== 3 || bodyItems.length !== 3) return;
 
   // ---- SVG 狀態（三段各一個 0–1 進度值） ----
   let p1 = 0;
@@ -52,10 +53,12 @@ export function initMissionScroll(): void {
   }
 
   function swapTo(index: number): void {
-    items.forEach((el, i) => {
-      el.classList.toggle('is-current', i === index);
-      el.classList.toggle('is-above', i < index);
-    });
+    for (const group of [titleItems, bodyItems]) {
+      group.forEach((el, i) => {
+        el.classList.toggle('is-current', i === index);
+        el.classList.toggle('is-above', i < index);
+      });
+    }
     tabs.forEach((tab, i) => {
       tab.classList.toggle('is-active', i === index);
       tab.setAttribute('aria-selected', String(i === index));
@@ -63,10 +66,10 @@ export function initMissionScroll(): void {
   }
 
   function snapSwapTo(index: number): void {
-    slot!.classList.add('no-anim');
+    slots.forEach((el) => el.classList.add('no-anim'));
     swapTo(index);
-    void slot!.offsetWidth;
-    slot!.classList.remove('no-anim');
+    void slots[0]!.offsetWidth;
+    slots.forEach((el) => el.classList.remove('no-anim'));
   }
 
   // ---- rAF tween（時間驅動，與捲動無關） ----
@@ -191,28 +194,30 @@ export function initMissionScroll(): void {
     return 'release';
   }
 
-  // ---- Tabs：自由切換三點（補間至該點完成狀態） ----
-  const STATE_TARGETS: Array<[number, number, number]> = [
-    [1, 0, 0],
-    [1, 1, 0],
-    [1, 1, 1],
-  ];
-
+  // ---- Tabs：自由切換三點。一律從該點的開頭「正向」播放該階段動畫，
+  //     不因往回跳而倒放（前置階段瞬間就位、後續階段瞬間清空） ----
   function goToPoint(target: 1 | 2 | 3): void {
     point = target;
     swapTo(target - 1);
-    const from: [number, number, number] = [p1, p2, p3];
-    const to = STATE_TARGETS[target - 1];
-    tween(
-      (v) => {
-        p1 = from[0] + (to[0] - from[0]) * v;
-        p2 = from[1] + (to[1] - from[1]) * v;
-        p3 = from[2] + (to[2] - from[2]) * v;
-      },
-      0,
-      1,
-      700,
-    );
+    if (target === 1) {
+      p1 = 0;
+      p2 = 0;
+      p3 = 0;
+      apply();
+      tween((v) => (p1 = v), 0, 1, STAGE1_MS);
+    } else if (target === 2) {
+      p1 = 1;
+      p2 = 0;
+      p3 = 0;
+      apply();
+      tween((v) => (p2 = v), 0, 1, STAGE_MS);
+    } else {
+      p1 = 1;
+      p2 = 1;
+      p3 = 0;
+      apply();
+      tween((v) => (p3 = v), 0, 1, STAGE_MS);
+    }
   }
 
   tabs.forEach((tab, i) => {

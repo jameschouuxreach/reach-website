@@ -100,16 +100,22 @@ const staticFigures = [
                 ))
               }
             </div>
+            {/* 標題與內文各自的滑動遮罩（如 Hero 右欄第二、三行） */}
             <div class="msp-slot">
               {
                 items.map((item, i) => (
-                  <article class:list={['msp-item', i === 0 && 'is-current']} data-msp-item>
-                    <p class="ms-index" aria-hidden="true">
-                      {item.index}
-                    </p>
-                    <h3 class="ms-title">{item.title}</h3>
-                    <p class="ms-body">{item.body}</p>
-                  </article>
+                  <h3 class:list={['ms-title', 'msp-item', i === 0 && 'is-current']} data-msp-title>
+                    {item.title}
+                  </h3>
+                ))
+              }
+            </div>
+            <div class="msp-slot msp-slot-body">
+              {
+                items.map((item, i) => (
+                  <p class:list={['ms-body', 'msp-item', i === 0 && 'is-current']} data-msp-body>
+                    {item.body}
+                  </p>
                 ))
               }
             </div>
@@ -267,10 +273,20 @@ const staticFigures = [
     outline-offset: 2px;
   }
 
-  /* 左：字幕輪替槽（同格堆疊＋遮罩；只做垂直位移＋淡入淡出） */
+  /* 左：字幕輪替槽（同格堆疊＋遮罩；只做垂直位移＋淡入淡出）。
+     標題與內文各自成槽，各有自己的滑動動畫 */
   .msp-slot {
     display: grid;
     overflow: hidden;
+  }
+
+  .msp-slot .ms-title,
+  .msp-slot .ms-body {
+    margin-top: 0;
+  }
+
+  .msp-slot-body {
+    margin-top: 1.25rem;
   }
 
   .msp-item {

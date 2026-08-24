@@ -72,6 +72,93 @@ export function initMissionScroll(): void {
     offset: ['start start', 'end end'],
   });
 
+  // ---- 捲動閘門守衛（第二層）----
+  // CSS snap-stop 對觸控慣性可靠，但滑鼠滾輪連續快轉會累加衝過哨點。
+  // 此守衛以「位置修正」實作：未解鎖而越過閘門 → 夾回閘門位置；
+  // 靜止 UNLOCK_QUIET_MS 後解鎖，下一次滑動才放行。
+  // 僅對滾輪／觸控生效（捲軸拖曳、鍵盤、錨點跳轉豁免）；僅擋往下方向；
+  // 捲回區塊上方後閘門重新武裝。
+  const UNLOCK_QUIET_MS = 350;
+  const INPUT_ACTIVE_MS = 800; // 涵蓋滾輪停止後的 snap 滑行尾巴（捲軸拖曳無滾輪事件，仍豁免）
+
+  let runwayTop = 0;
+  let scrollableH = 1;
+  function measureRunway(): void {
+    runwayTop = runway!.getBoundingClientRect().top + window.scrollY;
+    scrollableH = Math.max(1, runway!.offsetHeight - window.innerHeight);
+  }
+  measureRunway();
+  window.addEventListener('resize', measureRunway);
+
+  let gate1Unlocked = false;
+  let gate2Unlocked = false;
+  let holdingGate: 0 | 1 | 2 = 0;
+  let lastY = window.scrollY;
+  let lastInputTs = 0;
+  let unlockTimer: number | undefined;
+
+  const markInput = () => {
+    lastInputTs = performance.now();
+  };
+  window.addEventListener('wheel', markInput, { passive: true });
+  window.addEventListener('touchmove', markInput, { passive: true });
+
+  function scheduleUnlock(): void {
+    window.clearTimeout(unlockTimer);
+    unlockTimer = window.setTimeout(() => {
+      if (holdingGate === 1) gate1Unlocked = true;
+      if (holdingGate === 2) gate2Unlocked = true;
+      holdingGate = 0;
+    }, UNLOCK_QUIET_MS);
+  }
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      const y = window.scrollY;
+      const goingDown = y > lastY;
+      lastY = y;
+      const t = (y - runwayTop) / scrollableH;
+      const inputActive = performance.now() - lastInputTs < INPUT_ACTIVE_MS;
+
+      // 離開區塊上方：閘門重新武裝
+      if (t < -0.05) {
+        gate1Unlocked = false;
+        gate2Unlocked = false;
+        holdingGate = 0;
+        return;
+      }
+
+      if (!goingDown) return;
+
+      if (!gate1Unlocked && t > 0.001) {
+        if (inputActive) {
+          window.scrollTo({ top: runwayTop, behavior: 'instant' as ScrollBehavior });
+          holdingGate = 1;
+          scheduleUnlock();
+        } else {
+          // 捲軸拖曳／鍵盤／錨點：不對抗，直接視為通過
+          gate1Unlocked = true;
+        }
+        return;
+      }
+
+      if (gate1Unlocked && !gate2Unlocked && t > 0.999) {
+        if (inputActive) {
+          window.scrollTo({
+            top: runwayTop + scrollableH,
+            behavior: 'instant' as ScrollBehavior,
+          });
+          holdingGate = 2;
+          scheduleUnlock();
+        } else {
+          gate2Unlocked = true;
+        }
+      }
+    },
+    { passive: true },
+  );
+
   window.addEventListener('pagehide', () => cleanup(), { once: true });
 }
 

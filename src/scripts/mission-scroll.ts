@@ -18,6 +18,8 @@ const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2
 const STAGE1_MS = 1100; // 外圍圓 無→虛線→實線（自動播放）
 const STAGE_MS = 900; // 連線／填滿
 const GESTURE_GAP_MS = 350; // 事件間隔超過此值視為新手勢
+const SPIKE_MIN_DELTA = 40; // 力道突增判定：絕對值下限
+const SPIKE_RATIO = 2; // 力道突增判定：較前一事件放大倍數（慣性尾巴中的新手勢）
 const ARC_GROW_PORTION = 0.95; // 階段一內部：前 95% 弧段延長，後 5% 完整圓淡入
 
 export function initMissionScroll(): void {
@@ -77,6 +79,11 @@ export function initMissionScroll(): void {
         rafId = requestAnimationFrame(frame);
       } else {
         animating = false;
+        if (pendingDir !== 0) {
+          const dir = pendingDir;
+          pendingDir = 0;
+          step(dir);
+        }
       }
     };
     rafId = requestAnimationFrame(frame);
@@ -85,15 +92,19 @@ export function initMissionScroll(): void {
   // ---- 鎖定與步進狀態機 ----
   let point: 1 | 2 | 3 = 1; // 目前停留的點
   let locked = false;
+  let lockedAt = 0; // 鎖定時間戳（鎖定初期的漂移一律夾回）
   let arrived = false; // 第一段是否已自動播放
-  let completedDown = false; // 已完整走完並向下離開
   let touchMode = false; // 偵測到觸控即停用鎖定
   let lastY = window.scrollY;
   let lastWheelTs = 0;
+  let prevAbsDelta = 0;
+  let lastWheelDir: 1 | -1 | 0 = 0;
+  let pendingDir: 1 | -1 | 0 = 0; // 動畫中收到的新手勢排隊一步
   let sectionTop = 0;
 
   function measure(): void {
-    sectionTop = root!.getBoundingClientRect().top + window.scrollY;
+    // 取整：瀏覽器捲動位置為整數，小數邊界會讓「跨越」判定在對齊點附近抖動誤觸
+    sectionTop = Math.round(root!.getBoundingClientRect().top + window.scrollY);
   }
   measure();
   window.addEventListener('resize', measure);
@@ -104,19 +115,32 @@ export function initMissionScroll(): void {
   function resetAll(): void {
     point = 1;
     arrived = false;
-    completedDown = false;
     p1 = p2 = p3 = 0;
     apply();
     snapSwapTo(0);
   }
 
+  /** 自上方進入：鎖定；首次進入自動播第一段 */
   function engageLock(): void {
     locked = true;
+    lockedAt = performance.now();
     alignToSection();
     if (!arrived) {
       arrived = true;
       tween((v) => (p1 = v), p1, 1, STAGE1_MS);
     }
+  }
+
+  /** 自下方回捲進入：以完成狀態鎖定於第三點，向上手勢逐步倒退 */
+  function engageLockFromBelow(): void {
+    locked = true;
+    lockedAt = performance.now();
+    arrived = true;
+    point = 3;
+    p1 = p2 = p3 = 1;
+    apply();
+    snapSwapTo(2);
+    alignToSection();
   }
 
   /** 手勢決策：回傳 'consume'（吃掉）或 'release'（放行此事件） */
@@ -137,7 +161,6 @@ export function initMissionScroll(): void {
       }
       // 第三點再向下：放行離開
       locked = false;
-      completedDown = true;
       return 'release';
     }
     // 向上
@@ -162,15 +185,33 @@ export function initMissionScroll(): void {
   window.addEventListener(
     'wheel',
     (event: WheelEvent) => {
-      if (!locked || touchMode) return;
+      if (touchMode) return;
       const now = performance.now();
-      const isNewGesture = now - lastWheelTs > GESTURE_GAP_MS;
+      const absDelta = Math.abs(event.deltaY);
+      const gapNew = now - lastWheelTs > GESTURE_GAP_MS;
+      // 慣性尾巴（衰減中）出現力道突增＝使用者的新滑動
+      const spikeNew = absDelta >= SPIKE_MIN_DELTA && absDelta > prevAbsDelta * SPIKE_RATIO;
+      const dirNew =
+        prevAbsDelta > 0 && Math.sign(event.deltaY) !== 0 && lastWheelDir !== 0 &&
+        Math.sign(event.deltaY) !== lastWheelDir;
       lastWheelTs = now;
+      prevAbsDelta = absDelta;
+      lastWheelDir = event.deltaY > 0 ? 1 : event.deltaY < 0 ? -1 : lastWheelDir;
+
+      if (!locked) return;
+
+      const isNewGesture = gapNew || spikeNew || dirNew;
       if (!isNewGesture) {
         event.preventDefault();
         return;
       }
-      const decision = step(event.deltaY > 0 ? 1 : -1);
+      const dir: 1 | -1 = event.deltaY > 0 ? 1 : -1;
+      if (animating) {
+        pendingDir = dir;
+        event.preventDefault();
+        return;
+      }
+      const decision = step(dir);
       if (decision === 'consume') event.preventDefault();
     },
     { passive: false },
@@ -209,25 +250,37 @@ export function initMissionScroll(): void {
       if (touchMode) return;
 
       if (!locked) {
-        // 向下跨過區塊頂端 → 鎖定（暴力滑動也會被夾回對齊）
-        if (!completedDown && goingDown && prevY < sectionTop && y >= sectionTop) {
+        // 向下跨過區塊頂端 → 鎖定（暴力滑動也會被夾回對齊）；
+        // ±2px 容差帶：放行離開時起點就在對齊點上，不得立即誤判回鎖
+        if (goingDown && prevY < sectionTop - 2 && y >= sectionTop - 2) {
           engageLock();
           return;
         }
+        // 自下方向上跨過區塊頂端 → 以完成狀態鎖定（反向逐步倒退）
+        if (!goingDown && prevY > sectionTop + 2 && y <= sectionTop + 2) {
+          engageLockFromBelow();
+          return;
+        }
         // 回到區塊上方一段距離 → 重置以便重看
-        if (y < sectionTop - window.innerHeight * 0.9 && (arrived || completedDown)) {
+        if (y < sectionTop - window.innerHeight * 0.9 && arrived) {
           resetAll();
         }
         return;
       }
 
-      // 鎖定中：滾輪已被 preventDefault；頁面若仍被移動（捲軸拖曳、既有慣性）——
-      // 小幅殘餘夾回、大幅位移視為使用者接管，靜默解鎖
+      // 鎖定中：頁面若仍被移動——
+      // 1) 鎖定初期（<700ms）的漂移＝鎖定前滾輪的飛行中捲動，一律夾回
+      // 2) 近期有滾輪事件（<400ms）＝滾輪殘餘，一律夾回
+      // 3) 其餘大幅位移（捲軸拖曳）＝使用者接管，靜默解鎖
       const drift = Math.abs(y - sectionTop);
-      if (drift > 120) {
-        locked = false;
-      } else if (drift > 1) {
+      if (drift <= 1) return;
+      const now = performance.now();
+      const wheelRecent = now - lastWheelTs < 400;
+      const justLocked = now - lockedAt < 700;
+      if (justLocked || wheelRecent || drift <= 120) {
         alignToSection();
+      } else {
+        locked = false;
       }
     },
     { passive: true },

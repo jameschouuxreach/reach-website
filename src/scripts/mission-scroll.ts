@@ -1,7 +1,11 @@
 /**
- * 使命區捲動敘事（規格：致遠官網-v1-使命區捲動敘事-增量修改規格.md）：
- * - Motion `scroll()` 取得使命區 0–1 局部進度，scroll-linked、雙向可逆。
- * - 每幀只更新主 SVG 上的 5 個 CSS 變數與左欄 active panel，不 query DOM、不重算幾何。
+ * 使命區捲動敘事（v2）：
+ * - Motion `scroll()`（offset 含進場段），scroll-linked、雙向可逆。
+ * - 三階段時間窗由「實測段落中心」動態推算：每段動畫在該段文字滑到畫面正中前完成並停住，
+ *   文字置中期間右側維持該段最終示意圖。
+ * - 階段一自「完全沒有外圍圓」開始：弧段 0 → 虛線 → 接近實線，收尾完整圓淡入去接縫。
+ * - 中心圓自始即為實心（無中心填色動畫）；第三階段僅八個外圍圓同步填滿。
+ * - 每幀僅更新主 SVG 上 4 個 CSS 變數與 active panel；幾何與時間窗不在 scroll frame 重算。
  * - prefers-reduced-motion 或行動版：不註冊 observer（CSS 呈現靜態終態）。
  */
 import { scroll } from 'motion';
@@ -11,18 +15,17 @@ function segmentProgress(progress: number, start: number, end: number): number {
   return Math.min(1, Math.max(0, (progress - start) / (end - start)));
 }
 
-// 階段切分（規格 §3.2）
-const ARC_END = 0.32; // 虛線弧段延長為實線（含收尾）
-const LINE_START = 0.34;
-const LINE_END = 0.66; // 八條連線生成
-const FILL_CENTER_START = 0.68;
-const FILL_CENTER_END = 0.8; // 中心圓填滿
-const FILL_OUTER_START = 0.8;
-const FILL_OUTER_END = 1.0; // 外圍圓同步填滿
+const ENTRY_START = 0.03; // 區塊剛開始進場後不久，階段一即開演
+const HOLD_BEFORE = 0.05; // 每段文字到達正中前，動畫需提前完成的緩衝
+const HOLD_AFTER = 0.07; // 文字離開正中後，下一階段才開始
+const ARC_GROW_PORTION = 0.95; // 階段一內部：前 95% 弧段延長，後 5% 完整圓淡入
 
-// 第一階段內部：前 95% 弧段延長（0.3 → 1.0），後 5% 完整圓淡入、弧段淡出
-const ARC_INITIAL = 0.3;
-const ARC_GROW_PORTION = 0.95;
+interface StageWindows {
+  arc: [number, number];
+  line: [number, number];
+  fill: [number, number];
+  panelBounds: [number, number]; // active panel 切換界線（段落中心的中點）
+}
 
 export function initMissionScroll(): void {
   const section = document.querySelector<HTMLElement>('[data-mission-story]');
@@ -36,39 +39,67 @@ export function initMissionScroll(): void {
   const panels = Array.from(section.querySelectorAll<HTMLElement>('[data-mission-panel]'));
   if (!svg || panels.length !== 3) return;
 
+  let windows: StageWindows | null = null;
+  let lastProgress = 0;
   let activePanel = -1;
 
+  /** 量測段落中心 → 推算三階段時間窗（初始化與 resize 時執行，不在 scroll frame） */
+  function measure(): void {
+    const viewportH = window.innerHeight;
+    const sectionTop = section!.getBoundingClientRect().top + window.scrollY;
+    const total = section!.offsetHeight;
+
+    // offset ['start end','end end'] 下，progress = (scrollY + vh − sectionTop) / total；
+    // 段落中心與畫面正中重合時 progress = (段落中心相對位置 + vh/2) / total
+    const centers = panels.map((panel) => {
+      const rect = panel.getBoundingClientRect();
+      const centerRel = rect.top + window.scrollY - sectionTop + rect.height / 2;
+      return (centerRel + viewportH / 2) / total;
+    }) as [number, number, number];
+
+    const clampEnd = (v: number) => Math.min(v, 0.98);
+    windows = {
+      arc: [ENTRY_START, Math.max(clampEnd(centers[0] - HOLD_BEFORE), ENTRY_START + 0.1)],
+      line: [centers[0] + HOLD_AFTER, clampEnd(centers[1] - HOLD_BEFORE)],
+      fill: [centers[1] + HOLD_AFTER, clampEnd(centers[2] - HOLD_BEFORE)],
+      panelBounds: [(centers[0] + centers[1]) / 2, (centers[1] + centers[2]) / 2],
+    };
+  }
+
   function update(progress: number): void {
-    const arcPhase = segmentProgress(progress, 0, ARC_END);
+    lastProgress = progress;
+    if (!windows) return;
+
+    const arcPhase = segmentProgress(progress, windows.arc[0], windows.arc[1]);
     const arcGrow = Math.min(arcPhase / ARC_GROW_PORTION, 1);
     const ringfull = segmentProgress(arcPhase, ARC_GROW_PORTION, 1);
 
     const style = svg!.style;
-    style.setProperty('--ms-arc', String(ARC_INITIAL + (1 - ARC_INITIAL) * arcGrow));
+    style.setProperty('--ms-arc', String(arcGrow));
     style.setProperty('--ms-ringfull', String(ringfull));
-    style.setProperty('--ms-line', String(segmentProgress(progress, LINE_START, LINE_END)));
-    style.setProperty(
-      '--ms-fill-center',
-      String(segmentProgress(progress, FILL_CENTER_START, FILL_CENTER_END)),
-    );
-    style.setProperty(
-      '--ms-fill-outer',
-      String(segmentProgress(progress, FILL_OUTER_START, FILL_OUTER_END)),
-    );
+    style.setProperty('--ms-line', String(segmentProgress(progress, windows.line[0], windows.line[1])));
+    style.setProperty('--ms-fill-outer', String(segmentProgress(progress, windows.fill[0], windows.fill[1])));
 
-    const index = progress < 0.33 ? 0 : progress < 0.67 ? 1 : 2;
+    const index =
+      progress < windows.panelBounds[0] ? 0 : progress < windows.panelBounds[1] ? 1 : 2;
     if (index !== activePanel) {
       activePanel = index;
       panels.forEach((panel, i) => panel.classList.toggle('is-active', i === index));
     }
   }
 
+  measure();
   // 先以進度 0 覆寫 CSS 的最終態預設值，避免初載閃現完成狀態
   update(0);
 
   const cleanup = scroll((progress: number) => update(progress), {
     target: section,
-    offset: ['start start', 'end end'],
+    offset: ['start end', 'end end'],
+  });
+
+  window.addEventListener('resize', () => {
+    measure();
+    update(lastProgress);
   });
 
   window.addEventListener('pagehide', () => cleanup(), { once: true });

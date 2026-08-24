@@ -67,14 +67,13 @@ const staticFigures = [
 
 <section data-mission-story class="ms-section">
   <div class="container-site ms-inner">
-    {/* 反白版區塊標籤（維持 h2 階層；不共用 SectionLabel 以免動到共用元件） */}
-    <h2 class="ms-label">
-      <span class="ms-label-zh">我們的使命</span>
-      <span class="ms-label-en" aria-hidden="true">WHY WE DO</span>
-    </h2>
-
     <div class="ms-grid">
       <div class="ms-left">
+        {/* 反白版區塊標籤（維持 h2 階層；不共用 SectionLabel 以免動到共用元件） */}
+        <h2 class="ms-label">
+          <span class="ms-label-zh">我們的使命</span>
+          <span class="ms-label-en" aria-hidden="true">WHY WE DO</span>
+        </h2>
         {
           items.map((item, i) => (
             <article data-mission-panel={i} class:list={['ms-panel', i === 0 && 'is-active']}>
@@ -87,12 +86,7 @@ const staticFigures = [
               {/* 行動版／reduced-motion：對應階段的靜態圖 */}
               <div class="ms-fig-wrap" aria-hidden="true">
                 <svg viewBox="0 0 800 800" class="ms-fig" aria-hidden="true" focusable="false">
-                  <circle
-                    cx={CX}
-                    cy={CY}
-                    r={CENTER_R}
-                    class={staticFigures[i].fill ? 'msf-solid' : 'msf-outline'}
-                  />
+                  <circle cx={CX} cy={CY} r={CENTER_R} class="msf-solid" />
                   {staticFigures[i].links &&
                     rings.map((r) => (
                       <line x1={r.lineX1} y1={r.lineY1} x2={r.lineX2} y2={r.lineY2} class="msf-line" />
@@ -116,7 +110,7 @@ const staticFigures = [
         <div class="ms-sticky">
           {/* 主 SVG：裝飾性視覺；CSS 預設值＝最終完整狀態（無 JS／初載可讀） */}
           <svg viewBox="0 0 800 800" data-mission-svg class="ms-svg" aria-hidden="true" focusable="false">
-            {/* 中心圓：白色實線中空 */}
+            {/* 中心圓：自始即為白色實心（v2 調整） */}
             <circle cx={CX} cy={CY} r={CENTER_R} class="ms-center" />
 
             {/* 八條連線：中心圓外緣 → 外圍圓內緣 */}
@@ -147,8 +141,7 @@ const staticFigures = [
               {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-ringfull" />)}
             </g>
 
-            {/* 填色圓：中心與八個外圍，各自由自身圓心 scale 填滿 */}
-            <circle cx={CX} cy={CY} r={CENTER_R} class="ms-fill ms-fill-center" />
+            {/* 外圍填色圓：各自由自身圓心 scale 填滿（第三階段） */}
             {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-fill ms-fill-outer" />)}
           </svg>
         </div>
@@ -164,12 +157,17 @@ const staticFigures = [
   }
 
   .ms-inner {
+    padding-block: 0;
+  }
+
+  .ms-left {
     padding-block: 4rem 3rem;
   }
 
   @media (min-width: 769px) {
-    .ms-inner {
-      padding-block: 6rem 4rem;
+    .ms-left {
+      /* 底部 12vh：讓第三段文字能在 sticky 解除前滑到畫面正中 */
+      padding-block: 6rem 12vh;
     }
   }
 
@@ -307,19 +305,17 @@ const staticFigures = [
     --ms-arc: 1;
     --ms-ringfull: 1;
     --ms-line: 1;
-    --ms-fill-center: 1;
     --ms-fill-outer: 1;
   }
 
   .ms-center {
-    fill: none;
-    stroke: var(--neutral-0);
-    stroke-width: 4;
+    fill: var(--neutral-0);
+    stroke: none;
   }
 
   .ms-link {
     stroke: var(--neutral-0);
-    stroke-width: 4;
+    stroke-width: 3.2;
     stroke-linecap: butt;
     stroke-dasharray: var(--ms-line) 1;
   }
@@ -327,8 +323,8 @@ const staticFigures = [
   .ms-arc {
     fill: none;
     stroke: var(--neutral-0);
-    stroke-width: 4;
-    stroke-linecap: round;
+    stroke-width: 3.2;
+    stroke-linecap: butt; /* 從 0 長度開始時不留 round cap 圓點 */
     stroke-dasharray: var(--ms-arc) 1;
     stroke-dashoffset: 0;
   }
@@ -341,7 +337,7 @@ const staticFigures = [
   .ms-ringfull {
     fill: none;
     stroke: var(--neutral-0);
-    stroke-width: 4;
+    stroke-width: 3.2;
     opacity: var(--ms-ringfull);
   }
 
@@ -352,10 +348,6 @@ const staticFigures = [
     transform-origin: center;
   }
 
-  .ms-fill-center {
-    transform: scale(var(--ms-fill-center));
-  }
-
   .ms-fill-outer {
     transform: scale(var(--ms-fill-outer));
   }
@@ -364,7 +356,7 @@ const staticFigures = [
   .msf-outline {
     fill: none;
     stroke: var(--neutral-0);
-    stroke-width: 4;
+    stroke-width: 3.2;
   }
 
   .msf-solid {
@@ -374,7 +366,7 @@ const staticFigures = [
 
   .msf-line {
     stroke: var(--neutral-0);
-    stroke-width: 4;
+    stroke-width: 3.2;
   }
 </style>
 

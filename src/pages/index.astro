@@ -121,6 +121,12 @@ const positioning = [
           class="hidden md:inline"
         />我們結合 AI 的效率、使用者研究與全局判斷，讓成果真正回應需求。
       </p>
+      <div class="mt-9 flex justify-center">
+        <a href="/services/" class="ai-cta">
+          了解更多
+          <span class="cta-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -255,10 +261,58 @@ const positioning = [
 </BaseLayout>
 
 <style>
-  /* AI 主張強調詞：淡藍螢光筆畫記，進場時由左至右掃過（兩詞依序） */
+  /* AI 主張 CTA：藍框白底藍字 */
+  .ai-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.625rem 1.75rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-brand);
+    background-color: var(--color-surface);
+    color: var(--color-link);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 200ms ease, transform 200ms ease;
+  }
+
+  .ai-cta:hover {
+    background-color: var(--reach-blue-50);
+  }
+
+  .ai-cta:active {
+    transform: translateY(1px);
+  }
+
+  .ai-cta:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+  }
+
+  .ai-cta .cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  .ai-cta:hover .cta-arrow,
+  .ai-cta:focus-visible .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-cta,
+    .ai-cta .cta-arrow {
+      transition: none;
+    }
+    .ai-cta:hover .cta-arrow {
+      transform: none;
+    }
+  }
+
+  /* AI 主張強調詞：藍色螢光筆畫記，進場時由左至右掃過（兩詞同時） */
   .ai-em {
     color: var(--color-text);
-    background-image: linear-gradient(var(--reach-blue-100), var(--reach-blue-100));
+    background-image: linear-gradient(var(--reach-blue-200), var(--reach-blue-200));
     background-repeat: no-repeat;
     background-size: 100% 100%;
     background-position: 0 50%;
@@ -270,11 +324,7 @@ const positioning = [
     :global(html.js) .ai-em {
       background-size: 0% 100%;
       transition: background-size 550ms cubic-bezier(0.65, 0, 0.35, 1);
-      transition-delay: 250ms;
-    }
-
-    :global(html.js) .ai-em:last-of-type {
-      transition-delay: 700ms; /* 第二個詞接續畫線 */
+      transition-delay: 250ms; /* 兩詞同時開始 */
     }
 
     :global(html.js) [data-reveal].is-visible .ai-em {

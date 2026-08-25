@@ -115,7 +115,7 @@ const positioning = [
 
   {/* ---- 4. What We Do／我們的服務 ---- */}
   <section class="border-t border-line bg-page">
-    <div class="container-site py-24 md:py-36">
+    <div class="container-site sec-full">
       <SectionLabel zh="我們的服務" en="WHAT WE DO" />
       <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
         <div data-reveal>
@@ -152,7 +152,7 @@ const positioning = [
 
   {/* ---- 5. 我們與誰合作（獨立區塊，與其他區塊同級） ---- */}
   <section class="border-t border-line bg-page">
-    <div class="container-site py-24 md:py-36">
+    <div class="container-site sec-full">
       <div data-reveal>
         <SectionLabel zh="我們與誰合作" en="WHO WE WORK WITH" />
         <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
@@ -285,7 +285,7 @@ const positioning = [
 
   {/* ---- 6. 精選案例 ---- */}
   <section class="border-t border-line bg-page">
-    <div class="container-site py-16 md:py-24">
+    <div class="container-site sec-full">
       <div class="flex flex-wrap items-baseline justify-between gap-4" data-reveal>
         <SectionLabel zh="我們的經驗" en="OUR EXPERIENCE" />
         <TextLink href="/cases/" label="所有案例" />
@@ -299,7 +299,7 @@ const positioning = [
   {/* ---- 7. 信任與合作（v1.1：Reach 品牌動態併入 Hero，此區保留合作 Logo）---- */}
   <section class="border-t border-line bg-page">
     <h2 class="sr-only">信任與合作</h2>
-    <div class="container-site py-16 md:py-24" data-reveal>
+    <div class="container-site sec-full" data-reveal>
       <PartnerLogos />
     </div>
   </section>
@@ -381,6 +381,23 @@ const positioning = [
 
     :global(html.js) [data-reveal].is-visible .ai-em {
       background-size: 100% 100%;
+    }
+  }
+
+  /* ---- 滿版區塊：比照「我們的使命」（msp-frame padding-block 5rem 3rem、
+     高度＝視窗高 − header），套用於服務／誰合作／經驗／信任四區；
+     AI 與聯絡 CTA 除外。內容高於視窗時自然生長，padding 為最小間距 ---- */
+  .sec-full {
+    padding-block: 4rem;
+  }
+
+  @media (min-width: 768px) {
+    .sec-full {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: calc(100svh - 4.5rem);
+      padding-block: 5rem 3rem;
     }
   }
 

@@ -2,17 +2,31 @@
 /**
  * 最終聯絡 CTA（首頁與內頁共用）。
  * 底色採品牌色 Reach Blue 500。
+ * 左欄：標題（兩行，第二行縮小）＋按鈕；右欄：Reach us，樣式比照 Hero 右欄（白色分隔線＋白字）。
  */
 ---
 
 <section class="cta-band">
-  <div class="container-site py-20 text-center md:py-28" data-reveal>
-    <h2 class="heading-section text-white">與我們聊聊你的需求，一起找到改變的起點</h2>
-    <div class="mt-9 flex justify-center">
-      <a href="/contact/" class="btn-on-blue">
-        聯絡我們
-        <span class="cta-arrow" aria-hidden="true">→</span>
-      </a>
+  <div class="container-site py-20 md:py-28" data-reveal>
+    <div class="cta-grid">
+      {/* 左欄：現行內容，主句與「一起找到改變的起點」分兩行 */}
+      <div>
+        <h2 class="heading-section text-white">
+          與我們聊聊你的需求
+          <span class="cta-sub">一起找到改變的起點</span>
+        </h2>
+        <div class="mt-9">
+          <a href="/contact/" class="btn-on-blue">
+            聯絡我們
+            <span class="cta-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+
+      {/* 右欄：比照 Hero 右欄——左側分隔線，分隔線與文字皆為白色 */}
+      <div class="cta-right">
+        <p class="cta-en">Reach<br />us</p>
+      </div>
     </div>
   </div>
 </section>
@@ -20,6 +34,66 @@
 <style>
   .cta-band {
     background-color: var(--reach-blue-500); /* 與「我們的使命」區塊同底色 */
+  }
+
+  /* ---- 兩欄佈局：比照 Hero（手機直排、md+ 左右各半、垂直互相置中） ---- */
+  .cta-grid {
+    /* 與 .heading-hero / index.astro .hero-grid 相同的字級公式，右欄字級按比例推導 */
+    --hero-fs: clamp(2.5rem, 5.25vw - 3px, 4.125rem);
+    display: grid;
+    gap: 2.75rem;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .cta-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  /* 第二行：同標題級距下縮小、降字重 */
+  .cta-sub {
+    display: block;
+    margin-top: 0.35em;
+    font-size: 0.7em;
+    font-weight: 500;
+  }
+
+  /* ---- 右欄：分隔線貼齊左緣，線與文字皆白（結構同 Hero .hc-right / .hc-en） ---- */
+  .cta-right {
+    border-inline-start: 2px solid var(--neutral-0);
+    padding-inline-start: clamp(1.25rem, 3vw, 3rem);
+  }
+
+  @media (min-width: 768px) {
+    /* 撐滿列高（列高由左欄決定），文字垂直置中，分隔線隨之等高 */
+    .cta-right {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+
+  .cta-en {
+    font-size: 1.9375rem; /* 手機 31px，與 Hero 右欄一致 */
+    line-height: 1.15;
+    font-weight: 600;
+    color: var(--neutral-0);
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .cta-en {
+      font-size: calc(var(--hero-fs) * 0.68);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .cta-en {
+      font-size: calc(var(--hero-fs) * 0.75);
+    }
   }
 
   .btn-on-blue {

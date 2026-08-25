@@ -11,12 +11,10 @@
  * - 僅使用 opacity／transform；字槽固定尺寸，無 layout shift。
  */
 
-const DWELL_MS = 3200;
+/** 每幕「動畫結束後」的靜止停留，四幕統一 */
+const DWELL_MS = 2000;
 /** 每輪重置淡入後、進場滑入前的小拍（首次載入不留空拍，直接滑入） */
 const REENTER_DELAY_MS = 350;
-/** 第一幕縮短停留（自進場完成起算）：讓訪客一進站就看見第一次切換 */
-const FIRST_DWELL_MS = 1500;
-const BRAND_DWELL_MS = 5200;
 /** 與 index.astro 的 --hc-dur 保持一致 */
 const SLIDE_MS = 850;
 /** 與 index.astro 的 --hc-fly-dur 保持一致（幕 3→4 合併飛行）。
@@ -213,14 +211,16 @@ export function initHeroCarousel(): void {
       slideTo(0);
       await wait(SLIDE_MS);
 
-      await wait(firstCycle ? FIRST_DWELL_MS : DWELL_MS); // 第一幕
+      await wait(DWELL_MS); // 第一幕
       firstCycle = false;
       slideTo(1);
+      await wait(SLIDE_MS); // 等滑動完成，停留自動畫結束起算
       await wait(DWELL_MS); // 第二幕
       slideTo(2);
+      await wait(SLIDE_MS);
       await wait(DWELL_MS); // 第三幕
       await morphToBrand();
-      await wait(BRAND_DWELL_MS); // 第四幕
+      await wait(DWELL_MS); // 第四幕
       await resetToStart();
     }
   }

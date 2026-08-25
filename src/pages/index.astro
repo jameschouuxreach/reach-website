@@ -163,35 +163,29 @@ const positioning = [
             </p>
           </div>
 
-          {/* 三圓圖示：同一圓形、三種切分方式（深灰線＋品牌色 50% 填色） */}
+          {/* 三圓圖示：同一圓形、三種切分方式（無線條，三階品牌藍色塊，與「我們的服務」六圓同色階）。
+              每個圓由淺至深疊繪，避免相鄰色塊出現抗鋸齒縫隙。 */}
           <svg
             viewBox="0 0 660 220"
             class="ww-visual h-auto w-full"
             role="img"
-            aria-label="示意圖：三個圓形各以不同方式切分，填色區塊代表不同情境下的切入點"
+            aria-label="示意圖：三個圓形各以不同方式分層填色，色塊代表不同情境下的切入點"
           >
-            {/* 圓一：頂點放射的扇形切分 */}
-            <path
-              d="M 110 20 L 194.6 140.8 A 90 90 0 0 1 155 187.9 Z"
-              class="ww-fill"></path>
-            <circle cx="110" cy="110" r="90" class="ww-stroke"></circle>
-            <line x1="110" y1="20" x2="110" y2="200" class="ww-stroke"></line>
-            <line x1="110" y1="20" x2="194.6" y2="140.8" class="ww-stroke"></line>
-            <line x1="110" y1="20" x2="155" y2="187.9" class="ww-stroke"></line>
+            {/* 圓一：垂直對切＋頂點斜弦，右上弓形最深 */}
+            <circle cx="110" cy="110" r="90" class="ww-l"></circle>
+            <path d="M 110 20 A 90 90 0 0 1 110 200 Z" class="ww-m"></path>
+            <path d="M 110 20 A 90 90 0 0 1 178.9 167.9 Z" class="ww-d"></path>
 
-            {/* 圓二：同心內圓，水平線上方的內圓弧頂 */}
-            <path d="M 281.2 110 A 52 52 0 0 1 378.8 110 Z" class="ww-fill"></path>
-            <circle cx="330" cy="110" r="90" class="ww-stroke"></circle>
-            <circle cx="330" cy="128" r="52" class="ww-stroke"></circle>
-            <line x1="240" y1="110" x2="420" y2="110" class="ww-stroke"></line>
+            {/* 圓二：上半外環中階、同心內圓下半最深 */}
+            <circle cx="330" cy="110" r="90" class="ww-l"></circle>
+            <path d="M 240 110 A 90 90 0 0 1 420 110 Z" class="ww-m"></path>
+            <circle cx="330" cy="110" r="52" class="ww-l"></circle>
+            <path d="M 278 110 A 52 52 0 0 0 382 110 Z" class="ww-d"></path>
 
-            {/* 圓三：兩條水平弦切出的中段層帶 */}
-            <path
-              d="M 469.4 70 A 90 90 0 0 0 469.4 150 L 630.6 150 A 90 90 0 0 0 630.6 70 Z"
-              class="ww-fill"></path>
-            <circle cx="550" cy="110" r="90" class="ww-stroke"></circle>
-            <line x1="469.4" y1="70" x2="630.6" y2="70" class="ww-stroke"></line>
-            <line x1="469.4" y1="150" x2="630.6" y2="150" class="ww-stroke"></line>
+            {/* 圓三：兩條水平弦切成三層，由上而下漸深 */}
+            <circle cx="550" cy="110" r="90" class="ww-l"></circle>
+            <path d="M 465.1 80 A 90 90 0 1 0 634.9 80 Z" class="ww-m"></path>
+            <path d="M 465.1 140 A 90 90 0 0 0 634.9 140 Z" class="ww-d"></path>
           </svg>
         </div>
       </div>
@@ -606,18 +600,17 @@ const positioning = [
     max-width: 560px;
   }
 
-  .ww-stroke {
-    fill: none;
-    stroke: var(--neutral-700);
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  /* 三階藍與「我們的服務」六圓色階一致 */
+  .ww-l {
+    fill: #dfe8fa;
   }
 
-  .ww-fill {
-    fill: var(--reach-blue-500);
-    fill-opacity: 0.5;
-    stroke: none;
+  .ww-m {
+    fill: #b0c9fc;
+  }
+
+  .ww-d {
+    fill: #4d88fe;
   }
 
   /* ---- 未知到已知視覺：六圓由左至右依序浮現（進場一次） ---- */

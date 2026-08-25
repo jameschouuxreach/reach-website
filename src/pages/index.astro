@@ -165,7 +165,7 @@ const positioning = [
 
           {/* 三圓圖示（無線條，三階品牌藍色塊，與「我們的服務」六圓同色階）。
               二段式進場動畫：初始三圓相同（上淺下中階）；
-              第一段同時旋轉（左 270°、中 180°、右 180°＋中階增量帶自圓周外滑入）；
+              第一段同時旋轉（左 270°、中 180°、右 180°＋中階色塊邊轉邊長大）；
               第二段同時（左：深色弓形以圓頂點為軸旋開露出；中：內圓再轉 180°、
               跨過水平線的部分即為深色；右：再轉 180°＋深色底塊自圓周外滑入）。
               一律幾何呈現（旋轉／滑入／裁切），無漸變；皆帶回彈（overshoot 後彈回）。
@@ -219,18 +219,15 @@ const positioning = [
               </g>
             </g>
 
-            {/* 圓三：第一段轉 180°，中階增量帶（世界座標 110–140）自圓周下緣外滑入；
-                第二段再轉 180°（增量帶掛在同步旋轉群組上，與翻面的中階半圓合為一體），
-                深色底塊自圓周下緣外向上滑入落定於 140–200（皆非漸變、非原地長大）。 */}
+            {/* 圓三：第一段轉 180°，中階半平面同時把邊界外推 30——原本的色塊
+                邊旋轉邊長大（非另一塊飛入）；第二段再轉 180°（長大後的中階整片翻面），
+                深色底塊自圓周下緣外向上滑入落定於 140–200。 */}
             <g clip-path="url(#ww-clip-c)">
               <g class="ww-c-spin1">
                 <g class="ww-c-spin2">
                   <circle cx="550" cy="110" r="90" class="ww-l"></circle>
-                  <rect x="458" y="110" width="184" height="94" class="ww-m"></rect>
+                  <rect x="458" y="110" width="184" height="126" class="ww-m ww-c-med"></rect>
                 </g>
-              </g>
-              <g class="ww-c-bandspin">
-                <rect x="458" y="109" width="184" height="31" class="ww-m ww-c-band"></rect>
               </g>
               <rect x="458" y="140" width="184" height="160" class="ww-d ww-c-cap"></rect>
             </g>
@@ -678,8 +675,7 @@ const positioning = [
   .ww-b-inner,
   .ww-b-darkspin,
   .ww-c-spin1,
-  .ww-c-spin2,
-  .ww-c-bandspin {
+  .ww-c-spin2 {
     transform-box: view-box;
   }
 
@@ -703,13 +699,16 @@ const positioning = [
   }
 
   .ww-c-spin1,
-  .ww-c-spin2,
-  .ww-c-bandspin {
+  .ww-c-spin2 {
     transform-origin: 550px 110px;
     transform: rotate(180deg);
   }
 
-  .ww-c-band,
+  /* 中階半平面邊界外推 30：110 → 80（局部座標；終態即長大後位置） */
+  .ww-c-med {
+    transform: translateY(-30px);
+  }
+
   .ww-c-cap {
     transform: translateY(0);
   }
@@ -722,8 +721,7 @@ const positioning = [
     :global(html.js) [data-reveal]:not(.is-visible) .ww-b-inner,
     :global(html.js) [data-reveal]:not(.is-visible) .ww-b-darkspin,
     :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin1,
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin2,
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-bandspin {
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin2 {
       transform: rotate(0deg);
     }
 
@@ -732,29 +730,28 @@ const positioning = [
       transform: rotate(-90deg);
     }
 
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-band {
-      transform: translateY(100px);
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-med {
+      transform: translateY(0);
     }
 
     :global(html.js) [data-reveal]:not(.is-visible) .ww-c-cap {
       transform: translateY(165px);
     }
 
-    /* 第一段：三圓同時旋轉；右圓中階增量帶同步自下緣外滑入 */
+    /* 第一段：三圓同時旋轉；右圓中階色塊邊轉邊長大（邊界外推） */
     :global(html.js) .ww-a-spin,
     :global(html.js) .ww-b-spin,
     :global(html.js) .ww-c-spin1,
-    :global(html.js) .ww-c-band {
+    :global(html.js) .ww-c-med {
       transition: transform var(--wwa-d1) var(--wwa-spring) var(--wwa-t1);
     }
 
     /* 第二段：左深色半圓旋入、中內圓與深色層同步翻面、
-       右（含增量帶）再轉半圈＋深色底塊滑入 */
+       右再轉半圈＋深色底塊滑入 */
     :global(html.js) .ww-a-dark,
     :global(html.js) .ww-b-inner,
     :global(html.js) .ww-b-darkspin,
     :global(html.js) .ww-c-spin2,
-    :global(html.js) .ww-c-bandspin,
     :global(html.js) .ww-c-cap {
       transition: transform var(--wwa-d2) var(--wwa-spring) var(--wwa-t2);
     }

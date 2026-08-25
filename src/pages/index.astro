@@ -193,6 +193,8 @@ const positioning = [
                   左側跨線小色塊顯示最深色（搭配時間閘門避免第二段初始閃現） */}
               <clipPath id="ww-clip-b-wedge"><path d="M 330 110 L 238 110 L 238 76.5 Z"></path></clipPath>
               <clipPath id="ww-clip-c"><circle cx="550" cy="110" r="90"></circle></clipPath>
+              {/* 右圓 140 以下底帶：旋入的深色底塊只在落定區域內顯示 */}
+              <clipPath id="ww-clip-c-low"><rect x="458" y="140" width="184" height="64"></rect></clipPath>
             </defs>
 
             {/* 圓一：整體轉 270° → 第二段：深色右半圓形以頂點 (110,20) 為軸旋入。
@@ -237,7 +239,9 @@ const positioning = [
 
             {/* 圓三：第一段轉 180°，中階半平面同時把邊界外推 30——原本的色塊
                 邊旋轉邊長大（非另一塊飛入）；第二段再轉 180°（長大後的中階整片翻面），
-                深色底塊自圓周下緣外向上滑入落定於 140–200。 */}
+                深色與中階同步順時針旋入（同速同角度；完全比照圓二：深色＝通過圓心的
+                半圓隨 capspin 轉半圈，邊界線恆過圓心、旋轉感明確；靜態底帶裁切
+                只顯示跨入 140–200 落定區的部分，超轉時底帶保持全滿無破角）。 */}
             <g clip-path="url(#ww-clip-c)">
               <g class="ww-c-spin1">
                 <g class="ww-c-spin2">
@@ -245,7 +249,11 @@ const positioning = [
                   <rect x="458" y="110" width="184" height="126" class="ww-m ww-c-med"></rect>
                 </g>
               </g>
-              <rect x="458" y="140" width="184" height="160" class="ww-d ww-c-cap"></rect>
+              <g clip-path="url(#ww-clip-c-low)">
+                <g class="ww-c-capspin">
+                  <path d="M 460 110 A 90 90 0 0 1 640 110 Z" class="ww-d"></path>
+                </g>
+              </g>
             </g>
           </svg>
         </div>
@@ -715,7 +723,8 @@ const positioning = [
   .ww-b-inner,
   .ww-b-darkspin,
   .ww-c-spin1,
-  .ww-c-spin2 {
+  .ww-c-spin2,
+  .ww-c-capspin {
     transform-box: view-box;
   }
 
@@ -743,7 +752,8 @@ const positioning = [
   }
 
   .ww-c-spin1,
-  .ww-c-spin2 {
+  .ww-c-spin2,
+  .ww-c-capspin {
     transform-origin: 550px 110px;
     transform: rotate(180deg);
   }
@@ -751,10 +761,6 @@ const positioning = [
   /* 中階半平面邊界外推 30：110 → 80（局部座標；終態即長大後位置） */
   .ww-c-med {
     transform: translateY(-30px);
-  }
-
-  .ww-c-cap {
-    transform: translateY(0);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -765,7 +771,8 @@ const positioning = [
     :global(html.js) [data-reveal]:not(.is-visible) .ww-b-inner,
     :global(html.js) [data-reveal]:not(.is-visible) .ww-b-darkspin,
     :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin1,
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin2 {
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin2,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-capspin {
       transform: rotate(0deg);
     }
 
@@ -782,10 +789,6 @@ const positioning = [
       transform: translateY(0);
     }
 
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-cap {
-      transform: translateY(165px);
-    }
-
     /* 離場即瞬間重置（不跑回程的分段 transition）：否則快速捲回時
        深色層還停在終態，重播會一開始就整片出現 */
     :global(html.js) [data-reveal]:not(.is-visible) .ww-a-spin,
@@ -796,8 +799,8 @@ const positioning = [
     :global(html.js) [data-reveal]:not(.is-visible) .ww-b-wedgegate,
     :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin1,
     :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin2,
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-med,
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-cap {
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-capspin,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-med {
       transition: none;
     }
 
@@ -815,7 +818,7 @@ const positioning = [
     :global(html.js) .ww-b-inner,
     :global(html.js) .ww-b-darkspin,
     :global(html.js) .ww-c-spin2,
-    :global(html.js) .ww-c-cap {
+    :global(html.js) .ww-c-capspin {
       transition: transform var(--wwa-d2) var(--wwa-spring) var(--wwa-t2);
     }
 

@@ -9,23 +9,23 @@
 <section class="cta-band">
   <div class="container-site py-20 md:py-28" data-reveal>
     <div class="cta-grid">
-      {/* 左欄：現行內容，主句與「一起找到改變的起點」分兩行 */}
-      <div>
+      {/* 左欄：標題兩行（第二行縮小），內容水平置中 */}
+      <div class="cta-left">
         <h2 class="heading-section text-white">
           與我們聊聊你的需求
           <span class="cta-sub">一起找到改變的起點</span>
         </h2>
-        <div class="mt-9">
+      </div>
+
+      {/* 右欄：比照 Hero 右欄——左側白色分隔線；Reach us 單行＋按鈕，水平置中 */}
+      <div class="cta-right">
+        <p class="cta-en">Reach us</p>
+        <div class="mt-8">
           <a href="/contact/" class="btn-on-blue">
             聯絡我們
             <span class="cta-arrow" aria-hidden="true">→</span>
           </a>
         </div>
-      </div>
-
-      {/* 右欄：比照 Hero 右欄——左側分隔線，分隔線與文字皆為白色 */}
-      <div class="cta-right">
-        <p class="cta-en">Reach<br />us</p>
       </div>
     </div>
   </div>
@@ -52,6 +52,11 @@
     }
   }
 
+  /* 左欄：內容水平置中 */
+  .cta-left {
+    text-align: center;
+  }
+
   /* 第二行：同標題級距下縮小、降字重 */
   .cta-sub {
     display: block;
@@ -60,18 +65,20 @@
     font-weight: 500;
   }
 
-  /* ---- 右欄：分隔線貼齊左緣，線與文字皆白（結構同 Hero .hc-right / .hc-en） ---- */
+  /* ---- 右欄：分隔線貼齊左緣，線與文字皆白（結構同 Hero .hc-right / .hc-en）；內容水平置中 ---- */
   .cta-right {
     border-inline-start: 2px solid var(--neutral-0);
     padding-inline-start: clamp(1.25rem, 3vw, 3rem);
+    text-align: center;
   }
 
   @media (min-width: 768px) {
-    /* 撐滿列高（列高由左欄決定），文字垂直置中，分隔線隨之等高 */
+    /* 撐滿列高（列高由左欄決定），內容垂直置中，分隔線隨之等高 */
     .cta-right {
       align-self: stretch;
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: center;
     }
   }
@@ -102,7 +109,7 @@
     gap: 0.5rem;
     min-height: 2.75rem;
     padding: 0.75rem 2rem;
-    border-radius: 10px;
+    border-radius: 9999px; /* 膠囊圓角 */
     background-color: var(--neutral-0);
     color: var(--color-brand);
     font-weight: 700;

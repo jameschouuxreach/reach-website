@@ -181,13 +181,11 @@ const positioning = [
               {/* 左圓右半平面：深色層與遮板都限制在右半 */}
               <clipPath id="ww-clip-a-r"><rect x="110" y="18" width="94" height="184"></rect></clipPath>
               <clipPath id="ww-clip-b"><circle cx="330" cy="110" r="90"></circle></clipPath>
-              {/* 中圓水平線以下＋中心左側 0–20° 小楔形：深色半圓只在跨過水平線的
-                  部分顯示；楔形讓回彈超轉（>180°）時左側超出水平線的小色塊也呈最深色
-                 （正轉過程殘餘只會在右側上方，不會進入左楔形，終態時楔形為空） */}
-              <clipPath id="ww-clip-b-low">
-                <rect x="238" y="110" width="184" height="94"></rect>
-                <path d="M 330 110 L 238 110 L 238 76.5 Z"></path>
-              </clipPath>
+              {/* 中圓水平線以下：深色半圓只在跨過水平線的部分顯示 */}
+              <clipPath id="ww-clip-b-low"><rect x="238" y="110" width="184" height="94"></rect></clipPath>
+              {/* 中心左側水平線上方 0–20° 小楔形：僅供回彈超轉（>180°）時
+                  左側跨線小色塊顯示最深色（搭配時間閘門避免第二段初始閃現） */}
+              <clipPath id="ww-clip-b-wedge"><path d="M 330 110 L 238 110 L 238 76.5 Z"></path></clipPath>
               <clipPath id="ww-clip-c"><circle cx="550" cy="110" r="90"></circle></clipPath>
             </defs>
 
@@ -218,6 +216,13 @@ const positioning = [
                 </g>
               </g>
               <g clip-path="url(#ww-clip-b-low)">
+                <g class="ww-b-darkspin">
+                  <path d="M 278 110 A 52 52 0 0 1 382 110 Z" class="ww-d"></path>
+                </g>
+              </g>
+              {/* 楔形層：同步旋轉的深色複本，時間閘門在第二段開始 285ms 後開啟
+                 （彼時旋轉已過 20°、楔形必為空，開啟無感）；僅回彈超轉時顯示 */}
+              <g clip-path="url(#ww-clip-b-wedge)" class="ww-b-wedgegate">
                 <g class="ww-b-darkspin">
                   <path d="M 278 110 A 52 52 0 0 1 382 110 Z" class="ww-d"></path>
                 </g>
@@ -703,6 +708,10 @@ const positioning = [
     transform: rotate(180deg);
   }
 
+  .ww-b-wedgegate {
+    opacity: 1;
+  }
+
   .ww-c-spin1,
   .ww-c-spin2 {
     transform-origin: 550px 110px;
@@ -735,6 +744,10 @@ const positioning = [
       transform: rotate(-90deg);
     }
 
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-b-wedgegate {
+      opacity: 0;
+    }
+
     :global(html.js) [data-reveal]:not(.is-visible) .ww-c-med {
       transform: translateY(0);
     }
@@ -759,6 +772,12 @@ const positioning = [
     :global(html.js) .ww-c-spin2,
     :global(html.js) .ww-c-cap {
       transition: transform var(--wwa-d2) var(--wwa-spring) var(--wwa-t2);
+    }
+
+    /* 楔形時間閘門：第二段開始 285ms 後瞬間開啟（旋轉已過 20°、楔形為空，
+       開啟無感）；此後深色僅在回彈超轉 >180° 時進入楔形顯示 */
+    :global(html.js) .ww-b-wedgegate {
+      transition: opacity 20ms linear calc(var(--wwa-t2) + 285ms);
     }
   }
 

@@ -9,10 +9,15 @@ interface Props {
   description: string;
   /** 首頁不加站名後綴 */
   isHome?: boolean;
+  /** 分享用標題／描述（未提供時沿用 title／description） */
+  ogTitle?: string;
+  ogDescription?: string;
 }
 
-const { title, description, isHome = false } = Astro.props;
+const { title, description, isHome = false, ogTitle, ogDescription } = Astro.props;
 const fullTitle = isHome ? title : `${title}｜${SITE_NAME} ${SITE_NAME_EN}`;
+const shareTitle = ogTitle ?? fullTitle;
+const shareDescription = ogDescription ?? description;
 const pagePath = Astro.url.pathname;
 const pageUrl = new URL(pagePath, SITE_URL).href;
 ---
@@ -26,8 +31,8 @@ const pageUrl = new URL(pagePath, SITE_URL).href;
     <meta name="description" content={description} />
     {/* TODO: 正式網域確認後（src/config.ts），canonical 自動啟用 */}
     {SITE_URL_CONFIRMED && <link rel="canonical" href={pageUrl} />}
-    <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={shareTitle} />
+    <meta property="og:description" content={shareDescription} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={`${SITE_NAME} ${SITE_NAME_EN}`} />
     <meta property="og:locale" content="zh_TW" />

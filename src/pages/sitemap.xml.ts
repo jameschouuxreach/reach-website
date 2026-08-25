@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
-import { ROUTES, SITE_URL } from '../config';
+import { ROUTES, WORK_ROUTES, SITE_URL } from '../config';
 
 // 網域集中於 src/config.ts（TODO：正式網域確認後自動生效）
 export const GET: APIRoute = () => {
-  const urls = ROUTES.map(
+  const urls = [...ROUTES, ...WORK_ROUTES].map(
     (route) => `  <url>\n    <loc>${new URL(route.path, SITE_URL).href}</loc>\n  </url>`,
   ).join('\n');
 

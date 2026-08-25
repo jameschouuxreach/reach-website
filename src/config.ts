@@ -7,6 +7,12 @@ export const SITE_URL_CONFIRMED = false;
 export const SITE_NAME = '致遠體驗設計';
 export const SITE_NAME_EN = 'Reach Experience Design';
 
+/** 專案實例內頁路由（僅供 sitemap；不進主導覽） */
+export const WORK_ROUTES = [
+  { path: '/work/nexdo-a/', label: '好齡居（版本A）' },
+  { path: '/work/nexdo-b/', label: '好齡居（版本B）' },
+] as const;
+
 /** 供 sitemap 與導覽使用的主要路由 */
 export const ROUTES = [
   { path: '/', label: '首頁' },

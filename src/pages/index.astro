@@ -165,12 +165,11 @@ const positioning = [
 
           {/* 三圓圖示（無線條，三階品牌藍色塊，與「我們的服務」六圓同色階）。
               二段式進場動畫：初始三圓相同（上淺下中階）；
-              第一段同時旋轉（左 270°、中 180°、右 180°＋中階區塊變大）；
-              第二段同時（左：最深弓形以圓頂點為軸旋入；中：內圓再轉 180°、
-              過水平線的中階半圓變最深；右：再轉 180°＋最深底塊浮現）。
-              旋轉與位移皆帶回彈（overshoot 後彈回）。結構上每圓是「淺色底圓＋
-              中階半平面矩形」的旋轉群組裁切在圓內，終態與靜態版完全一致；
-              無 JS／reduced-motion 直接顯示終態。 */}
+              第一段同時旋轉（左 270°、中 180°、右 180°＋中階增量帶自圓周外滑入）；
+              第二段同時（左：深色弓形以圓頂點為軸旋開露出；中：內圓再轉 180°、
+              跨過水平線的部分即為深色；右：再轉 180°＋深色底塊自圓周外滑入）。
+              一律幾何呈現（旋轉／滑入／裁切），無漸變；皆帶回彈（overshoot 後彈回）。
+              終態與靜態版完全一致；無 JS／reduced-motion 直接顯示終態。 */}
           <svg
             viewBox="0 0 660 220"
             class="ww-visual h-auto w-full"
@@ -179,45 +178,61 @@ const positioning = [
           >
             <defs>
               <clipPath id="ww-clip-a"><circle cx="110" cy="110" r="90"></circle></clipPath>
-              {/* 左圓右半平面：最深弓形旋入時，越過垂直中線的部分才顯示 */}
+              {/* 左圓右半平面：深色層與遮板都限制在右半 */}
               <clipPath id="ww-clip-a-r"><rect x="110" y="18" width="94" height="184"></rect></clipPath>
               <clipPath id="ww-clip-b"><circle cx="330" cy="110" r="90"></circle></clipPath>
+              {/* 中圓水平線以下：深色半圓只在跨過水平線的部分顯示 */}
+              <clipPath id="ww-clip-b-low"><rect x="238" y="110" width="184" height="94"></rect></clipPath>
               <clipPath id="ww-clip-c"><circle cx="550" cy="110" r="90"></circle></clipPath>
             </defs>
 
-            {/* 圓一：整體轉 270° → 最深弓形以頂點 (110,20) 為軸旋入右半 */}
+            {/* 圓一：整體轉 270° → 第二段：深色右半圓形以頂點 (110,20) 為軸旋入。
+                初始轉 90°（整片在圓外，不可見），旋回 25° 時其直邊恰為 130° 弓形的弦
+                （頂點圓周角＝圓心角一半），露出的深色恆為貼著圓弧的弓形；
+                回彈超過 25° 時弓形真的變大再縮回。 */}
             <g clip-path="url(#ww-clip-a)">
               <g class="ww-a-spin">
                 <circle cx="110" cy="110" r="90" class="ww-l"></circle>
                 <rect x="18" y="110" width="184" height="94" class="ww-m"></rect>
               </g>
               <g clip-path="url(#ww-clip-a-r)">
-                <path d="M 110 20 A 90 90 0 0 1 178.9 167.9 Z" class="ww-d ww-a-dark"></path>
+                <path d="M 110 20 A 90 90 0 0 1 110 200 Z" class="ww-d ww-a-dark"></path>
               </g>
             </g>
 
-            {/* 圓二：整體轉 180° → 內圓再轉 180°；內圓兩個半圓初始與外圈同色（隱形），
-                淺色半圓弦線多留 1px 疊在中階半圓下方，避免終態接縫 */}
+            {/* 圓二：整體轉 180° → 內圓再轉 180°。深色＝獨立的同步旋轉半圓，
+                以靜態「水平線以下」裁切：只有跨過水平線的部分顯示為深色（非漸變）。
+                內圓中階半圓維持中階色，與深色層同步旋轉、始終重合。 */}
             <g clip-path="url(#ww-clip-b)">
               <g class="ww-b-spin">
                 <circle cx="330" cy="110" r="90" class="ww-l"></circle>
                 <rect x="238" y="110" width="184" height="94" class="ww-m"></rect>
                 <g class="ww-b-inner">
                   <path d="M 278 111 A 52 52 0 0 1 382 111 Z" class="ww-l"></path>
-                  <path d="M 278 110 A 52 52 0 0 0 382 110 Z" class="ww-b-flip"></path>
+                  <path d="M 278 110 A 52 52 0 0 0 382 110 Z" class="ww-m"></path>
+                </g>
+              </g>
+              <g clip-path="url(#ww-clip-b-low)">
+                <g class="ww-b-darkspin">
+                  <path d="M 278 110 A 52 52 0 0 1 382 110 Z" class="ww-d"></path>
                 </g>
               </g>
             </g>
 
-            {/* 圓三：轉 180°＋中階半平面上移 30（區塊變大）→ 再轉 180°＋最深底塊浮現 */}
+            {/* 圓三：第一段轉 180°，中階增量帶（世界座標 110–140）自圓周下緣外滑入；
+                第二段再轉 180°（增量帶掛在同步旋轉群組上，與翻面的中階半圓合為一體），
+                深色底塊自圓周下緣外向上滑入落定於 140–200（皆非漸變、非原地長大）。 */}
             <g clip-path="url(#ww-clip-c)">
               <g class="ww-c-spin1">
                 <g class="ww-c-spin2">
                   <circle cx="550" cy="110" r="90" class="ww-l"></circle>
-                  <rect x="458" y="110" width="184" height="126" class="ww-m ww-c-med"></rect>
-                  <path d="M 465.1 140 A 90 90 0 0 0 634.9 140 Z" class="ww-d ww-c-dark"></path>
+                  <rect x="458" y="110" width="184" height="94" class="ww-m"></rect>
                 </g>
               </g>
+              <g class="ww-c-bandspin">
+                <rect x="458" y="109" width="184" height="31" class="ww-m ww-c-band"></rect>
+              </g>
+              <rect x="458" y="140" width="184" height="160" class="ww-d ww-c-cap"></rect>
             </g>
           </svg>
         </div>
@@ -661,8 +676,10 @@ const positioning = [
   .ww-a-dark,
   .ww-b-spin,
   .ww-b-inner,
+  .ww-b-darkspin,
   .ww-c-spin1,
-  .ww-c-spin2 {
+  .ww-c-spin2,
+  .ww-c-bandspin {
     transform-box: view-box;
   }
 
@@ -671,83 +688,75 @@ const positioning = [
     transform: rotate(270deg);
   }
 
+  /* 深色右半圓的直邊停在 130° 弓形的弦上（頂點圓周角為圓心角一半＝65°，
+     即自垂直徑偏 25°；CSS 正角向左轉出，故取 -25°） */
   .ww-a-dark {
     transform-origin: 110px 20px;
-    transform: rotate(0deg);
+    transform: rotate(-25deg);
   }
 
   .ww-b-spin,
-  .ww-b-inner {
+  .ww-b-inner,
+  .ww-b-darkspin {
     transform-origin: 330px 110px;
     transform: rotate(180deg);
   }
 
-  .ww-b-flip {
-    fill: #4d88fe;
-  }
-
   .ww-c-spin1,
-  .ww-c-spin2 {
+  .ww-c-spin2,
+  .ww-c-bandspin {
     transform-origin: 550px 110px;
     transform: rotate(180deg);
   }
 
-  .ww-c-med {
-    transform: translateY(-30px);
-  }
-
-  .ww-c-dark {
-    opacity: 1;
+  .ww-c-band,
+  .ww-c-cap {
+    transform: translateY(0);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    /* 初始態（進場前）：三圓一致＝上淺下中階，無最深色塊 */
+    /* 初始態（進場前）：三圓一致＝上淺下中階；深色層與增量帶
+       以「隱藏／圓周外」待命，全程無漸變 */
     :global(html.js) [data-reveal]:not(.is-visible) .ww-a-spin,
     :global(html.js) [data-reveal]:not(.is-visible) .ww-b-spin,
     :global(html.js) [data-reveal]:not(.is-visible) .ww-b-inner,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-b-darkspin,
     :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin1,
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin2 {
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin2,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-bandspin {
       transform: rotate(0deg);
     }
 
+    /* 深色右半圓初始轉 -90°：整片在切線外側（圓外），不可見 */
     :global(html.js) [data-reveal]:not(.is-visible) .ww-a-dark {
-      transform: rotate(-65deg);
+      transform: rotate(-90deg);
     }
 
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-b-flip {
-      fill: #b0c9fc;
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-band {
+      transform: translateY(100px);
     }
 
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-med {
-      transform: translateY(0);
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-cap {
+      transform: translateY(165px);
     }
 
-    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-dark {
-      opacity: 0;
-    }
-
-    /* 第一段：三圓同時旋轉（右圓的中階區塊同步變大） */
+    /* 第一段：三圓同時旋轉；右圓中階增量帶同步自下緣外滑入 */
     :global(html.js) .ww-a-spin,
     :global(html.js) .ww-b-spin,
     :global(html.js) .ww-c-spin1,
-    :global(html.js) .ww-c-med {
+    :global(html.js) .ww-c-band {
       transition: transform var(--wwa-d1) var(--wwa-spring) var(--wwa-t1);
     }
 
-    /* 第二段：左弓形旋入、中內圓翻面變深、右再轉半圈 */
+    /* 第二段：左深色半圓旋入、中內圓與深色層同步翻面、
+       右（含增量帶）再轉半圈＋深色底塊滑入 */
     :global(html.js) .ww-a-dark,
     :global(html.js) .ww-b-inner,
-    :global(html.js) .ww-c-spin2 {
+    :global(html.js) .ww-b-darkspin,
+    :global(html.js) .ww-c-spin2,
+    :global(html.js) .ww-c-bandspin,
+    :global(html.js) .ww-c-cap {
       transition: transform var(--wwa-d2) var(--wwa-spring) var(--wwa-t2);
-    }
-
-    :global(html.js) .ww-b-flip {
-      transition: fill var(--wwa-d2) ease var(--wwa-t2);
-    }
-
-    /* 最深底塊在第二段後半浮現（隨旋轉落到底部時成形） */
-    :global(html.js) .ww-c-dark {
-      transition: opacity 500ms ease calc(var(--wwa-t2) + 400ms);
     }
   }
 

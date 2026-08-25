@@ -155,10 +155,45 @@ const positioning = [
     <div class="container-site py-16 md:py-24">
       <div data-reveal>
         <SectionLabel zh="我們與誰合作" en="WHO WE WORK WITH" />
-        <h3 class="heading-sub mt-10 max-w-xl">解法因情境而異，核心始終如一</h3>
-        <p class="mt-5 max-w-xl leading-loose text-ink-secondary">
-          面對不同的目標、限制與協作方式，我們找出合適的切入點，讓解法符合情境，也能真正落地。
-        </p>
+        <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
+          <div>
+            <h3 class="heading-sub max-w-xl">解法因情境而異，核心始終如一</h3>
+            <p class="mt-5 max-w-xl leading-loose text-ink-secondary">
+              面對不同的目標、限制與協作方式，我們找出合適的切入點，讓解法符合情境，也能真正落地。
+            </p>
+          </div>
+
+          {/* 三圓圖示：同一圓形、三種切分方式（深灰線＋品牌色 50% 填色） */}
+          <svg
+            viewBox="0 0 660 220"
+            class="ww-visual h-auto w-full"
+            role="img"
+            aria-label="示意圖：三個圓形各以不同方式切分，填色區塊代表不同情境下的切入點"
+          >
+            {/* 圓一：頂點放射的扇形切分 */}
+            <path
+              d="M 110 20 L 194.6 140.8 A 90 90 0 0 1 155 187.9 Z"
+              class="ww-fill"></path>
+            <circle cx="110" cy="110" r="90" class="ww-stroke"></circle>
+            <line x1="110" y1="20" x2="110" y2="200" class="ww-stroke"></line>
+            <line x1="110" y1="20" x2="194.6" y2="140.8" class="ww-stroke"></line>
+            <line x1="110" y1="20" x2="155" y2="187.9" class="ww-stroke"></line>
+
+            {/* 圓二：同心內圓，水平線上方的內圓弧頂 */}
+            <path d="M 281.2 110 A 52 52 0 0 1 378.8 110 Z" class="ww-fill"></path>
+            <circle cx="330" cy="110" r="90" class="ww-stroke"></circle>
+            <circle cx="330" cy="128" r="52" class="ww-stroke"></circle>
+            <line x1="240" y1="110" x2="420" y2="110" class="ww-stroke"></line>
+
+            {/* 圓三：兩條水平弦切出的中段層帶 */}
+            <path
+              d="M 469.4 70 A 90 90 0 0 0 469.4 150 L 630.6 150 A 90 90 0 0 0 630.6 70 Z"
+              class="ww-fill"></path>
+            <circle cx="550" cy="110" r="90" class="ww-stroke"></circle>
+            <line x1="469.4" y1="70" x2="630.6" y2="70" class="ww-stroke"></line>
+            <line x1="469.4" y1="150" x2="630.6" y2="150" class="ww-stroke"></line>
+          </svg>
+        </div>
       </div>
       <div class="mt-10 grid gap-5 md:grid-cols-2" data-reveal>
         <AudienceCard
@@ -564,6 +599,25 @@ const positioning = [
 
   .hc-en-static + .hc-en-static {
     margin-top: 0.75rem;
+  }
+
+  /* ---- 我們與誰合作：三圓切分圖示 ---- */
+  .ww-visual {
+    max-width: 560px;
+  }
+
+  .ww-stroke {
+    fill: none;
+    stroke: var(--neutral-700);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ww-fill {
+    fill: var(--reach-blue-500);
+    fill-opacity: 0.5;
+    stroke: none;
   }
 
   /* ---- 未知到已知視覺：六圓由左至右依序浮現（進場一次） ---- */

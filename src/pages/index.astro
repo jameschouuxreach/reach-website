@@ -181,8 +181,13 @@ const positioning = [
               {/* 左圓右半平面：深色層與遮板都限制在右半 */}
               <clipPath id="ww-clip-a-r"><rect x="110" y="18" width="94" height="184"></rect></clipPath>
               <clipPath id="ww-clip-b"><circle cx="330" cy="110" r="90"></circle></clipPath>
-              {/* 中圓水平線以下：深色半圓只在跨過水平線的部分顯示 */}
-              <clipPath id="ww-clip-b-low"><rect x="238" y="110" width="184" height="94"></rect></clipPath>
+              {/* 中圓水平線以下＋中心左側 0–20° 小楔形：深色半圓只在跨過水平線的
+                  部分顯示；楔形讓回彈超轉（>180°）時左側超出水平線的小色塊也呈最深色
+                 （正轉過程殘餘只會在右側上方，不會進入左楔形，終態時楔形為空） */}
+              <clipPath id="ww-clip-b-low">
+                <rect x="238" y="110" width="184" height="94"></rect>
+                <path d="M 330 110 L 238 110 L 238 76.5 Z"></path>
+              </clipPath>
               <clipPath id="ww-clip-c"><circle cx="550" cy="110" r="90"></circle></clipPath>
             </defs>
 

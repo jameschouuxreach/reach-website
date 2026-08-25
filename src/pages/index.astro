@@ -136,12 +136,13 @@ const positioning = [
             role="img"
             aria-label="示意圖：六個圓形由左至右重疊排列，顏色由淺至品牌藍原色，象徵從未知逐步走向已知"
           >
-            <circle class="wd-circle" cx="80" cy="140" r="80" fill="var(--reach-blue-500)" fill-opacity="0.1"></circle>
-            <circle class="wd-circle" cx="156" cy="140" r="80" fill="var(--reach-blue-500)" fill-opacity="0.18"></circle>
-            <circle class="wd-circle" cx="232" cy="140" r="80" fill="var(--reach-blue-500)" fill-opacity="0.3"></circle>
-            <circle class="wd-circle" cx="308" cy="140" r="80" fill="var(--reach-blue-500)" fill-opacity="0.48"></circle>
-            <circle class="wd-circle" cx="384" cy="140" r="80" fill="var(--reach-blue-500)" fill-opacity="0.72"></circle>
-            <circle class="wd-circle" cx="460" cy="140" r="80" fill="var(--reach-blue-500)" fill-opacity="1"></circle>
+            {/* 實色（原透明度混色的烘焙值）；繪製順序左→右，右圓疊在左圓之上 */}
+            <circle class="wd-circle" cx="80" cy="140" r="80" fill="#DFE8FA"></circle>
+            <circle class="wd-circle" cx="156" cy="140" r="80" fill="#CCDCFB"></circle>
+            <circle class="wd-circle" cx="232" cy="140" r="80" fill="#B0C9FC"></circle>
+            <circle class="wd-circle" cx="308" cy="140" r="80" fill="#86ADFC"></circle>
+            <circle class="wd-circle" cx="384" cy="140" r="80" fill="#4D88FE"></circle>
+            <circle class="wd-circle" cx="460" cy="140" r="80" fill="var(--reach-blue-500)"></circle>
           </svg>
         </div>
       </div>

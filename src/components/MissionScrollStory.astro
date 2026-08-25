@@ -4,7 +4,8 @@
  * - 桌機＋JS：260vh 跑道內一個 100vh sticky 畫面；區塊滑到定位後釘住，
  *   繼續捲動驅動三階段。左側字幕以 Hero 式垂直滑動輪替（第一點初始即顯示，無進場動畫）；
  *   每次輪替與右側該階段動畫同一進度門檻同時開始，階段窗結束後才輪到下一點。
- * - 右側 SVG 初始只有中心實心白圓；三階段：外圍圓 無→虛線→實線 → 八條連線 → 外圍圓填滿。
+ * - 右側 SVG（v2 九宮格）：初始只有中心實心白圓；三階段：外圍八圓 無→虛線→實線
+ *   → 十六條連線（中心對外八條＋外圈相鄰八條，動畫同時）→ 外圍圓填滿。九圓大小一致。
  * - 行動版／reduced-motion／無 JS：改為三段靜態排列（文字＋對應終態圖）。
  */
 interface MissionItem {
@@ -25,39 +26,64 @@ if (items.length !== 3) {
 // ---- SVG 固定幾何（建置時計算，不在 scroll frame 重算）----
 const CX = 400;
 const CY = 400;
-const CENTER_R = 64;
-const OUTER_R = 42;
-const ORBIT_R = 245;
+const R = 54; // 九圓同大小
+const STEP = 245; // 九宮格相鄰圓心距
 const SEGMENTS = 12; // 每個外圍圓 12 段 30° 弧段
 const STROKE = 3.2;
 const CAP_INSET = STROKE / 2; // 圓角端點內縮：讓 round cap 剛好停在圓周
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
-const rings = Array.from({ length: 8 }, (_, i) => {
-  const angle = ((-90 + i * 45) * Math.PI) / 180;
-  const dx = Math.cos(angle);
-  const dy = Math.sin(angle);
+// 外圍八圓：九宮格外圈，自正上方起順時針
+const OFFSETS: Array<[number, number]> = [
+  [0, -1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
+  [0, 1],
+  [-1, 1],
+  [-1, 0],
+  [-1, -1],
+];
+
+const rings = OFFSETS.map(([gx, gy]) => ({
+  cx: round(CX + gx * STEP),
+  cy: round(CY + gy * STEP),
+}));
+
+/** 兩圓心間的連線，兩端各內縮 R + CAP_INSET，round cap 剛好停在圓周 */
+function link(x1: number, y1: number, x2: number, y2: number) {
+  const dist = Math.hypot(x2 - x1, y2 - y1);
+  const ux = (x2 - x1) / dist;
+  const uy = (y2 - y1) / dist;
+  const inset = R + CAP_INSET;
   return {
-    cx: round(CX + dx * ORBIT_R),
-    cy: round(CY + dy * ORBIT_R),
-    lineX1: round(CX + dx * (CENTER_R + CAP_INSET)),
-    lineY1: round(CY + dy * (CENTER_R + CAP_INSET)),
-    lineX2: round(CX + dx * (ORBIT_R - OUTER_R - CAP_INSET)),
-    lineY2: round(CY + dy * (ORBIT_R - OUTER_R - CAP_INSET)),
+    x1: round(x1 + ux * inset),
+    y1: round(y1 + uy * inset),
+    x2: round(x2 - ux * inset),
+    y2: round(y2 - uy * inset),
   };
-});
+}
+
+// 中心對外八條＋外圈相鄰互連八條；共用同一個 --ms-line，動畫同時進行
+const links = [
+  ...rings.map((r) => link(CX, CY, r.cx, r.cy)),
+  ...rings.map((r, i) => {
+    const next = rings[(i + 1) % rings.length];
+    return link(r.cx, r.cy, next.cx, next.cy);
+  }),
+];
 
 /** 每段 30° 弧段：起點固定、順時針（SVG y 軸向下，角度遞增即順時針） */
 function arcSegments(cx: number, cy: number): string[] {
   return Array.from({ length: SEGMENTS }, (_, s) => {
     const a0 = ((s * 30 - 90) * Math.PI) / 180;
     const a1 = (((s + 1) * 30 - 90) * Math.PI) / 180;
-    const x0 = round(cx + OUTER_R * Math.cos(a0));
-    const y0 = round(cy + OUTER_R * Math.sin(a0));
-    const x1 = round(cx + OUTER_R * Math.cos(a1));
-    const y1 = round(cy + OUTER_R * Math.sin(a1));
-    return `M ${x0} ${y0} A ${OUTER_R} ${OUTER_R} 0 0 1 ${x1} ${y1}`;
+    const x0 = round(cx + R * Math.cos(a0));
+    const y0 = round(cy + R * Math.sin(a0));
+    const x1 = round(cx + R * Math.cos(a1));
+    const y1 = round(cy + R * Math.sin(a1));
+    return `M ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1}`;
   });
 }
 
@@ -124,17 +150,10 @@ const staticFigures = [
           {/* 右：SVG（初始只有中心實心圓） */}
           <div class="msp-figure">
             <svg viewBox="0 0 800 800" data-mission-svg class="ms-svg" aria-hidden="true" focusable="false">
-              <circle cx={CX} cy={CY} r={CENTER_R} class="ms-center" />
+              <circle cx={CX} cy={CY} r={R} class="ms-center" />
               {
-                rings.map((r) => (
-                  <line
-                    x1={r.lineX1}
-                    y1={r.lineY1}
-                    x2={r.lineX2}
-                    y2={r.lineY2}
-                    pathLength="1"
-                    class="ms-link"
-                  />
+                links.map((l) => (
+                  <line x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} pathLength="1" class="ms-link" />
                 ))
               }
               <g class="ms-arcs">
@@ -145,9 +164,9 @@ const staticFigures = [
                 }
               </g>
               <g class="ms-ringfulls">
-                {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-ringfull" />)}
+                {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={R} class="ms-ringfull" />)}
               </g>
-              {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={OUTER_R} class="ms-fill ms-fill-outer" />)}
+              {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={R} class="ms-fill ms-fill-outer" />)}
             </svg>
           </div>
         </div>
@@ -172,16 +191,16 @@ const staticFigures = [
             <p class="ms-body">{item.body}</p>
             <div class="ms-fig-wrap" aria-hidden="true">
               <svg viewBox="0 0 800 800" class="ms-fig" aria-hidden="true" focusable="false">
-                <circle cx={CX} cy={CY} r={CENTER_R} class="msf-solid" />
+                <circle cx={CX} cy={CY} r={R} class="msf-solid" />
                 {staticFigures[i].links &&
-                  rings.map((r) => (
-                    <line x1={r.lineX1} y1={r.lineY1} x2={r.lineX2} y2={r.lineY2} class="msf-line" />
+                  links.map((l) => (
+                    <line x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} class="msf-line" />
                   ))}
                 {rings.map((r) => (
                   <circle
                     cx={r.cx}
                     cy={r.cy}
-                    r={OUTER_R}
+                    r={R}
                     class={staticFigures[i].fill ? 'msf-solid' : 'msf-outline'}
                   />
                 ))}

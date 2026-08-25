@@ -1,21 +1,38 @@
 #!/usr/bin/env bash
 # 部署目前 branch 的 build 成品到 GitHub Pages（gh-pages branch）。
+# 部署位置由目前 branch 自動決定，checkout 好 branch 直接跑 ./scripts/deploy.sh 即可：
+#   main         → 網站根       https://jameschouuxreach.github.io/reach-website-v1/
+#   reach-web-v2 → /v2/ 子資料夾 https://jameschouuxreach.github.io/reach-website-v1/v2/
 #
-# 用法：
-#   ./scripts/deploy.sh        部署到網站根  → https://jameschouuxreach.github.io/reach-website-v1/
-#   ./scripts/deploy.sh v2     部署到子資料夾 → https://jameschouuxreach.github.io/reach-website-v1/v2/
-#
-# 根部署會保留 KEEP_DIRS 列出的子資料夾（其他版本的部署不會被蓋掉）；
-# 新增一個要並存的版本時，把它的子資料夾名加進 KEEP_DIRS 即可。
+# 新增一個要並存的版本：在下方對應表加一行 branch↔子資料夾，
+# 並把子資料夾名加進 KEEP_DIRS（根部署時不會被蓋掉的資料夾）。
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 REPO_BASE="/reach-website-v1"
 KEEP_DIRS=(v2)
-SUBDIR="${1:-}"
+SUBDIR_ARG="${1:-}"
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 SHA=$(git rev-parse --short HEAD)
+
+# branch ↔ 部署位置對應表
+case "$BRANCH" in
+  main)         SUBDIR="" ;;
+  reach-web-v2) SUBDIR="v2" ;;
+  *)
+    echo "錯誤：branch「${BRANCH}」沒有對應的部署位置。" >&2
+    echo "請 checkout 到 main 或 reach-web-v2 再部署，或先在 scripts/deploy.sh 的對應表加上這個 branch。" >&2
+    exit 1 ;;
+esac
+
+# 有指定參數時必須與對應表一致，避免把某版誤蓋到別版的位置
+if [[ -n "$SUBDIR_ARG" && "$SUBDIR_ARG" != "$SUBDIR" ]]; then
+  echo "錯誤：branch「${BRANCH}」的部署位置是「${SUBDIR:-網站根}」，與指定的「${SUBDIR_ARG}」不符，已中止。" >&2
+  exit 1
+fi
+
+echo "部署 ${BRANCH}（${SHA}）→ https://jameschouuxreach.github.io/reach-website-v1${SUBDIR:+/${SUBDIR}}/"
 
 npm run build
 node scripts/prefix-base.mjs "${REPO_BASE}${SUBDIR:+/${SUBDIR}}" dist

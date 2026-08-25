@@ -1,8 +1,8 @@
 ---
 /**
- * 案例卡（v1.7，參照 AJA 版式）：獨立圖片 → 客戶類別小標 → 大標題 → 專案類型 pills。
- * v1.9：支援真實案例（image／href／eyebrow／summary／cta）；未提供 image 時
- * 維持灰階佔位框，未提供 href 時為純展示卡（不可點）。
+ * 案例卡（v2.0）：獨立圖片 → 大標題 → 摘要 → 專案類型 pills；hover 時標題轉品牌色。
+ * eyebrow／cta 欄位保留但不顯示。未提供 image 時維持灰階佔位框，
+ * 未提供 href 時為純展示卡（不可點）。
  */
 interface Props {
   name: string;
@@ -10,7 +10,7 @@ interface Props {
   tag?: string;
   types?: string[];
   mediaNote?: string;
-  /** 客戶名稱小標（如「好齡居 NEXDO」） */
+  /** 客戶名稱小標（v2.0 版式上不顯示，保留資料欄位） */
   eyebrow?: string;
   /** 卡片摘要 */
   summary?: string;
@@ -18,7 +18,7 @@ interface Props {
   image?: { src: string; alt: string };
   /** 內頁連結（提供後整卡可點） */
   href?: string;
-  /** CTA 文字（僅在有 href 時顯示） */
+  /** CTA 文字（v2.0 版式上不顯示，保留資料欄位） */
   cta?: string;
 }
 
@@ -26,16 +26,14 @@ const {
   name,
   types = ['案例整理中'],
   mediaNote = '需要素材：專案代表圖或研究現場照片',
-  eyebrow,
   summary,
   image,
   href,
-  cta = '查看專案',
 } = Astro.props;
 
 const Wrapper = href ? 'a' : 'article';
 const wrapperProps = href
-  ? { href, class: 'case-card group block no-underline', 'aria-label': `${name}：${cta}` }
+  ? { href, class: 'case-card group block no-underline' }
   : { class: 'case-card' };
 ---
 
@@ -56,8 +54,7 @@ const wrapperProps = href
       <div class="media-placeholder aspect-[16/10] rounded-xl">{mediaNote}</div>
     )
   }
-  {eyebrow && <p class="mt-6 text-sm font-bold tracking-wide text-brand">{eyebrow}</p>}
-  <h3 class:list={['text-xl font-bold text-ink md:text-2xl', eyebrow ? 'mt-2' : 'mt-6']}>{name}</h3>
+  <h3 class="case-title mt-6 text-xl font-bold text-ink md:text-2xl">{name}</h3>
   {summary && <p class="mt-3 leading-relaxed text-ink-secondary">{summary}</p>}
   <p class="mt-4 flex flex-wrap gap-2">
     {
@@ -68,16 +65,6 @@ const wrapperProps = href
       ))
     }
   </p>
-  {
-    href && (
-      <p class="mt-5">
-        <span class="case-cta inline-flex items-center gap-1.5 font-semibold text-ink-secondary">
-          {cta}
-          <span class="cta-arrow" aria-hidden="true">→</span>
-        </span>
-      </p>
-    )
-  }
 </Wrapper>
 
 <style>
@@ -96,33 +83,23 @@ const wrapperProps = href
     border-radius: 12px;
   }
 
-  .case-cta .cta-arrow {
-    transition: transform 200ms ease;
+  .case-title {
+    transition: color 200ms ease;
   }
 
-  a.case-card:hover .case-cta,
-  a.case-card:focus-visible .case-cta {
+  a.case-card:hover .case-title,
+  a.case-card:focus-visible .case-title {
     color: var(--color-brand);
-  }
-
-  a.case-card:hover .cta-arrow,
-  a.case-card:focus-visible .cta-arrow {
-    transform: translateX(3px);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .case-card-img,
-    .case-cta .cta-arrow {
+    .case-title {
       transition: none;
     }
 
     a.case-card:hover .case-card-img,
     a.case-card:focus-visible .case-card-img {
-      transform: none;
-    }
-
-    a.case-card:hover .cta-arrow,
-    a.case-card:focus-visible .cta-arrow {
       transform: none;
     }
   }

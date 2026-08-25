@@ -34,10 +34,16 @@ const positioning = [
   description="致遠體驗設計透過研究、全局梳理與多方協作，陪政府與企業從複雜走向清晰，找出可落地的改善方向。"
   isHome
 >
+  {/* 重新整理一律從頁面頂端開始，不還原上次捲動位置（Hero 輪播從頭看起） */}
+  <script is:inline>
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  </script>
+
   {/* ---- 2. Hero：滿版海報式＋四幕輪播（v1.1）。左欄中文主標打字輪替，右欄 Reach 句同步切換 ---- */}
   <section class="bg-page">
     <div class="hero-band" data-hc>
-      <div class="hero-grid" data-reveal>
+      <div class="hero-grid" data-reveal data-reveal-once>
         {/* 左欄：主標（單一 H1；朗讀內容固定，動畫層 aria-hidden） */}
         <h1 class="heading-hero relative" data-hc-stage>
           <span class="sr-only">從複雜，致清晰，陪你走得更深、更廣、更遠。致遠體驗設計。</span>
@@ -248,6 +254,7 @@ const positioning = [
         <AudienceCard
           pill="政府與公共服務"
           title="深耕數位公共服務，始終以民眾為本"
+          em="以民眾為本"
           body="我們熟悉政府標案、跨單位協作與既有系統限制，在民眾需要、政策目標與執行現實之間，找到真正可行的改善方向。"
           href="/public-sector/"
           ariaLabel="查看更多：政府與公共服務"
@@ -255,6 +262,7 @@ const positioning = [
         <AudienceCard
           pill="企業與服務團隊"
           title="找對問題，讓體驗改善轉為商業價值"
+          em="轉為商業價值"
           body="從使用者、服務流程與組織全局中找出關鍵施力點，讓重大決策建立在理解之上。"
           href="/business/"
           ariaLabel="查看更多：企業與服務團隊"
@@ -381,6 +389,11 @@ const positioning = [
 
     :global(html.js) [data-reveal].is-visible .ai-em {
       background-size: 100% 100%;
+    }
+
+    /* 離場即瞬間重置，捲回時螢光筆重新掃入 */
+    :global(html.js) [data-reveal]:not(.is-visible) .ai-em {
+      transition: none;
     }
   }
 
@@ -773,6 +786,21 @@ const positioning = [
       transform: translateY(165px);
     }
 
+    /* 離場即瞬間重置（不跑回程的分段 transition）：否則快速捲回時
+       深色層還停在終態，重播會一開始就整片出現 */
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-a-spin,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-a-dark,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-b-spin,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-b-inner,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-b-darkspin,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-b-wedgegate,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin1,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-spin2,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-med,
+    :global(html.js) [data-reveal]:not(.is-visible) .ww-c-cap {
+      transition: none;
+    }
+
     /* 第一段：三圓同時旋轉；右圓中階色塊邊轉邊長大（邊界外推） */
     :global(html.js) .ww-a-spin,
     :global(html.js) .ww-b-spin,
@@ -798,7 +826,7 @@ const positioning = [
     }
   }
 
-  /* ---- 未知到已知視覺：六圓由左至右依序浮現（進場一次） ---- */
+  /* ---- 未知到已知視覺：六圓由左至右依序浮現（捲出重置、捲回重播） ---- */
   .wd-visual {
     max-width: 560px;
   }
@@ -822,6 +850,11 @@ const positioning = [
     :global(html.js) [data-reveal].is-visible .wd-circle:nth-child(4) { transition-delay: 330ms; }
     :global(html.js) [data-reveal].is-visible .wd-circle:nth-child(5) { transition-delay: 440ms; }
     :global(html.js) [data-reveal].is-visible .wd-circle:nth-child(6) { transition-delay: 550ms; }
+
+    /* 離場即瞬間重置，確保捲回時從頭依序浮現 */
+    :global(html.js) [data-reveal]:not(.is-visible) .wd-circle {
+      transition: none;
+    }
   }
 
   .ab-label {

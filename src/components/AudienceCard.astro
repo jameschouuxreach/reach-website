@@ -9,14 +9,23 @@ interface Props {
   body: string;
   href: string;
   ariaLabel: string;
+  /** 標題內要以藍色螢光筆畫記的片段（效果同首頁 AI 區塊的 .ai-em） */
+  em?: string;
 }
 
-const { pill, title, body, href, ariaLabel } = Astro.props;
+const { pill, title, body, href, ariaLabel, em } = Astro.props;
+
+// 切出畫記片段；找不到時整句原樣顯示
+const emIndex = em ? title.indexOf(em) : -1;
+const pre = emIndex >= 0 ? title.slice(0, emIndex) : title;
+const post = emIndex >= 0 && em ? title.slice(emIndex + em.length) : '';
 ---
 
 <a href={href} aria-label={ariaLabel} class="audience-card card group flex h-full flex-col p-7 no-underline md:p-9">
   <p class="text-sm font-bold tracking-wide text-brand">{pill}</p>
-  <h3 class="mt-5 text-xl font-bold text-ink md:text-2xl">{title}</h3>
+  <h3 class="mt-5 text-xl font-bold text-ink md:text-2xl">
+    {emIndex >= 0 ? <>{pre}<span class="aud-em">{em}</span>{post}</> : title}
+  </h3>
   <p class="mt-3 leading-relaxed text-ink-secondary">{body}</p>
   <p class="mt-auto pt-6">
     <span class="audience-cta inline-flex items-center gap-1.5 font-semibold text-ink-secondary">
@@ -45,6 +54,34 @@ const { pill, title, body, href, ariaLabel } = Astro.props;
   .audience-card:focus-visible {
     outline: 2px solid var(--reach-blue-300);
     outline-offset: 2px;
+  }
+
+  /* 標題強調詞：藍色螢光筆畫記，進場時由左至右掃過（同首頁 AI 區塊 .ai-em） */
+  .aud-em {
+    color: var(--color-text);
+    background-image: linear-gradient(var(--reach-blue-200), var(--reach-blue-200));
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: 0 50%;
+    padding-inline: 0.06em;
+    margin-inline: -0.03em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .aud-em {
+      background-size: 0% 100%;
+      transition: background-size 550ms cubic-bezier(0.65, 0, 0.35, 1);
+      transition-delay: 250ms;
+    }
+
+    :global(html.js [data-reveal].is-visible) .aud-em {
+      background-size: 100% 100%;
+    }
+
+    /* 離場即瞬間重置，捲回時螢光筆重新掃入 */
+    :global(html.js [data-reveal]:not(.is-visible)) .aud-em {
+      transition: none;
+    }
   }
 
   .audience-cta .cta-arrow {

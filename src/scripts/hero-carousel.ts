@@ -1,10 +1,10 @@
 /**
  * Hero 循環輪播（v2.0，無縫輪迴、無淡出重置）：
  * - 全部轉場統一為垂直滑動字槽（機制同 Animate UI「Rotating Text」primitive，原生重寫）：
- *   舊字上滑出、新字自下方滑入；時長與緩動由 CSS 變數 --hc-dur／--hc-ease 控制。
+ *   舊字下滑出、新字自上方滑入；時長與緩動由 CSS 變數 --hc-dur／--hc-ease 控制。
  * - 循環結構（首次載入直接從開場狀態開始）：
  *   O1 開場＝合併終態：左「致遠體驗設計」置中、右 Reach／Experience／Design，停留。
- *   O2 「體驗設計」沿原路滑回下方消失，「致遠」整行滑回原本上下合併的位置。
+ *   O2 「體驗設計」沿原路滑回上方消失，「致遠」整行滑回原本上下合併的位置。
  *   O3 拉霸：「遠」字槽快速輪轉 遠→深→廣→遠→深→廣→遠→深（樣式同一般換幕、
  *      整體漸快再漸慢），落定「致深」。
  *   O4 「致」「深」以 FLIP 上下分離飛回句中位置；右欄同步滑至 deeper understanding。
@@ -162,9 +162,9 @@ export function initHeroCarousel(): void {
     brand!.classList.add('is-shown');
   }
 
-  /** O2：「體驗設計」沿原路滑回下方，「致遠」整行滑回上下合併點 */
+  /** O2：「體驗設計」沿原路滑回上方，「致遠」整行滑回上下合併點 */
   async function retractBrand(): Promise<void> {
-    // 移除 is-current 即回到待命基態（下方＋透明），transition 讓它沿原路滑出
+    // 移除 is-current 即回到待命基態（上方＋透明），transition 讓它沿原路滑出
     brandRest!.classList.remove('is-current');
     await wait(SLIDE_MS * 0.4);
     brand!.style.transform = 'translateX(0px)';
@@ -177,19 +177,21 @@ export function initHeroCarousel(): void {
   async function spinBrandSlot(): Promise<void> {
     const strip = document.createElement('span');
     strip.className = 'hc-spin-strip';
-    for (const ch of SPIN_SEQUENCE) {
+    // 往下捲動＝顯示順序與 DOM 堆疊相反，故以反序建格：
+    // 起點對齊最末格（遠），捲回 0 依序流過 深→廣→…，落定首格（深）
+    for (const ch of [...SPIN_SEQUENCE].reverse()) {
       const cell = document.createElement('span');
       cell.className = 'hc-spin-cell';
       cell.textContent = ch;
       strip.appendChild(cell);
     }
-    // 同一影格內：清空實體字槽、掛上捲軸（首格「遠」與原字同位，無縫換手）
+    // 同一影格內：清空實體字槽、掛上捲軸（起始格「遠」與原字同位，無縫換手）
     snapGroup(brandSlotItems, -1);
     brandSlot!.appendChild(strip);
-    strip.style.transform = 'translateY(0)';
+    strip.style.transform = `translateY(${-(SPIN_SEQUENCE.length - 1) * SPIN_CELL_EM}em)`;
     void strip.offsetWidth;
     strip.style.transition = `transform ${SPIN_MS}ms ${SPIN_EASE}`;
-    strip.style.transform = `translateY(${-(SPIN_SEQUENCE.length - 1) * SPIN_CELL_EM}em)`;
+    strip.style.transform = 'translateY(0)';
     await wait(SPIN_MS + 80);
     // 末格「深」與實體字同位：實體接手後移除捲軸
     snapGroup(brandSlotItems, 1);

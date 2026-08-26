@@ -68,7 +68,7 @@ const positioning = [
                 ><span class="hc-slide-item">遠</span></span
               ></span
             >
-            {/* 品牌行：致遠合併後「體驗設計」自下方滑入；「遠」為字槽，
+            {/* 品牌行：致遠合併後「體驗設計」自上方滑入；「遠」為字槽，
                 開頭段落在此拉霸輪轉（遠→深→廣→…→深）後上下分離回句子 */}
             <span class="hc-brand" data-hc-brand
               ><span class="text-brand hc-brand-char" data-hc-brand-zhi>致</span><span
@@ -100,8 +100,8 @@ const positioning = [
             <p class="hc-en-static"><span class="text-brand">Reach</span> better experiences</p>
           </div>
 
-          {/* 輪播動畫層：Reach 固定不動；詞組與中文句垂直滑動輪替（舊字上滑出、
-              新字下方進）。初始態＝品牌開場（O1）：Experience／Design 預設 is-current */}
+          {/* 輪播動畫層：Reach 固定不動；詞組與中文句垂直滑動輪替（舊字下滑出、
+              新字上方進）。初始態＝品牌開場（O1）：Experience／Design 預設 is-current */}
           <div class="hc-anim hc-right-anim" aria-hidden="true">
             <p class="hc-en"><span class="text-brand">Reach</span></p>
             <div class="hc-en hc-slide" data-hc-phrase>
@@ -662,7 +662,7 @@ const positioning = [
   }
 
 
-  /* 垂直滑動字槽：舊字上滑出、新字自下方進（機制同 Animate UI「Rotating Text」，原生實作） */
+  /* 垂直滑動字槽：舊字下滑出、新字自上方進（機制同 Animate UI「Rotating Text」，原生實作） */
   .hc-slide {
     position: relative;
     overflow: hidden;
@@ -675,7 +675,7 @@ const positioning = [
     inset-inline-start: 0;
     white-space: nowrap;
     opacity: 0;
-    transform: translateY(130%);
+    transform: translateY(-130%);
     transition:
       transform var(--hc-dur, 680ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1)),
       opacity calc(var(--hc-dur, 680ms) * 0.7) ease;
@@ -688,7 +688,7 @@ const positioning = [
 
   .hc-slide-item.is-leaving {
     opacity: 0;
-    transform: translateY(-130%);
+    transform: translateY(130%);
   }
 
   .hc-slide-item.no-anim {

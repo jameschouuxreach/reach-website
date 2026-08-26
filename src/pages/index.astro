@@ -650,8 +650,9 @@ const positioning = [
     margin-inline: -0.03em;
   }
 
-  /* 掃過：2s，加強版 ease-in-out——前段更快加速、後段提早減速拉長收尾。
-     畫滿後底線保留，隨字句一起滑出；歸位後由 JS 移除 class 瞬間歸零。
+  /* 掃過：延遲 0.5s 起筆、2s 掃完，加強版 ease-in-out——前段更快加速、
+     後段提早減速拉長收尾。畫滿後底線保留，隨字句一起滑出；
+     歸位後由 JS 移除 class 瞬間歸零。
      注意：transition 需保留字槽原本的 transform／opacity 項目，
      否則掛著 is-sweeping 離場時會失去滑出動畫（瞬間消失） */
   [data-hc-phrase] .hc-slide-item.is-sweeping,
@@ -660,7 +661,7 @@ const positioning = [
     transition:
       transform var(--hc-dur, 680ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1)),
       opacity calc(var(--hc-dur, 680ms) * 0.7) ease,
-      background-size 2000ms cubic-bezier(0.35, 0, 0.12, 1);
+      background-size 2000ms cubic-bezier(0.35, 0, 0.12, 1) 500ms;
   }
 
   /* 由主標字級推導；v1.9 右欄字級盡量貼近左欄（md 0.68、lg+ 0.75）。

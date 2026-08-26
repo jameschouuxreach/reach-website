@@ -304,22 +304,45 @@ const positioning = [
     </div>
   </section>
 
-  {/* ---- AI 主張（移至我們的經驗上方）---- */}
+  {/* ---- AI 主張：左內容＋右 4×4 圓陣動畫（從混亂到一致，見 ai-grid.ts）---- */}
   <section class="border-t border-line bg-page">
-    <div class="container-site py-30 text-center md:py-42" data-reveal>
-      <h2 class="heading-section mx-auto max-w-4xl">
-        AI 能讓產出<span class="ai-em">更快速</span>，但我們能讓成果<span class="ai-em">更精準</span>
-      </h2>
-      <p class="mx-auto mt-6 max-w-2xl leading-loose text-ink-secondary">
-        AI 能快速產出，但產出的價值仍取決於對問題的理解深度。<br
-          class="hidden md:inline"
-        />我們結合 AI 的效率、使用者研究與全局判斷，讓成果真正回應需求。
-      </p>
-      <div class="mt-9 flex justify-center">
-        <a href="/services/" class="ai-cta">
-          了解更多
-          <span class="cta-arrow" aria-hidden="true">→</span>
-        </a>
+    <div class="container-site py-30 md:py-42">
+      <SectionLabel zh="AI 時代的體驗設計" en="UX × AI" />
+      <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+        <div data-reveal>
+          <h2 class="heading-section max-w-xl">
+            AI 能讓產出<span class="ai-em">更快速</span>，但我們能讓成果<span class="ai-em"
+              >更精準</span
+            >
+          </h2>
+          <p class="mt-6 max-w-xl leading-loose text-ink-secondary">
+            AI 能快速產出，但產出的價值仍取決於對問題的理解深度。我們結合 AI
+            的效率、使用者研究與全局判斷，讓成果真正回應需求。
+          </p>
+          <div class="mt-9">
+            <a href="/services/" class="ai-cta">
+              了解更多
+              <span class="cta-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+
+        {/* 右欄：16 圓 4×4，樣式同「我們與誰合作」三圓的初始樣貌（上淺下中階），
+            各自不同角度起始；輪轉編排見 src/scripts/ai-grid.ts */}
+        <div data-reveal>
+          <div class="ai-grid" data-ai-grid aria-hidden="true">
+            {
+              Array.from({ length: 16 }).map(() => (
+                <svg viewBox="0 0 100 100" class="ai-orb">
+                  <g class="ai-orb-spin" data-ai-orb>
+                    <circle cx="50" cy="50" r="50" class="ai-orb-l" />
+                    <path d="M 0 50 A 50 50 0 0 0 100 50 Z" class="ai-orb-m" />
+                  </g>
+                </svg>
+              ))
+            }
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -329,10 +352,46 @@ const positioning = [
 
   <script>
     import '../scripts/hero-carousel';
+    import '../scripts/ai-grid';
   </script>
 </BaseLayout>
 
 <style>
+  /* ---- AI 區塊 4×4 圓陣：每圓＝上淺下中階半圓（同三圓初始樣貌），
+     旋轉由 ai-grid.ts 驅動，回彈曲線同 --wwa-spring ---- */
+  .ai-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    max-width: 460px;
+    margin-inline: auto;
+  }
+
+  .ai-orb {
+    width: 100%;
+    height: auto;
+  }
+
+  .ai-orb-spin {
+    transform-box: view-box;
+    transform-origin: 50px 50px;
+    transition: transform 950ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  .ai-orb-l {
+    fill: #dfe8fa;
+  }
+
+  .ai-orb-m {
+    fill: #b0c9fc;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-orb-spin {
+      transition: none;
+    }
+  }
+
   /* AI 主張 CTA：藍框白底藍字 */
   .ai-cta {
     display: inline-flex;

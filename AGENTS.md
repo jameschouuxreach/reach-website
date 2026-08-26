@@ -8,6 +8,8 @@ astro dev --background
 
 Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
 
+注意：專案在外接硬碟上，Vite 檔案監聽不可靠——**切換 branch 後一律重啟 dev server**；遇到「檔案存在卻 404」「改了樣式沒生效」也先重啟再查。
+
 ## Deploy（GitHub Pages）
 
 網站以「gh-pages branch 放靜態成品」的方式部署，多個版本並存供比較。部署方式：checkout 要部署的 branch，跑 `./scripts/deploy.sh`——部署位置由 branch 自動決定，腳本開頭會印出目標網址：

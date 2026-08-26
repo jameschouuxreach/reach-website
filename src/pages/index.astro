@@ -125,6 +125,15 @@ const positioning = [
   {/* ---- 3. Why We Do／我們的使命（捲動敘事版，見 MissionScrollStory） ---- */}
   <MissionScrollStory items={positioning} />
 
+  {/* ---- 3.5 合作客戶 Logo 輪播（我們的使命下方；企業與政府交錯混排、左右淡出）。
+       上下 padding 比照「我們的經驗」（sec-full 的內距、不撐滿版高） ---- */}
+  <section class="bg-page">
+    <h2 class="sr-only">合作客戶</h2>
+    <div class="py-16 md:pt-20 md:pb-12" data-reveal>
+      <PartnerLogos />
+    </div>
+  </section>
+
   {/* ---- 4. What We Do／我們的服務 ---- */}
   <section class="border-t border-line bg-page">
     <div class="container-site sec-full">
@@ -162,7 +171,20 @@ const positioning = [
     </div>
   </section>
 
-  {/* ---- 5. 我們與誰合作（獨立區塊，與其他區塊同級） ---- */}
+  {/* ---- 5. 精選案例／我們的經驗（緊接我們的服務） ---- */}
+  <section class="border-t border-line bg-page">
+    <div class="container-site sec-full">
+      <div class="flex flex-wrap items-baseline justify-between gap-4" data-reveal>
+        <SectionLabel zh="我們的經驗" en="OUR EXPERIENCE" />
+        <TextLink href="/cases/" label="所有案例" />
+      </div>
+      <div class="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2" data-reveal>
+        {CASES.map((item) => <CaseCard {...item} />)}
+      </div>
+    </div>
+  </section>
+
+  {/* ---- 6. 我們與誰合作（獨立區塊，與其他區塊同級） ---- */}
   <section class="border-t border-line bg-page">
     <div class="container-site sec-full">
       <div data-reveal>
@@ -299,27 +321,6 @@ const positioning = [
           <span class="cta-arrow" aria-hidden="true">→</span>
         </a>
       </div>
-    </div>
-  </section>
-
-  {/* ---- 6. 精選案例 ---- */}
-  <section class="border-t border-line bg-page">
-    <div class="container-site sec-full">
-      <div class="flex flex-wrap items-baseline justify-between gap-4" data-reveal>
-        <SectionLabel zh="我們的經驗" en="OUR EXPERIENCE" />
-        <TextLink href="/cases/" label="所有案例" />
-      </div>
-      <div class="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2" data-reveal>
-        {CASES.map((item) => <CaseCard {...item} />)}
-      </div>
-    </div>
-  </section>
-
-  {/* ---- 7. 信任與合作（v1.1：Reach 品牌動態併入 Hero，此區保留合作 Logo）---- */}
-  <section class="border-t border-line bg-page">
-    <h2 class="sr-only">信任與合作</h2>
-    <div class="container-site sec-full" data-reveal>
-      <PartnerLogos />
     </div>
   </section>
 

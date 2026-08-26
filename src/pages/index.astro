@@ -40,7 +40,9 @@ const positioning = [
     window.scrollTo(0, 0);
   </script>
 
-  {/* ---- 2. Hero：滿版海報式＋四幕輪播（v1.1）。左欄中文主標打字輪替，右欄 Reach 句同步切換 ---- */}
+  {/* ---- 2. Hero：滿版海報式＋無縫循環輪播（v2.0）。開場＝品牌合併終態 →
+       體驗設計退場、致遠滑回合併點 → 「遠」拉霸輪轉落定「致深」→ 上下分離回句子
+       （右欄同步切 deeper）→ 深／廣／遠三幕 → 合併回品牌 → 循環 ---- */}
   <section class="bg-page">
     <div class="hero-band" data-hc>
       <div class="hero-grid" data-reveal data-reveal-once>
@@ -54,23 +56,27 @@ const positioning = [
             <span class="mt-3 block">陪你走得更深、更廣、更<span class="text-brand">遠</span></span>
           </span>
 
-          {/* 輪播動畫層 */}
+          {/* 輪播動畫層：初始態＝品牌開場（O1），兩行句子預設隱藏（is-faded），
+              避免 JS 就位前閃出原版標題；品牌行由腳本量測定位後顯示 */}
           <span class="hc-anim" aria-hidden="true">
-            <span class="hc-line block" data-hc-line1
+            <span class="hc-line is-faded block" data-hc-line1
               >從複雜，<span class="text-brand" data-hc-zhi>致</span>清晰</span
             >
-            {/* 深不預設 is-current：首次載入由腳本滑入（與換幕同一轉場） */}
-            <span class="hc-line mt-3 block" data-hc-line2
+            <span class="hc-line is-faded mt-3 block" data-hc-line2
               >陪你走得更<span class="hc-slot text-brand" data-hc-left
                 ><span class="hc-slide-item">深</span><span class="hc-slide-item">廣</span
                 ><span class="hc-slide-item">遠</span></span
               ></span
             >
-            {/* 第四幕：致遠合併後「體驗設計」自下方滑入 */}
+            {/* 品牌行：致遠合併後「體驗設計」自下方滑入；「遠」為字槽，
+                開頭段落在此拉霸輪轉（遠→深→廣→…→深）後上下分離回句子 */}
             <span class="hc-brand" data-hc-brand
               ><span class="text-brand hc-brand-char" data-hc-brand-zhi>致</span><span
-                class="text-brand hc-brand-char"
-                data-hc-brand-yuan>遠</span
+                class="hc-slot text-brand hc-brand-char"
+                data-hc-brand-slot
+                ><span class="hc-slide-item is-current" data-hc-brand-yuan>遠</span><span
+                  class="hc-slide-item">深</span
+                ><span class="hc-slide-item">廣</span></span
               ><span class="hc-brand-rest"
                 ><span class="hc-slide-item" data-hc-brand-rest>體驗設計</span></span
               ></span
@@ -94,21 +100,21 @@ const positioning = [
             <p class="hc-en-static"><span class="text-brand">Reach</span> better experiences</p>
           </div>
 
-          {/* 輪播動畫層：Reach 與主標同步一開始就顯示、固定不動；詞組與中文句垂直滑動輪替
-              （舊字上滑出、新字下方進），首幕兩行不預設 is-current，由腳本進場滑入 */}
+          {/* 輪播動畫層：Reach 固定不動；詞組與中文句垂直滑動輪替（舊字上滑出、
+              新字下方進）。初始態＝品牌開場（O1）：Experience／Design 預設 is-current */}
           <div class="hc-anim hc-right-anim" aria-hidden="true">
             <p class="hc-en"><span class="text-brand">Reach</span></p>
             <div class="hc-en hc-slide" data-hc-phrase>
               <span class="hc-slide-item">deeper understanding</span>
               <span class="hc-slide-item">the bigger picture</span>
               <span class="hc-slide-item">change that matters</span>
-              <span class="hc-slide-item">Experience</span>
+              <span class="hc-slide-item is-current">Experience</span>
             </div>
             <div class="hc-en hc-slide hc-line3" data-hc-zh>
               <span class="hc-slide-item hc-zh-item">讓決策源自理解</span>
               <span class="hc-slide-item hc-zh-item">讓全局清晰可見</span>
               <span class="hc-slide-item hc-zh-item">讓改變真實發生</span>
-              <span class="hc-slide-item">Design</span>
+              <span class="hc-slide-item is-current">Design</span>
             </div>
           </div>
         </div>
@@ -560,6 +566,21 @@ const positioning = [
     width: 4em;
     height: 1.12em;
     vertical-align: bottom;
+  }
+
+  /* 拉霸連續捲軸（由 JS 建立）：整串字直向堆疊，單一 transition 從頭捲到尾。
+     每格高度與 .hc-slot 的 1.12em 一致，字形在格內位置與字槽實體字重合 */
+  :global(.hc-spin-strip) {
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    width: 100%;
+    will-change: transform;
+  }
+
+  :global(.hc-spin-strip .hc-spin-cell) {
+    display: block;
+    height: 1.12em;
   }
 
   /* FLIP 飛行字（致、遠）：由 JS 建立，繼承 h1 字體樣式 */

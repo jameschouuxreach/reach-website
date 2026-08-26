@@ -4,7 +4,7 @@
  *   舊字下滑出、新字自上方滑入；時長與緩動由 CSS 變數 --hc-dur／--hc-ease 控制。
  * - 循環結構（首次載入直接從開場狀態開始）：
  *   O1 開場＝合併終態：左「致遠體驗設計」置中、右 Reach／Experience／Design，停留。
- *   O2 「體驗設計」沿原路滑回上方消失，「致遠」整行滑回原本上下合併的位置。
+ *   O2 「體驗設計」往下滑出消失，「致遠」整行滑回原本上下合併的位置。
  *   O3 拉霸：「遠」字槽快速輪轉 遠→深→廣→遠→深→廣→遠→深（樣式同一般換幕、
  *      整體漸快再漸慢），落定「致深」。
  *   O4 「致」「深」以 FLIP 上下分離飛回句中位置；右欄同步滑至 deeper understanding。
@@ -15,7 +15,7 @@
  */
 
 /** 每幕「動畫結束後」的靜止停留（O1、深、廣、遠四個停點統一） */
-const DWELL_MS = 3000;
+const DWELL_MS = 3500;
 /** 首次載入的品牌開場停留：比循環中的停留短，讓動畫早點開始 */
 const FIRST_DWELL_MS = 1000;
 /** 與 index.astro 的 --hc-dur 保持一致 */
@@ -175,10 +175,17 @@ export function initHeroCarousel(): void {
     brand!.classList.add('is-shown');
   }
 
-  /** O2：「體驗設計」沿原路滑回上方，「致遠」整行滑回上下合併點 */
+  /** O2：「體驗設計」往下滑出消失，「致遠」整行滑回上下合併點 */
   async function retractBrand(): Promise<void> {
-    // 移除 is-current 即回到待命基態（上方＋透明），transition 讓它沿原路滑出
+    // is-leaving＝往下滑出；離場後無動畫歸回上方待命，供下一輪合併自上方滑入
     brandRest!.classList.remove('is-current');
+    brandRest!.classList.add('is-leaving');
+    window.setTimeout(() => {
+      brandRest!.classList.add('no-anim');
+      brandRest!.classList.remove('is-leaving');
+      void brandRest!.offsetWidth;
+      brandRest!.classList.remove('no-anim');
+    }, SLIDE_MS + 80);
     await wait(SLIDE_MS * 0.4);
     brand!.style.transform = 'translateX(0px)';
     await wait(Math.max(GLIDE_MS, SLIDE_MS * 0.6) + 80);
@@ -314,7 +321,7 @@ export function initHeroCarousel(): void {
     await snapToBrandState();
     let firstCycle = true;
     for (;;) {
-      // O1／合併終態：致遠體驗設計（首次載入停 1 秒，循環中停 3 秒）
+      // O1／合併終態：致遠體驗設計（首次載入停 1 秒，循環中停 3.5 秒）
       await wait(firstCycle ? FIRST_DWELL_MS : DWELL_MS);
       firstCycle = false;
       await retractBrand(); // O2

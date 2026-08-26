@@ -569,6 +569,21 @@ const positioning = [
     vertical-align: bottom;
   }
 
+  /* 體驗設計出現時的淡入（退場淡出的相反）：透明度預設前段就完成、
+     彼時字形還在遮罩外看不到，故將淡入延後 0.4×時長——字形進入遮罩後
+     才由透明轉濃、落定後收尾，淡入清楚可見。只掛在 is-current（進場後狀態），
+     退場（is-leaving）維持原本邊滑出邊淡出 */
+  .hc-brand-rest .hc-slide-item.is-current {
+    transition:
+      transform var(--hc-dur, 680ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1)),
+      opacity calc(var(--hc-dur, 680ms) * 0.7) ease calc(var(--hc-dur, 680ms) * 0.4);
+  }
+
+  /* no-anim 守門（同前述 scoping 特異度陷阱） */
+  .hc-brand-rest .hc-slide-item.no-anim {
+    transition: none;
+  }
+
   /* 拉霸連續捲軸（由 JS 建立）：整串字直向堆疊，單一 transition 從頭捲到尾。
      每格高度與 .hc-slot 的 1.12em 一致，字形在格內位置與字槽實體字重合 */
   :global(.hc-spin-strip) {

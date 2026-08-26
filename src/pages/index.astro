@@ -638,9 +638,10 @@ const positioning = [
     color: var(--color-text-secondary);
   }
 
-  /* 停留進度畫記（右欄第二行詞組）：比 AI 區塊 .ai-em（blue-200）淡一階的
-     螢光筆待命，轉場結束後由 JS 掛上 is-sweeping 掃過 */
-  [data-hc-phrase] .hc-slide-item {
+  /* 停留進度畫記（右欄第二行詞組＋第三行中文句同時）：比 AI 區塊 .ai-em
+     （blue-200）淡一階的螢光筆待命，轉場結束後由 JS 掛上 is-sweeping 掃過 */
+  [data-hc-phrase] .hc-slide-item,
+  [data-hc-zh] .hc-zh-item {
     background-image: linear-gradient(var(--reach-blue-100), var(--reach-blue-100));
     background-repeat: no-repeat;
     background-size: 0% 100%;
@@ -650,10 +651,11 @@ const positioning = [
   }
 
   /* 掃過：2s，加強版 ease-in-out——前段更快加速、後段提早減速拉長收尾。
-     畫滿後底線保留，隨詞組一起滑出；歸位後由 JS 移除 class 瞬間歸零。
+     畫滿後底線保留，隨字句一起滑出；歸位後由 JS 移除 class 瞬間歸零。
      注意：transition 需保留字槽原本的 transform／opacity 項目，
      否則掛著 is-sweeping 離場時會失去滑出動畫（瞬間消失） */
-  [data-hc-phrase] .hc-slide-item.is-sweeping {
+  [data-hc-phrase] .hc-slide-item.is-sweeping,
+  [data-hc-zh] .hc-zh-item.is-sweeping {
     background-size: 100% 100%;
     transition:
       transform var(--hc-dur, 680ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1)),

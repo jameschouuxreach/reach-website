@@ -98,15 +98,17 @@ export function initHeroCarousel(): void {
     slideGroup(zhItems, index);
   }
 
-  /** 停留進度：轉場結束後，右欄第二行詞組以淡色螢光筆掃過（時長曲線見 CSS） */
+  /** 停留進度：轉場結束後，右欄第二行詞組與第三行中文句同時以淡色螢光筆掃過
+   *（時長曲線見 CSS） */
   function startPhraseSweep(index: number): void {
-    if (index > 2) return; // 品牌開場的 Experience 不套用
+    if (index > 2) return; // 品牌開場的 Experience／Design 不套用
     phraseItems[index]?.classList.add('is-sweeping');
+    zhItems[index]?.classList.add('is-sweeping');
   }
 
-  /** 底線隨舊詞組一起滑出，待其離場歸位（不可見）後才移除、瞬間歸零 */
+  /** 底線隨舊字句一起滑出，待其離場歸位（不可見）後才移除、瞬間歸零 */
   function clearPhraseSweep(): void {
-    phraseItems.forEach((el) => el.classList.remove('is-sweeping'));
+    for (const el of [...phraseItems, ...zhItems]) el.classList.remove('is-sweeping');
   }
 
   /** 無動畫直接定位一組字槽；index 為 -1 時全部歸回下方待命（空槽） */

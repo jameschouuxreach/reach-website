@@ -98,6 +98,17 @@ export function initHeroCarousel(): void {
     slideGroup(zhItems, index);
   }
 
+  /** 停留進度：轉場結束後，右欄第二行詞組以淡色螢光筆掃過（ease-in-out、2s，CSS 定義） */
+  function startPhraseSweep(index: number): void {
+    if (index > 2) return; // 品牌開場的 Experience 不套用
+    phraseItems[index]?.classList.add('is-sweeping');
+  }
+
+  /** 下一次轉場開始前移除：畫記瞬間歸零（無 transition） */
+  function clearPhraseSweep(): void {
+    phraseItems.forEach((el) => el.classList.remove('is-sweeping'));
+  }
+
   /** 無動畫直接定位一組字槽；index 為 -1 時全部歸回下方待命（空槽） */
   function snapGroup(items: HTMLElement[], index: number): void {
     items.forEach((el, i) => {
@@ -309,11 +320,19 @@ export function initHeroCarousel(): void {
       await spinBrandSlot(); // O3
       await wait(160);
       await splitToLines(); // O4＋O5 → 幕「深」
+      startPhraseSweep(0);
       await wait(DWELL_MS); // 深
+      clearPhraseSweep();
       slideTo(1);
-      await wait(SLIDE_MS + DWELL_MS); // 廣
+      await wait(SLIDE_MS);
+      startPhraseSweep(1);
+      await wait(DWELL_MS); // 廣
+      clearPhraseSweep();
       slideTo(2);
-      await wait(SLIDE_MS + DWELL_MS); // 遠
+      await wait(SLIDE_MS);
+      startPhraseSweep(2);
+      await wait(DWELL_MS); // 遠
+      clearPhraseSweep();
       await morphToBrand(); // 合併 → 銜接回 O1
     }
   }

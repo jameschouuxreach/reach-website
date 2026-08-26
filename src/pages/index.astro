@@ -638,6 +638,24 @@ const positioning = [
     color: var(--color-text-secondary);
   }
 
+  /* 停留進度畫記（右欄第二行詞組）：比 AI 區塊 .ai-em（blue-200）淡一階的
+     螢光筆待命，轉場結束後由 JS 掛上 is-sweeping 掃過 */
+  [data-hc-phrase] .hc-slide-item {
+    background-image: linear-gradient(var(--reach-blue-100), var(--reach-blue-100));
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    background-position: 0 50%;
+    padding-inline: 0.06em;
+    margin-inline: -0.03em;
+  }
+
+  /* 掃過：ease-in-out、2s（短於 3s 停留，示意輪播仍在進行）。
+     移除 class 即瞬間歸零（無 transition），下一幕重新開始 */
+  [data-hc-phrase] .hc-slide-item.is-sweeping {
+    background-size: 100% 100%;
+    transition: background-size 2000ms ease-in-out;
+  }
+
   /* 由主標字級推導；v1.9 右欄字級盡量貼近左欄（md 0.68、lg+ 0.75）。
      右塊自然高度略高於左欄兩行，由 grid align-items:center 互相垂直置中。 */
   @media (min-width: 768px) {

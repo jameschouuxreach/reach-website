@@ -5,7 +5,7 @@
  *   1、2：各圓隨機方向與角度（混亂）
  *   3：全部就近轉回同一角度（上淺下中階）
  *   4、5：全體同步順時針各轉 180°（方向速度一致）
- * 完全捲出視窗後重置為新的隨機初始角，捲回時重播。
+ * 完全捲出視窗即「立即中止」播放並重置為新的隨機初始角，捲回時一律從頭播。
  * prefers-reduced-motion：不啟動，所有圓維持一致角度（CSS 預設 rotate(0)）。
  */
 
@@ -42,20 +42,27 @@ export function initAiGrid(): void {
   }
 
   let running = false;
-  let needsReset = false;
+  /** 世代序號：完全離場時遞增，使進行中的播放在下一個檢查點作廢 */
+  let generation = 0;
 
   async function play(): Promise<void> {
     if (running) return;
     running = true;
+    const token = ++generation;
+    /** 等待一步；若期間被離場中止則回傳 false（running 已由中止方接管） */
+    const step = async (): Promise<boolean> => {
+      await wait(SPIN_DUR + STEP_GAP);
+      return generation === token;
+    };
 
     // 1、2：各圓隨機方向（順逆各半機率）與角度（90°–270°）
-    for (let step = 0; step < 2; step++) {
+    for (let s = 0; s < 2; s++) {
       orbs.forEach((el, i) => {
         const delta = (Math.random() < 0.5 ? -1 : 1) * (90 + Math.random() * 180);
         angles[i]! += delta;
         el.style.transform = `rotate(${angles[i]}deg)`;
       });
-      await wait(SPIN_DUR + STEP_GAP);
+      if (!(await step())) return;
     }
 
     // 3：全部就近轉回同一角度（≡ 0°，上淺下中階）
@@ -63,27 +70,23 @@ export function initAiGrid(): void {
       angles[i] = Math.round(angles[i]! / 360) * 360;
       el.style.transform = `rotate(${angles[i]}deg)`;
     });
-    await wait(SPIN_DUR + STEP_GAP);
+    if (!(await step())) return;
 
     // 4、5：全體同步順時針各轉 180°
-    for (let step = 0; step < 2; step++) {
+    for (let s = 0; s < 2; s++) {
       orbs.forEach((el, i) => {
         angles[i]! += 180;
         el.style.transform = `rotate(${angles[i]}deg)`;
       });
-      await wait(SPIN_DUR + STEP_GAP);
+      if (!(await step())) return;
     }
 
     running = false;
-    if (needsReset) {
-      needsReset = false;
-      snapInitial();
-    }
   }
 
   snapInitial();
 
-  // 進場（>35% 可見）播放；完全捲出後重置，捲回重播
+  // 進場（>35% 可見）播放
   const show = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -92,15 +95,14 @@ export function initAiGrid(): void {
     },
     { threshold: 0.35 },
   );
+  // 完全捲出：立即中止播放並重置為新的初始亂角，回場一律從頭開始
   const hide = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) continue;
-        if (running) {
-          needsReset = true;
-        } else {
-          snapInitial();
-        }
+        generation++;
+        running = false;
+        snapInitial();
       }
     },
     { threshold: 0 },

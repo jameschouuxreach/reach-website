@@ -4,7 +4,8 @@
  * - 桌機＋JS：260vh 跑道內一個 100vh sticky 畫面；區塊滑到定位後釘住，
  *   繼續捲動驅動三階段。左側字幕以 Hero 式垂直滑動輪替（第一點初始即顯示，無進場動畫）；
  *   每次輪替與右側該階段動畫同一進度門檻同時開始，階段窗結束後才輪到下一點。
- * - 右側 SVG（v2 九宮格）：初始只有中心實心白圓；三階段：外圍八圓 無→虛線→實線
+ * - 右側 SVG（v2 九宮格）：初始只有中心實心白圓；三階段：外圍八圓各由單一線條
+ *   自頂點順時針一筆畫滿一圈
  *   → 十六條連線（中心對外八條＋外圈相鄰八條，動畫同時）→ 外圍圓填滿。九圓大小一致。
  * - 行動版／reduced-motion／無 JS：改為三段靜態排列（文字＋對應終態圖）。
  */
@@ -28,7 +29,6 @@ const CX = 400;
 const CY = 400;
 const R = 54; // 九圓同大小
 const STEP = 245; // 九宮格相鄰圓心距
-const SEGMENTS = 12; // 每個外圍圓 12 段 30° 弧段
 const STROKE = 3.2;
 const CAP_INSET = STROKE / 2; // 圓角端點內縮：讓 round cap 剛好停在圓周
 
@@ -74,17 +74,11 @@ const links = [
   }),
 ];
 
-/** 每段 30° 弧段：起點固定、順時針（SVG y 軸向下，角度遞增即順時針） */
-function arcSegments(cx: number, cy: number): string[] {
-  return Array.from({ length: SEGMENTS }, (_, s) => {
-    const a0 = ((s * 30 - 90) * Math.PI) / 180;
-    const a1 = (((s + 1) * 30 - 90) * Math.PI) / 180;
-    const x0 = round(cx + R * Math.cos(a0));
-    const y0 = round(cy + R * Math.sin(a0));
-    const x1 = round(cx + R * Math.cos(a1));
-    const y1 = round(cy + R * Math.sin(a1));
-    return `M ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1}`;
-  });
+/** 單一線條畫滿整圈：自頂點起順時針一筆到底（搭配 pathLength=1 以 dasharray 畫線） */
+function circlePath(cx: number, cy: number): string {
+  const top = `${round(cx)} ${round(cy - R)}`;
+  const bottom = `${round(cx)} ${round(cy + R)}`;
+  return `M ${top} A ${R} ${R} 0 1 1 ${bottom} A ${R} ${R} 0 1 1 ${top}`;
 }
 
 // Tabs 詞語（品牌對應：更深→01、更廣→02、更遠→03）
@@ -157,11 +151,7 @@ const staticFigures = [
                 ))
               }
               <g class="ms-arcs">
-                {
-                  rings.map((r) =>
-                    arcSegments(r.cx, r.cy).map((d) => <path d={d} pathLength="1" class="ms-arc" />),
-                  )
-                }
+                {rings.map((r) => <path d={circlePath(r.cx, r.cy)} pathLength="1" class="ms-arc" />)}
               </g>
               <g class="ms-ringfulls">
                 {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={R} class="ms-ringfull" />)}
@@ -420,8 +410,8 @@ const staticFigures = [
     stroke-dashoffset: 0;
   }
 
-  /* 收尾：完整實線圓淡入時，分段弧線同步淡出；
-     另以長度門檻處理 round cap 在 0 長度時的殘留圓點（96 顆小點→透明） */
+  /* 收尾：完整實線圓淡入時，畫圓線條同步淡出；
+     另以長度門檻處理 round cap 在 0 長度時的殘留圓點（8 顆起筆點→透明） */
   .ms-arcs {
     opacity: min(calc(1 - var(--ms-ringfull)), calc(var(--ms-arc) * 25), 1);
   }

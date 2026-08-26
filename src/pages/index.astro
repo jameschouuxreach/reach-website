@@ -717,6 +717,27 @@ const positioning = [
     transform: translateY(130%);
   }
 
+  /* 左欄「深廣遠」：比照開頭拉霸捲軸——純滑動、不淡出，
+     進出場字形由字槽 overflow 裁切（槽外恆不可見，opacity 可恆為 1） */
+  [data-hc-left] .hc-slide-item {
+    opacity: 1;
+    transition: transform var(--hc-dur, 680ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1));
+  }
+
+  [data-hc-left] .hc-slide-item.is-leaving {
+    opacity: 1;
+  }
+
+  /* no-anim 守門：上列覆寫（含 is-sweeping）經 Astro scoping 後特異度高於
+     基礎 .no-anim，須在同等以上特異度重申 transition: none，
+     否則 snapGroup 的「瞬間歸位」會變成 850ms 可見動畫
+     （症狀：分離時深的落點量測錯位、換幕後殘字往上飄過字槽） */
+  [data-hc-left] .hc-slide-item.no-anim,
+  [data-hc-phrase] .hc-slide-item.no-anim,
+  [data-hc-zh] .hc-zh-item.no-anim {
+    transition: none;
+  }
+
   .hc-slide-item.no-anim {
     transition: none;
   }

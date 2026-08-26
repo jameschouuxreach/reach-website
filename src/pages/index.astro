@@ -125,15 +125,6 @@ const positioning = [
   {/* ---- 3. Why We Do／我們的使命（捲動敘事版，見 MissionScrollStory） ---- */}
   <MissionScrollStory items={positioning} />
 
-  {/* ---- 3.5 合作客戶 Logo 輪播（我們的使命下方；企業與政府交錯混排、左右淡出）。
-       上下 padding 比照「我們的經驗」（sec-full 的內距、不撐滿版高） ---- */}
-  <section class="bg-page">
-    <h2 class="sr-only">合作客戶</h2>
-    <div class="py-16 md:pt-20 md:pb-12" data-reveal>
-      <PartnerLogos />
-    </div>
-  </section>
-
   {/* ---- 4. What We Do／我們的服務 ---- */}
   <section class="border-t border-line bg-page">
     <div class="container-site sec-full">
@@ -171,7 +162,16 @@ const positioning = [
     </div>
   </section>
 
-  {/* ---- 5. 精選案例／我們的經驗（緊接我們的服務） ---- */}
+  {/* ---- 4.5 合作客戶 Logo 輪播（我們的服務下方；企業與政府交錯混排、左右淡出）。
+       上下 padding 比照「我們的經驗」（sec-full 的內距、不撐滿版高） ---- */}
+  <section class="bg-page">
+    <h2 class="sr-only">合作客戶</h2>
+    <div class="py-16 md:pt-20 md:pb-12" data-reveal>
+      <PartnerLogos />
+    </div>
+  </section>
+
+  {/* ---- 5. 精選案例／我們的經驗 ---- */}
   <section class="border-t border-line bg-page">
     <div class="container-site sec-full">
       <div class="flex flex-wrap items-baseline justify-between gap-4" data-reveal>
@@ -308,7 +308,7 @@ const positioning = [
   <section class="border-t border-line bg-page">
     <div class="container-site py-30 text-center md:py-42" data-reveal>
       <h2 class="heading-section mx-auto max-w-4xl">
-        AI 讓產出<span class="ai-em">更快速</span>，我們讓成果<span class="ai-em">更精準</span>
+        AI 能讓產出<span class="ai-em">更快速</span>，但我們能讓成果<span class="ai-em">更精準</span>
       </h2>
       <p class="mx-auto mt-6 max-w-2xl leading-loose text-ink-secondary">
         AI 能快速產出，但產出的價值仍取決於對問題的理解深度。<br

@@ -2,8 +2,9 @@
 /**
  * 我們的使命：釘住式捲動敘事（v3）。
  * - 桌機＋JS：260vh 跑道內一個 100vh sticky 畫面；區塊滑到定位後釘住，
- *   繼續捲動驅動三階段。左側字幕以 Hero 式垂直滑動輪替（第一點初始即顯示，無進場動畫）；
- *   每次輪替與右側該階段動畫同一進度門檻同時開始，階段窗結束後才輪到下一點。
+ *   繼續捲動驅動三階段。左側字幕（標題、內文、具體舉例卡）以 Hero 式垂直滑動輪替
+ *   （第一點初始即顯示，無進場動畫）；每次輪替與右側該階段動畫同一進度門檻同時開始，
+ *   階段窗結束後才輪到下一點。
  * - 右側 SVG（v2 九宮格）：初始只有中心實心白圓；三階段：外圍八圓各由單一線條
  *   自頂點順時針一筆畫滿一圈
  *   → 十六條連線（中心對外八條＋外圈相鄰八條，動畫同時）→ 外圍圓填滿。九圓大小一致。
@@ -13,6 +14,8 @@ interface MissionItem {
   index: string;
   title: string;
   body: string;
+  /** 具體舉例：這一點如何落實在專案中 */
+  example: { project: string; body: string };
 }
 
 interface Props {
@@ -139,6 +142,20 @@ const staticFigures = [
                 ))
               }
             </div>
+            {/* 具體舉例卡：這一點如何落實在專案中（卡片同格堆疊，隨點切換） */}
+            <div class="msp-slot msp-slot-example">
+              {
+                items.map((item, i) => (
+                  <div
+                    class:list={['ms-example', 'msp-item', i === 0 && 'is-current']}
+                    data-msp-example
+                  >
+                    <p class="ms-example-project">{item.example.project}</p>
+                    <p class="ms-example-body">{item.example.body}</p>
+                  </div>
+                ))
+              }
+            </div>
           </div>
 
           {/* 右：SVG（初始只有中心實心圓） */}
@@ -179,6 +196,10 @@ const staticFigures = [
             </p>
             <h3 class="ms-title">{item.title}</h3>
             <p class="ms-body">{item.body}</p>
+            <div class="ms-example ms-fb-example">
+              <p class="ms-example-project">{item.example.project}</p>
+              <p class="ms-example-body">{item.example.body}</p>
+            </div>
             <div class="ms-fig-wrap" aria-hidden="true">
               <svg viewBox="0 0 800 800" class="ms-fig" aria-hidden="true" focusable="false">
                 <circle cx={CX} cy={CY} r={R} class="msf-solid" />
@@ -298,6 +319,10 @@ const staticFigures = [
     margin-top: 1.25rem;
   }
 
+  .msp-slot-example {
+    margin-top: 2rem;
+  }
+
   .msp-item {
     grid-area: 1 / 1;
     opacity: 0;
@@ -379,6 +404,30 @@ const staticFigures = [
     max-width: 30em;
   }
 
+  /* ---- 具體舉例卡（兩個變體共用）：底色同 Hero（--color-page），
+     專案名＝品牌色，內文＝Hero 右欄第三行中文句的 --color-text-secondary ---- */
+  .ms-example {
+    max-width: 30em;
+    padding: 1.25rem 1.5rem 1.375rem;
+    border-radius: 1rem;
+    background-color: var(--color-page);
+    color: var(--color-text-secondary);
+  }
+
+  .ms-example-project {
+    font-size: 1.125rem;
+    line-height: 1.4;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  .ms-example-body {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: var(--color-text-secondary);
+  }
+
   /* ---- 主 SVG 元素狀態（CSS 變數預設＝最終完整狀態；JS 逐幀覆寫） ---- */
   .ms-svg {
     --ms-arc: 1;
@@ -445,6 +494,10 @@ const staticFigures = [
 
   .ms-fb-panel + .ms-fb-panel {
     border-top: 1px solid rgb(255 255 255 / 0.22);
+  }
+
+  .ms-fb-example {
+    margin-top: 1.75rem;
   }
 
   .ms-fig-wrap {

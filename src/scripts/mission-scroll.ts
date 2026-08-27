@@ -33,8 +33,17 @@ export function initMissionScroll(): void {
   const slots = Array.from(root.querySelectorAll<HTMLElement>('.msp-slot'));
   const titleItems = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-title]'));
   const bodyItems = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-body]'));
+  const exampleItems = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-example]'));
   const tabs = Array.from(root.querySelectorAll<HTMLElement>('[data-msp-tab]'));
-  if (!svg || slots.length === 0 || titleItems.length !== 3 || bodyItems.length !== 3) return;
+  if (
+    !svg ||
+    slots.length === 0 ||
+    titleItems.length !== 3 ||
+    bodyItems.length !== 3 ||
+    exampleItems.length !== 3
+  ) {
+    return;
+  }
 
   // ---- SVG 狀態（三段各一個 0–1 進度值） ----
   let p1 = 0;
@@ -53,7 +62,7 @@ export function initMissionScroll(): void {
   }
 
   function swapTo(index: number): void {
-    for (const group of [titleItems, bodyItems]) {
+    for (const group of [titleItems, bodyItems, exampleItems]) {
       group.forEach((el, i) => {
         el.classList.toggle('is-current', i === index);
         el.classList.toggle('is-above', i < index);

@@ -24,7 +24,7 @@ npm run preview    # 預覽 build 結果
 - `src/config.ts`：**網域集中設定（TODO）**。正式網域確認後改 `SITE_URL` 並把 `SITE_URL_CONFIRMED` 設為 `true`，canonical／og:url／sitemap／robots 會同時生效。
 - `src/styles/`：`tokens.css`（品牌 Token）→ `global.css`（Tailwind 入口）→ `components.css`（按鈕／卡片／字級）→ `motion.css`（進場與切換動畫、reduced-motion 降級）
 - `src/scripts/`：`hero-carousel.ts`（Hero 四幕輪播：打字機刪改＋致遠 FLIP 合併＋無限循環）、`reveal.ts`（區塊進場）
-- `src/data/`：`cases.ts`（四個案例，順序鎖定）、`partners.ts`（14 個合作 Logo 清單）
+- `src/data/`：`cases.ts`（四張案例卡：好齡居 A／B／C 三版並列測試＋合作金庫佔位）、`partners.ts`（14 個合作 Logo 清單）
 - `src/assets/partners/`：合作 Logo（自 `合作客戶logo.pdf` 裁切），build 時由 astro:assets 產出 WebP＋PNG fallback，前端以灰階呈現、hover 恢復原色
 
 ## 驗證結果（2026-08-21）
@@ -56,6 +56,7 @@ npm run preview    # 預覽 build 結果
 12. v2.0（2026-08-23）：首次載入加進場動畫——主標與「Reach」隨整塊 data-reveal 直接顯示，左欄「深」與右欄詞組、中文句自下方滑入第一幕，轉場與換幕相同（垂直字槽滑動，--hc-dur／--hc-ease）。進場字槽於標記中不預設 is-current，由腳本進場補上（無 JS 或 reduced-motion 時仍顯示完整靜態版，不受影響）。第四幕後的淡出重置改為歸回空槽，淡入後每輪重播同一套進場滑入（首次載入不留空拍直接滑入，重置後留 350ms 小拍）。
 13. 覆蓋的規格條文：首頁九區塊順序（Reach 位置）、Hero 互動要求（hover／keyboard 切換）、§8「禁止持續無限動畫」（輪播無限循環）。降級不變：`prefers-reduced-motion` 與無 JS 時顯示完整靜態版（全三詞主標＋四句 Reach），螢幕閱讀器一律讀固定完整文案（動畫層 aria-hidden）。
 14. v2.1（2026-08-25）：新增好齡居專案實例雙版本測試——`/work/nexdo-a/`（悠識務實版）與 `/work/nexdo-b/`（AJA 品牌敘事版），內容依《好齡居專案實例-版本A/B》指示文件產出；擇定後保留一版並改用 `/work/nexdo/`。案例卡（CaseCard）擴充支援真實案例（圖片／連結／摘要／CTA），cases.ts 以兩張好齡居卡取代原佔位卡；BaseLayout 新增 ogTitle／ogDescription。素材：現行網站 nexdo.tw 三張截圖（2026-08-25 擷取）＋研究報告 目錄-19 Before/After 輸出圖；其餘研究圖表依指示重製為網頁原生圖。正式發布前需完成兩份指示文件內的上線確認清單（客戶同意、AI 情境圖授權等）。
+15. v2.2（2026-08-26）：新增第三版好齡居案例 `/work/nexdo-c/`（小瑜觀點版），依《好齡居專案實例-版本C-小瑜觀點版.md》製作：Our Approach 前置＋四個頁內錨點（`scroll-margin-top` 避開 sticky 導覽列）、四個策略章節皆以「Before／我們如何判斷／After」三欄呈現、Hero 自 目錄-19 分別裁出舊／新網站畫面重製為原生 Before／After（不貼整頁簡報）、首頁策略附現行首頁長頁截圖＋四階段標記、預設不顯示 303／5 與族群百分比（客戶同意後再開）。首頁與案例列表的案例卡以此版取代原「桃園卡」佔位卡（順序：好齡居 A → B → C → 合作金庫）。BaseLayout 新增 `ogImage`（正式網域確認後才輸出）。現行網站截圖於 2026-08-26 以 puppeteer-core＋本機 Chrome 重新擷取（檔名帶日期；08-25 舊圖保留給 A／B 版）——注意 nexdo.tw 前端首次載入常未把 CMS（Supabase）內容寫進畫面，需同一 profile 載入兩次才截得到完整卡片。**與指示文件的已知差異（發布前請與客戶確認）**：現行首頁「我們提供」區塊只有居住安全、收納清潔、租房搬家三張卡（Hero 仍列四類含樂齡健康；卡片「收納清潔」與 Hero「清潔收納」名稱不一致），合作流程已改為填表預約→真人顧問→透明溝通→安心出發，與文件所寫的四張卡／初步諮詢～執行驗收不同，頁面文字已依現行網站調整。B、C 兩版卡片標題依各自指示文件皆為「好齡居｜重新定義長照服務的角色與價值」，並列展示時撞名，擇定後需調整。
 
 ## 待補素材（正式上線前）
 

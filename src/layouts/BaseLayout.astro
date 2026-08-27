@@ -12,14 +12,17 @@ interface Props {
   /** 分享用標題／描述（未提供時沿用 title／description） */
   ogTitle?: string;
   ogDescription?: string;
+  /** 分享圖片（站內路徑，如 /images/...；未提供時用公司 Logo）。正式網域確認後才輸出 */
+  ogImage?: string;
 }
 
-const { title, description, isHome = false, ogTitle, ogDescription } = Astro.props;
+const { title, description, isHome = false, ogTitle, ogDescription, ogImage } = Astro.props;
 const fullTitle = isHome ? title : `${title}｜${SITE_NAME} ${SITE_NAME_EN}`;
 const shareTitle = ogTitle ?? fullTitle;
 const shareDescription = ogDescription ?? description;
 const pagePath = Astro.url.pathname;
 const pageUrl = new URL(pagePath, SITE_URL).href;
+const shareImage = new URL(ogImage ?? '/images/reach-logo.png', SITE_URL).href;
 ---
 
 <!doctype html>
@@ -37,7 +40,7 @@ const pageUrl = new URL(pagePath, SITE_URL).href;
     <meta property="og:site_name" content={`${SITE_NAME} ${SITE_NAME_EN}`} />
     <meta property="og:locale" content="zh_TW" />
     {SITE_URL_CONFIRMED && <meta property="og:url" content={pageUrl} />}
-    {SITE_URL_CONFIRMED && <meta property="og:image" content={new URL('/images/reach-logo.png', SITE_URL).href} />}
+    {SITE_URL_CONFIRMED && <meta property="og:image" content={shareImage} />}
     <link rel="icon" type="image/png" href="/favicon/favicon-64.png" />
     <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
     <script is:inline>

@@ -10,7 +10,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 REPO_BASE="/reach-website-v1"
-KEEP_DIRS=(v2)
+KEEP_DIRS=(v2 v2-1)
 SUBDIR_ARG="${1:-}"
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -18,8 +18,9 @@ SHA=$(git rev-parse --short HEAD)
 
 # branch ↔ 部署位置對應表
 case "$BRANCH" in
-  main)         SUBDIR="" ;;
-  reach-web-v2) SUBDIR="v2" ;;
+  main)           SUBDIR="" ;;
+  reach-web-v2)   SUBDIR="v2" ;;
+  reach-web-v2-1) SUBDIR="v2-1" ;;
   *)
     echo "錯誤：branch「${BRANCH}」沒有對應的部署位置。" >&2
     echo "請 checkout 到 main 或 reach-web-v2 再部署，或先在 scripts/deploy.sh 的對應表加上這個 branch。" >&2

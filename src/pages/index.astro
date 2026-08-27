@@ -122,6 +122,17 @@ const positioning = [
     </div>
   </section>
 
+  {/* ---- 2.5 合作客戶 Logo 輪播（Hero 正下方；企業與政府交錯混排、左右淡出）。
+       首屏即露出上半：.hero-band 的 min-height 扣掉 --logo-peek（4rem），
+       等於此區上內距（2rem）＋約八成 logo 高（下緣被切），讓訪客知道下滑有內容。
+       不加 data-reveal：只露一半時 reveal 觀察器不會觸發，會整塊透明 ---- */}
+  <section class="bg-page">
+    <h2 class="sr-only">合作客戶</h2>
+    <div class="pt-8 pb-14">
+      <PartnerLogos />
+    </div>
+  </section>
+
   {/* ---- 3. Why We Do／我們的使命（捲動敘事版，見 MissionScrollStory） ---- */}
   <MissionScrollStory items={positioning} />
 
@@ -164,15 +175,6 @@ const positioning = [
         </div>
       </div>
 
-    </div>
-  </section>
-
-  {/* ---- 4.5 合作客戶 Logo 輪播（我們的服務下方；企業與政府交錯混排、左右淡出）。
-       上下 padding 比照「我們的經驗」（sec-full 的內距、不撐滿版高） ---- */}
-  <section class="bg-page">
-    <h2 class="sr-only">合作客戶</h2>
-    <div class="py-16 md:pt-20 md:pb-12" data-reveal>
-      <PartnerLogos />
     </div>
   </section>
 
@@ -490,10 +492,12 @@ const positioning = [
     }
   }
 
-  /* ---- 滿版 Hero：內距約 80px（5.5vw 封頂），桌機高度撐到視窗高扣掉 header ---- */
+  /* ---- Hero：左右內距約 80px（5.5vw 封頂）、上下內距縮小；
+     桌機高度＝視窗高 − header − --logo-peek，讓下方合作客戶 Logo 區塊首屏露出上半 ---- */
   .hero-band {
+    --logo-peek: 4rem; /* 與 2.5 合作客戶區塊的上內距（pt-8）＋約八成 logo 高對應 */
     padding-inline: clamp(1.25rem, 5.5vw, 5rem);
-    padding-block: 5rem 4rem;
+    padding-block: 3rem 2.5rem;
     overflow-x: clip; /* 垂直合併期間品牌行的隱形佔位盒可能超出，夾住避免水平捲動 */
   }
 
@@ -503,8 +507,8 @@ const positioning = [
       flex-direction: column;
       justify-content: center;
       /* header 桌機高 72px；svh 避免行動瀏覽器網址列造成跳動 */
-      min-height: calc(100svh - 4.5rem);
-      padding-block: 3rem;
+      min-height: calc(100svh - 4.5rem - var(--logo-peek));
+      padding-block: 2rem;
     }
   }
 

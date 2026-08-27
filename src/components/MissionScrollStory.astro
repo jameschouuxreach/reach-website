@@ -34,6 +34,13 @@ const R = 54; // 九圓同大小
 const STEP = 245; // 九宮格相鄰圓心距
 const STROKE = 3.2;
 const CAP_INSET = STROKE / 2; // 圓角端點內縮：讓 round cap 剛好停在圓周
+// 釘住版 SVG 的 viewBox 裁到圓陣實際外緣（外圈圓 + 線寬），盒子＝圖示本體，
+// 左欄才能精準對齊圖示頂端與底端
+const FIG_EDGE = STEP + R + STROKE / 2;
+const FIG_VIEWBOX = `${CX - FIG_EDGE} ${CY - FIG_EDGE} ${FIG_EDGE * 2} ${FIG_EDGE * 2}`;
+// 圓半徑佔圖示邊長的比例：左欄「標題＋內文」上方、「舉例卡」下方各多留一個半徑，
+// 讓文字頂端與卡片底端對齊最上／最下排圓的圓心（實際像素 = 圖示寬 × 此比例）
+const FIG_R_RATIO = Math.round((R / (FIG_EDGE * 2)) * 10000) / 10000;
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
@@ -105,42 +112,47 @@ const staticFigures = [
           <span class="ms-label-en" aria-hidden="true">WHY WE DO</span>
         </h2>
 
-        <div class="msp-grid">
-          {/* 左：Tabs＋字幕輪替槽（Hero 式垂直滑動；第一點初始即顯示） */}
+        {/* Tabs：整個區塊正上方（標籤之下、兩欄之上），對齊畫面中軸置中，自由切換三點 */}
+        <div class="msp-tabs" role="tablist" aria-label="三項定位切換">
+          {
+            items.map((item, i) => (
+              <button
+                type="button"
+                role="tab"
+                aria-selected={i === 0 ? 'true' : 'false'}
+                class:list={['msp-tab', i === 0 && 'is-active']}
+                data-msp-tab={i}
+              >
+                {item.index} {TAB_WORDS[i]}
+              </button>
+            ))
+          }
+        </div>
+
+        <div class="msp-grid" style={`--ms-r-ratio: ${FIG_R_RATIO}`}>
+          {/* 左：字幕輪替槽（Hero 式垂直滑動；第一點初始即顯示）。
+              與右側圖示等高：標題＋內文對齊最上排圓心，舉例卡底端對齊最下排圓心 */}
           <div class="msp-leftcol">
-            <div class="msp-tabs" role="tablist" aria-label="三項定位切換">
-              {
-                items.map((item, i) => (
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={i === 0 ? 'true' : 'false'}
-                    class:list={['msp-tab', i === 0 && 'is-active']}
-                    data-msp-tab={i}
-                  >
-                    {item.index} {TAB_WORDS[i]}
-                  </button>
-                ))
-              }
-            </div>
-            {/* 標題與內文各自的滑動遮罩（如 Hero 右欄第二、三行） */}
-            <div class="msp-slot">
-              {
-                items.map((item, i) => (
-                  <h3 class:list={['ms-title', 'msp-item', i === 0 && 'is-current']} data-msp-title>
-                    {item.title}
-                  </h3>
-                ))
-              }
-            </div>
-            <div class="msp-slot msp-slot-body">
-              {
-                items.map((item, i) => (
-                  <p class:list={['ms-body', 'msp-item', i === 0 && 'is-current']} data-msp-body>
-                    {item.body}
-                  </p>
-                ))
-              }
+            <div class="msp-copy">
+              {/* 標題與內文各自的滑動遮罩（如 Hero 右欄第二、三行） */}
+              <div class="msp-slot">
+                {
+                  items.map((item, i) => (
+                    <h3 class:list={['ms-title', 'msp-item', i === 0 && 'is-current']} data-msp-title>
+                      {item.title}
+                    </h3>
+                  ))
+                }
+              </div>
+              <div class="msp-slot msp-slot-body">
+                {
+                  items.map((item, i) => (
+                    <p class:list={['ms-body', 'msp-item', i === 0 && 'is-current']} data-msp-body>
+                      {item.body}
+                    </p>
+                  ))
+                }
+              </div>
             </div>
             {/* 具體舉例卡：這一點如何落實在專案中（卡片同格堆疊，隨點切換） */}
             <div class="msp-slot msp-slot-example">
@@ -160,7 +172,7 @@ const staticFigures = [
 
           {/* 右：SVG（初始只有中心實心圓） */}
           <div class="msp-figure">
-            <svg viewBox="0 0 800 800" data-mission-svg class="ms-svg" aria-hidden="true" focusable="false">
+            <svg viewBox={FIG_VIEWBOX} data-mission-svg class="ms-svg" aria-hidden="true" focusable="false">
               <circle cx={CX} cy={CY} r={R} class="ms-center" />
               {
                 links.map((l) => (
@@ -260,19 +272,39 @@ const staticFigures = [
     padding-block: 5rem 3rem;
   }
 
+  /* 兩欄同高（列高＝圖示或左欄較高者），整列在剩餘空間垂直置中。
+     --ms-fig＝圖示邊長：右欄寬 52cqw 的 75%＝39cqw，480px／56vh 封頂；
+     以 container 單位定義，左欄的內距才能引用同一個尺寸 */
   .msp-grid {
+    --ms-fig: min(39cqw, 480px, 56vh);
     flex: 1;
     display: grid;
     grid-template-columns: 48fr 52fr;
-    align-items: center;
+    align-items: stretch;
+    align-content: center;
     min-height: 0;
+    container-type: inline-size;
   }
 
-  /* Tabs：圓角 pill；active 白底品牌字、inactive 無底白字、hover 半透明白底 */
+  /* 左欄：標題＋內文在頂端、舉例卡在底端，與右側圖示上下緣對齊 */
+  .msp-leftcol {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* 標題＋內文上方多留一個圓半徑 → 文字頂端對齊最上排圓心 */
+  .msp-copy {
+    padding-top: calc(var(--ms-fig) * var(--ms-r-ratio, 0.09));
+  }
+
+  /* Tabs：區塊正上方（標籤之下）、水平置中對齊畫面中軸；
+     圓角 pill；active 白底品牌字、inactive 無底白字、hover 半透明白底 */
   .msp-tabs {
     display: flex;
+    justify-content: center;
     gap: 0.5rem;
-    margin-bottom: 2.25rem;
+    margin-top: 2rem;
   }
 
   .msp-tab {
@@ -319,8 +351,12 @@ const staticFigures = [
     margin-top: 1.25rem;
   }
 
+  /* 具體舉例卡與內文之間留較大間距，區分「理念」與「案例」；
+     下方多留一個圓半徑 → 卡片底端對齊最下排圓心
+     （用 margin 而非 padding：槽有 overflow:hidden，padding 區會露出滑出中的舊卡） */
   .msp-slot-example {
-    margin-top: 2rem;
+    margin-top: 3rem;
+    margin-bottom: calc(var(--ms-fig) * var(--ms-r-ratio, 0.09));
   }
 
   .msp-item {
@@ -350,13 +386,14 @@ const staticFigures = [
     align-items: center;
     justify-content: center;
     min-height: 0;
-    height: 100%;
   }
 
+  /* viewBox 已裁到圓陣本體（原 800 盒的 75%），寬度上限同比縮小以維持畫面上的圖示大小；
+     以 vh 封頂取代 max-height，避免盒子被壓扁後留白、失去對齊基準 */
   .ms-svg {
-    width: min(100%, 640px);
+    width: var(--ms-fig);
     height: auto;
-    max-height: 74vh;
+    aspect-ratio: 1;
   }
 
   /* ---- 反白版區塊標籤 ---- */

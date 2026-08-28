@@ -154,11 +154,13 @@ const positioning = [
       <SectionLabel zh="我們的服務" en="WHAT WE DO" />
       <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
         <div data-reveal>
+          {/* 兩行為設計：第一行「從未知到已知，」；第二行以詞組（inline-block）為單位換行，
+              字級放大時只會在逗號處整段換到下一行，不會斷在詞中間 */}
           <h3 class="heading-sub max-w-xl">
-            從未知到已知，<br />
-            我們以研究<span class="ai-em">找出關鍵</span>，以設計<span class="ai-em"
-              >推動改變</span
-            >
+            <span class="block">從未知到已知，</span>
+            <span class="block">
+              <span class="inline-block">我們以研究<span class="ai-em">找出關鍵</span>，</span><span class="inline-block">以設計<span class="ai-em">推動改變</span></span>
+            </span>
           </h3>
           <p class="mt-5 max-w-xl leading-loose text-ink-secondary">
             面對複雜問題，我們從真實情境出發，結合研究、全局梳理與多方協作，釐清真正影響成效的關鍵，形成可執行的改善方向。
@@ -336,11 +338,11 @@ const positioning = [
     <div class="container-site py-30 md:py-42">
       <SectionLabel zh="AI 時代的體驗設計" en="UX × AI" />
       <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
-        <div data-reveal>
-          <h2 class="heading-section max-w-xl">
-            AI 能讓產出<span class="ai-em">更快速</span>，但我們能讓成果<span class="ai-em"
-              >更精準</span
-            >
+        <div class="ai-title-col" data-reveal>
+          {/* 詞組單位換行：只在逗號處整段換行；字級另以欄寬封頂（.ai-title），
+              使用者放大瀏覽器字級時詞組仍放得進一行 */}
+          <h2 class="heading-section ai-title max-w-xl">
+            <span class="inline-block">AI 能讓產出<span class="ai-em">更快速</span>，</span><span class="inline-block">但我們能讓成果<span class="ai-em">更精準</span></span>
           </h2>
           <p class="mt-6 max-w-xl leading-loose text-ink-secondary">
             AI 能快速產出，但產出的價值仍取決於對問題的理解深度。我們結合 AI
@@ -384,6 +386,16 @@ const positioning = [
 </BaseLayout>
 
 <style>
+  /* AI 區標題：字級以欄寬封頂（最長詞組「AI 能讓產出更快速，」約 10.5 字寬 → 每字 ≤ 9cqw），
+     正常字級下不影響（heading-section 上限 48px 較小），只在使用者放大字級時生效 */
+  .ai-title-col {
+    container-type: inline-size;
+  }
+
+  .ai-title {
+    font-size: min(clamp(1.875rem, 1.35rem + 2.1vw, 3rem), 9cqw);
+  }
+
   /* ---- AI 區塊 4×4 圓陣：每圓＝上淺下中階半圓（同三圓初始樣貌），
      旋轉由 ai-grid.ts 驅動，回彈曲線同 --wwa-spring ---- */
   .ai-grid {
@@ -535,7 +547,12 @@ const positioning = [
   /* ---- Hero 兩欄 ----
      --hero-fs 與 .heading-hero 的 clamp 公式一致，右欄字級按比例推導以維持左右等高 */
   .hero-grid {
-    --hero-fs: clamp(2.5rem, 5.25vw - 3px, 4.125rem);
+    /* 與 .heading-hero 同一條公式（上限 66px，不隨瀏覽器預設字級放大），
+       再以左欄實際可用寬封頂：主標最長一行「從複雜，致清晰」7 字，取 /7.1 留餘裕；
+       cqw 相對於 .hero-grid（見下方 container-type），左右欄共用同一基準 */
+    --hero-fs-base: clamp(2.5rem, 5.25vw - 3px, 66px);
+    --hero-fs: min(var(--hero-fs-base), calc((100cqw - var(--hero-lead)) / 7.1));
+    container-type: inline-size;
     /* 左欄前導內距：讓主標離左緣遠一點、靠近中間（手機為 0，md+ 於下方 media 設值） */
     --hero-lead: 0rem;
     /* 字槽滑動：時長與緩動（開頭漸快、結尾漸慢 easeInOutQuint）在此統一調整；
@@ -558,6 +575,11 @@ const positioning = [
       gap: 3rem;
     }
 
+    .hero-grid {
+      /* 兩欄：左欄可用寬＝(格寬 − gap 3rem)/2 − 前導內距 */
+      --hero-fs: min(var(--hero-fs-base), calc((50cqw - 1.5rem - var(--hero-lead)) / 7.1));
+    }
+
     .hero-grid > h1 {
       padding-inline-start: var(--hero-lead);
     }
@@ -575,6 +597,10 @@ const positioning = [
   .hc-right {
     border-inline-start: 2px solid var(--color-border);
     padding-inline-start: clamp(1.25rem, 3vw, 3rem);
+  }
+
+  .hero-grid > h1 {
+    font-size: var(--hero-fs);
   }
 
   [data-hc].is-resetting .hero-grid {

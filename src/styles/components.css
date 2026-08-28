@@ -11,8 +11,9 @@
 
   /* ---- 字級（規格 §7.3）---- */
   .heading-hero {
-    /* v1.3：左欄減重，桌機 70 → 66px（手機守規格下限 40px）、字重 500 */
-    font-size: clamp(2.5rem, 5.25vw - 3px, 4.125rem);
+    /* v1.3：左欄減重，桌機 70 → 66px（手機守規格下限 40px）、字重 500。
+       上限用 px（不隨使用者瀏覽器預設字級放大）：Hero 尺寸由設計決定；寬度響應交給 vw */
+    font-size: clamp(2.5rem, 5.25vw - 3px, 66px);
     line-height: 1.12;
     font-weight: 500;
     letter-spacing: -0.01em;

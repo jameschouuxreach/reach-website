@@ -13,6 +13,8 @@ export interface CaseItem {
   types: string[];
   mediaNote?: string;
   eyebrow?: string;
+  /** 標題上方的品牌色小標（提供時才顯示） */
+  kicker?: string;
   summary?: string;
   image?: { src: string; alt: string };
   href?: string;
@@ -49,13 +51,12 @@ export const CASES: CaseItem[] = [
     cta: '查看專案',
   },
   {
-    // 版本 C：小瑜觀點版（卡片文字依指示文件 §2；標題與 B 版指示文件相同，擇定後需調整）
+    // 版本 C：小瑜觀點版。2026-08-28 依業主指示改卡片版式：標題上方加藍色小標、不顯示摘要、tag 改為五項
     name: '好齡居｜重新定義長照服務的角色與價值',
     tag: '生活服務',
-    types: ['品牌研究', '服務定位', '網站策略'],
+    types: ['網站改版', '資訊架構', '服務定位', '內容策略', '品牌研究'],
     eyebrow: '好齡居 NEXDO',
-    summary:
-      '我們從子女與長輩不同的需求出發，協助好齡居重新整理目標受眾、服務分類與品牌角色，並將研究判斷落實到網站與內容策略。',
+    kicker: '樂齡居住服務品牌及網站優化',
     image: {
       src: '/images/work/nexdo/nexdo-home-hero-20260826.jpg',
       alt: '好齡居現行網站首頁，以家庭生活情境呈現樂齡居住服務',

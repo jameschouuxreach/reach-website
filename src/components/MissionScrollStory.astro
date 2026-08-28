@@ -91,7 +91,7 @@ function circlePath(cx: number, cy: number): string {
   return `M ${top} A ${R} ${R} 0 1 1 ${bottom} A ${R} ${R} 0 1 1 ${top}`;
 }
 
-/** 舉例卡標題「專案名｜副標」拆兩段：窄版面時副標整段換行，不在句中折斷 */
+/** 舉例卡標題「專案名｜副標」拆兩段：第一行小標「真實案例｜專案名」、第二行大標＝副標 */
 const examples = items.map((item) => {
   const [name = '', ...rest] = item.example.project.split('｜');
   return { name, sub: rest.join('｜') };
@@ -168,18 +168,8 @@ const staticFigures = [
                     class:list={['ms-example', 'msp-item', i === 0 && 'is-current']}
                     data-msp-example
                   >
-                    <p class="ms-example-project">
-                      {
-                        examples[i]!.sub ? (
-                          <>
-                            <span>{examples[i]!.name}｜</span>
-                            <span class="ms-example-sub">{examples[i]!.sub}</span>
-                          </>
-                        ) : (
-                          examples[i]!.name
-                        )
-                      }
-                    </p>
+                    <p class="ms-example-label">真實案例｜{examples[i]!.name}</p>
+                    <p class="ms-example-title">{examples[i]!.sub}</p>
                     <p class="ms-example-body">{item.example.body}</p>
                   </div>
                 ))
@@ -226,18 +216,8 @@ const staticFigures = [
             <h3 class="ms-title">{item.title}</h3>
             <p class="ms-body">{item.body}</p>
             <div class="ms-example ms-fb-example">
-              <p class="ms-example-project">
-                {
-                  examples[i]!.sub ? (
-                    <>
-                      <span>{examples[i]!.name}｜</span>
-                      <span class="ms-example-sub">{examples[i]!.sub}</span>
-                    </>
-                  ) : (
-                    examples[i]!.name
-                  )
-                }
-              </p>
+              <p class="ms-example-label">真實案例｜{examples[i]!.name}</p>
+              <p class="ms-example-title">{examples[i]!.sub}</p>
               <p class="ms-example-body">{item.example.body}</p>
             </div>
             <div class="ms-fig-wrap" aria-hidden="true">
@@ -387,17 +367,19 @@ const staticFigures = [
     margin-bottom: calc(var(--ms-fig) * var(--ms-r-ratio, 0.09));
   }
 
+  /* 切換方向＝往下滑（2026-08-28 業主指示反轉）：
+     未輪到的項目停在上方（-110%），切入時往下滑到定位；已過的項目（.is-past）停在下方（110%） */
   .msp-item {
     grid-area: 1 / 1;
     opacity: 0;
-    transform: translateY(110%);
+    transform: translateY(-110%);
     transition:
       transform 850ms cubic-bezier(0.83, 0, 0.17, 1),
       opacity 600ms ease;
   }
 
-  .msp-item.is-above {
-    transform: translateY(-110%);
+  .msp-item.is-past {
+    transform: translateY(110%);
   }
 
   .msp-item.is-current {
@@ -469,8 +451,9 @@ const staticFigures = [
     max-width: 30em;
   }
 
-  /* ---- 具體舉例卡（兩個變體共用）：底色同 Hero（--color-page），
-     專案名＝品牌色，內文＝Hero 右欄第三行中文句的 --color-text-secondary ---- */
+  /* ---- 具體舉例卡（兩個變體共用）：底色同 Hero（--color-page）。
+     第一行小標「真實案例｜專案名」品牌色、第二行大標 --neutral-700（#353B45）、
+     內文＝Hero 右欄第三行中文句的 --color-text-secondary ---- */
   .ms-example {
     max-width: 30em;
     padding: 1.25rem 1.5rem 1.375rem;
@@ -479,16 +462,20 @@ const staticFigures = [
     color: var(--color-text-secondary);
   }
 
-  .ms-example-project {
-    font-size: 1.125rem;
+  .ms-example-label {
+    font-size: 0.875rem;
     line-height: 1.4;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--color-brand);
   }
 
-  /* 副標成一個不可拆的行內塊：放不下就整段換到下一行 */
-  .ms-example-sub {
-    display: inline-block;
+  .ms-example-title {
+    margin-top: 0.375rem;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    font-weight: 700;
+    /* 業主指示（2026-08-28）：比 --color-text 淡一階，介於標題黑與內文灰之間 */
+    color: var(--neutral-700);
   }
 
   .ms-example-body {

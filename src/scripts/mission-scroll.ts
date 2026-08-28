@@ -65,7 +65,7 @@ export function initMissionScroll(): void {
     for (const group of [titleItems, bodyItems, exampleItems]) {
       group.forEach((el, i) => {
         el.classList.toggle('is-current', i === index);
-        el.classList.toggle('is-above', i < index);
+        el.classList.toggle('is-past', i < index); // 已過的項目停在下方（往下滑方向）
       });
     }
     tabs.forEach((tab, i) => {

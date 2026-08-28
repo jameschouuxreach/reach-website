@@ -1,7 +1,7 @@
 ---
 /**
  * 案例卡（v2.0）：獨立圖片 → 大標題 → 摘要 → 專案類型 pills；hover 時標題轉品牌色。
- * eyebrow／cta 欄位保留但不顯示。未提供 image 時維持灰階佔位框，
+ * eyebrow／cta 欄位保留但不顯示；kicker 提供時顯示為標題上方的品牌色小標。未提供 image 時維持灰階佔位框，
  * 未提供 href 時為純展示卡（不可點）。
  */
 interface Props {
@@ -12,6 +12,8 @@ interface Props {
   mediaNote?: string;
   /** 客戶名稱小標（v2.0 版式上不顯示，保留資料欄位） */
   eyebrow?: string;
+  /** 標題上方的品牌色小標（v2.3 新增，僅提供時顯示） */
+  kicker?: string;
   /** 卡片摘要 */
   summary?: string;
   /** 卡片圖片（提供後取代佔位框） */
@@ -27,6 +29,7 @@ const {
   types = ['案例整理中'],
   mediaNote = '需要素材：專案代表圖或研究現場照片',
   summary,
+  kicker,
   image,
   href,
 } = Astro.props;
@@ -54,7 +57,8 @@ const wrapperProps = href
       <div class="media-placeholder aspect-[16/10] rounded-xl">{mediaNote}</div>
     )
   }
-  <h3 class="case-title mt-6 text-xl font-bold text-ink md:text-2xl">{name}</h3>
+  {kicker && <p class="mt-6 text-sm font-bold tracking-wide text-brand">{kicker}</p>}
+  <h3 class:list={['case-title text-xl font-bold text-ink md:text-2xl', kicker ? 'mt-2' : 'mt-6']}>{name}</h3>
   {summary && <p class="mt-3 leading-relaxed text-ink-secondary">{summary}</p>}
   <p class="mt-4 flex flex-wrap gap-2">
     {

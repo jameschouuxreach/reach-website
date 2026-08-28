@@ -4,6 +4,7 @@
 #   main           → 網站根         https://jameschouuxreach.github.io/reach-website-v1/
 #   reach-web-v2   → /v2/ 子資料夾   https://jameschouuxreach.github.io/reach-website-v1/v2/
 #   reach-web-v2-1 → /v2-1/ 子資料夾 https://jameschouuxreach.github.io/reach-website-v1/v2-1/
+#   reach-web-v2-2 → /v2-2/ 子資料夾 https://jameschouuxreach.github.io/reach-website-v1/v2-2/
 #
 # 新增一個要並存的版本：在下方對應表加一行 branch↔子資料夾，
 # 並把子資料夾名加進 KEEP_DIRS（根部署時不會被蓋掉的資料夾）。
@@ -11,7 +12,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 REPO_BASE="/reach-website-v1"
-KEEP_DIRS=(v2 v2-1)
+KEEP_DIRS=(v2 v2-1 v2-2)
 SUBDIR_ARG="${1:-}"
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -22,9 +23,10 @@ case "$BRANCH" in
   main)           SUBDIR="" ;;
   reach-web-v2)   SUBDIR="v2" ;;
   reach-web-v2-1) SUBDIR="v2-1" ;;
+  reach-web-v2-2) SUBDIR="v2-2" ;;
   *)
     echo "錯誤：branch「${BRANCH}」沒有對應的部署位置。" >&2
-    echo "請 checkout 到 main、reach-web-v2 或 reach-web-v2-1 再部署，或先在 scripts/deploy.sh 的對應表加上這個 branch。" >&2
+    echo "請 checkout 到 main、reach-web-v2、reach-web-v2-1 或 reach-web-v2-2 再部署，或先在 scripts/deploy.sh 的對應表加上這個 branch。" >&2
     exit 1 ;;
 esac
 

@@ -163,6 +163,14 @@ const positioning = [
           <p class="mt-5 max-w-xl leading-loose text-ink-secondary">
             面對複雜問題，我們從真實情境出發，結合研究、全局梳理與多方協作，釐清真正影響成效的關鍵，形成可執行的改善方向。
           </p>
+          {/* 服務範疇 pills（2026-08-28 業主指示新增；樣式同案例卡 tag） */}
+          <ul class="mt-6 flex max-w-xl flex-wrap gap-2" aria-label="服務範疇">
+            {
+              ['研究分析', '體驗設計', '商業策略', '體驗顧問'].map((label) => (
+                <li class="rounded-full border border-line bg-surface px-3.5 py-1 text-sm text-ink-secondary">{label}</li>
+              ))
+            }
+          </ul>
           <p class="mt-8">
             <TextLink href="/services/" label="服務項目" />
           </p>

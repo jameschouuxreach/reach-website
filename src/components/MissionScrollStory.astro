@@ -91,6 +91,12 @@ function circlePath(cx: number, cy: number): string {
   return `M ${top} A ${R} ${R} 0 1 1 ${bottom} A ${R} ${R} 0 1 1 ${top}`;
 }
 
+/** 舉例卡標題「專案名｜副標」拆兩段：窄版面時副標整段換行，不在句中折斷 */
+const examples = items.map((item) => {
+  const [name = '', ...rest] = item.example.project.split('｜');
+  return { name, sub: rest.join('｜') };
+});
+
 // Tabs 詞語（品牌對應：更深→01、更廣→02、更遠→03）
 const TAB_WORDS = ['更深', '更廣', '更遠'];
 
@@ -162,7 +168,18 @@ const staticFigures = [
                     class:list={['ms-example', 'msp-item', i === 0 && 'is-current']}
                     data-msp-example
                   >
-                    <p class="ms-example-project">{item.example.project}</p>
+                    <p class="ms-example-project">
+                      {
+                        examples[i]!.sub ? (
+                          <>
+                            <span>{examples[i]!.name}｜</span>
+                            <span class="ms-example-sub">{examples[i]!.sub}</span>
+                          </>
+                        ) : (
+                          examples[i]!.name
+                        )
+                      }
+                    </p>
                     <p class="ms-example-body">{item.example.body}</p>
                   </div>
                 ))
@@ -209,7 +226,18 @@ const staticFigures = [
             <h3 class="ms-title">{item.title}</h3>
             <p class="ms-body">{item.body}</p>
             <div class="ms-example ms-fb-example">
-              <p class="ms-example-project">{item.example.project}</p>
+              <p class="ms-example-project">
+                {
+                  examples[i]!.sub ? (
+                    <>
+                      <span>{examples[i]!.name}｜</span>
+                      <span class="ms-example-sub">{examples[i]!.sub}</span>
+                    </>
+                  ) : (
+                    examples[i]!.name
+                  )
+                }
+              </p>
               <p class="ms-example-body">{item.example.body}</p>
             </div>
             <div class="ms-fig-wrap" aria-hidden="true">
@@ -456,6 +484,11 @@ const staticFigures = [
     line-height: 1.4;
     font-weight: 700;
     color: var(--color-brand);
+  }
+
+  /* 副標成一個不可拆的行內塊：放不下就整段換到下一行 */
+  .ms-example-sub {
+    display: inline-block;
   }
 
   .ms-example-body {

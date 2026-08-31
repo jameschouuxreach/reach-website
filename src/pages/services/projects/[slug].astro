@@ -12,6 +12,7 @@ import CaseCard from '../../../components/CaseCard.astro';
 import ServiceContextNav from '../../../components/services/ServiceContextNav.astro';
 import FaqList from '../../../components/services/FaqList.astro';
 import RelatedCasePlaceholder from '../../../components/services/RelatedCasePlaceholder.astro';
+import ProjectGlyph from '../../../components/services/ProjectGlyph.astro';
 import {
   PROJECT_TYPES,
   PROJECT_TYPES_HREF,
@@ -61,9 +62,11 @@ const description = `${project.subtitle}。${project.fit}`;
     items={navItems}
   />
 
-  {/* ---- 專案 Hero ---- */}
-  <section class="border-b border-line bg-page">
-    <div class="container-site py-16 md:py-24">
+  {/* ---- 專案 Hero（右下以專案類型標誌當背景裝飾，2026-08-31 業主指示）---- */}
+  <section class="relative isolate overflow-hidden border-b border-line bg-page">
+    {/* 手機版底部多留 120px：標誌固定住在文字下方的留白帶，不壓到副標 */}
+    <div class="container-site relative pt-16 pb-30 md:py-24">
+      <ProjectGlyph slug={project.slug} class="svc-hero-glyph" />
       <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand">{project.eyebrow}</p>
       <h1 class="heading-section mt-4 max-w-3xl">{project.title}</h1>
       <p class="mt-4 max-w-3xl text-xl font-semibold leading-relaxed text-ink md:text-2xl">{project.subtitle}</p>
@@ -145,6 +148,26 @@ const description = `${project.subtitle}。${project.fit}`;
 </BaseLayout>
 
 <style>
+  /* Hero 背景標誌：靠右下、被區塊底邊裁切；置於文字之下（section isolate＋z-index:-1） */
+  .svc-hero-glyph {
+    position: absolute;
+    z-index: -1;
+    right: -4%;
+    bottom: -38%;
+    width: clamp(240px, 30vw, 420px);
+    height: auto;
+    pointer-events: none;
+  }
+
+  @media (max-width: 767px) {
+    /* 以 px 定位：可見部分固定 150×110px，落在 pb-30（120px）的留白帶內 */
+    .svc-hero-glyph {
+      right: -70px;
+      bottom: -110px;
+      width: 220px;
+    }
+  }
+
   /* 常見搭配服務 pill（可點）：44px 觸控高度；hover／focus 轉品牌藍邊框與文字 */
   .svc-pill-link {
     display: inline-flex;

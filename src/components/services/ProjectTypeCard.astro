@@ -3,9 +3,12 @@
  * 專案類型摘要卡（探索型／優化型各三張）：整張卡為單一 <a>，內部 CTA 為 <span>。
  * 內容順序：專案類型標題 → 副標 → 小標「適合誰」→ fit 內文 → 查看專案說明。
  * headingLevel 依頁面結構傳入（ProjectTypeGroups 內的群組標題為 H3，卡片標題用 H4，避免跳級）。
+ * 右下角以該專案類型標誌作裝飾（2026-08-31 業主指示）：標誌不完整呈現，被卡片右下邊裁切、只露出左上部分；
+ * 純裝飾且置於內容之下（isolate＋z-index:-1），不影響文字可讀性與點擊。
  */
 import type { ProjectType } from '../../data/services';
 import { getProjectTypePath } from '../../data/services';
+import ProjectGlyph from './ProjectGlyph.astro';
 
 interface Props extends ProjectType {
   headingLevel?: 'h3' | 'h4';
@@ -16,7 +19,8 @@ const Heading = headingLevel;
 const href = getProjectTypePath(slug);
 ---
 
-<a href={href} class="svc-link-card card flex h-full flex-col p-6 no-underline md:p-8">
+<a href={href} class="svc-link-card card relative isolate flex h-full flex-col overflow-hidden p-6 no-underline md:p-8">
+  <ProjectGlyph slug={slug} class="svc-card-glyph" />
   <Heading class="svc-card-title text-[1.375rem] font-bold text-ink md:text-2xl">{title}</Heading>
   <p class="mt-3 text-[17px] font-semibold leading-relaxed text-ink md:text-lg">{subtitle}</p>
   <p class="mt-5 text-sm font-bold text-brand">適合誰</p>
@@ -30,6 +34,18 @@ const href = getProjectTypePath(slug);
 </a>
 
 <style>
+  /* 右下角裝飾標誌：約六成卡寬，往右下各推出兩成多，只露出標誌左上部分；透明度 30%（2026-08-31 業主指示） */
+  .svc-card-glyph {
+    position: absolute;
+    z-index: -1;
+    right: -22%;
+    bottom: -26%;
+    width: 64%;
+    height: auto;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
   .svc-link-card {
     transition:
       background-color 200ms ease,

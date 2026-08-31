@@ -1,0 +1,184 @@
+---
+/**
+ * 專案類型頁（第二層，六頁由 getStaticPaths 產出）：
+ * Header → ServiceContextNav（返回常見專案類型＋六類切換）→ 專案 Hero
+ * → 專案完整內容（適合誰／我們會如何協助／常見情境舉例／常見搭配服務／決策價值）
+ * → 相關案例 → 常見問題 → 既有 ContactCta → Footer。
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ContactCta from '../../../components/ContactCta.astro';
+import CaseCard from '../../../components/CaseCard.astro';
+import ServiceContextNav from '../../../components/services/ServiceContextNav.astro';
+import FaqList from '../../../components/services/FaqList.astro';
+import RelatedCasePlaceholder from '../../../components/services/RelatedCasePlaceholder.astro';
+import {
+  PROJECT_TYPES,
+  PROJECT_TYPES_HREF,
+  SERVICE_FAQ,
+  getProjectTypePath,
+  getPublishedCase,
+  resolveServiceItems,
+  type ProjectType,
+} from '../../../data/services';
+
+export const getStaticPaths = (() =>
+  PROJECT_TYPES.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  project: ProjectType;
+}
+
+const { project } = Astro.props;
+
+const navItems = PROJECT_TYPES.map((item) => ({
+  label: item.title,
+  href: getProjectTypePath(item.slug),
+  active: item.slug === project.slug,
+}));
+
+// 搭配服務：由 slug 反查類別與 anchor，不硬編碼名稱
+const services = resolveServiceItems(project.serviceItemSlugs);
+
+// 相關案例：published 且能在 CASES 找到者用 CaseCard；其餘一律顯示整理中（不輸出連結）
+const relatedCases = project.relatedCases.map((reference) => {
+  const published = getPublishedCase(reference);
+  return published ? { kind: 'published' as const, data: published } : { kind: 'preparing' as const, name: reference.name };
+});
+
+// 專案頁 description：副標＋適合誰（§16.1）
+const description = `${project.subtitle}。${project.fit}`;
+---
+
+<BaseLayout title={`${project.title}｜常見專案類型`} description={description}>
+  <ServiceContextNav
+    ariaLabel="常見專案類型切換"
+    backLabel="常見專案類型"
+    backHref={PROJECT_TYPES_HREF}
+    items={navItems}
+  />
+
+  {/* ---- 專案 Hero ---- */}
+  <section class="border-b border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand">{project.eyebrow}</p>
+      <h1 class="heading-section mt-4 max-w-3xl">{project.title}</h1>
+      <p class="mt-4 max-w-3xl text-xl font-semibold leading-relaxed text-ink md:text-2xl">{project.subtitle}</p>
+    </div>
+  </section>
+
+  {/* ---- 專案完整內容 ---- */}
+  <section class="bg-surface">
+    <div class="container-site py-16 md:py-24">
+      {/* 適合誰／我們會如何協助：桌機兩欄、手機單欄 */}
+      <div class="grid gap-10 md:grid-cols-2 md:gap-12" data-reveal>
+        <div>
+          <h2 class="heading-sub">適合誰</h2>
+          <p class="mt-4 text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.fit}</p>
+        </div>
+        <div>
+          <h2 class="heading-sub">我們會如何協助</h2>
+          <p class="mt-4 text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.approach}</p>
+        </div>
+      </div>
+
+      {/* 常見情境舉例：Blue 50 底、1px Blue 100 邊框，不用引號造型或假客戶照片 */}
+      <div class="mt-12 rounded-2xl border border-accent-100 bg-accent p-6 md:mt-16 md:p-10" data-reveal>
+        <h2 class="heading-sub">常見情境舉例</h2>
+        <p class="mt-4 max-w-3xl text-[17px] leading-relaxed text-ink md:text-lg">{project.example}</p>
+      </div>
+
+      {/* 常見搭配服務：可換行 pill，每個連至服務類別頁對應 anchor */}
+      <div class="mt-12 md:mt-16" data-reveal>
+        <h2 class="heading-sub">常見搭配服務</h2>
+        <ul class="mt-5 flex flex-wrap gap-3">
+          {
+            services.map(({ item, href }) => (
+              <li>
+                <a href={href} class="svc-pill-link">{item.title}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      {/* 決策價值：大一級文字收束，不寫成保證成效、KPI 或 ROI */}
+      <div class="mt-12 md:mt-16" data-reveal>
+        <h2 class="heading-sub">這類專案帶來的決策價值</h2>
+        <p class="mt-4 max-w-3xl text-xl font-semibold leading-relaxed text-ink md:text-2xl">{project.value}</p>
+      </div>
+    </div>
+  </section>
+
+  {/* ---- 相關案例（relatedCases 為空時整個 section 不渲染）---- */}
+  {
+    relatedCases.length > 0 && (
+      <section class="border-t border-line bg-page">
+        <div class="container-site py-16 md:py-24">
+          <h2 class="heading-sub" data-reveal>相關案例</h2>
+          <div class="mt-8 grid gap-x-8 gap-y-12 md:mt-10 md:grid-cols-2" data-reveal>
+            {relatedCases.map((entry) =>
+              entry.kind === 'published' ? <CaseCard {...entry.data} /> : <RelatedCasePlaceholder name={entry.name} />,
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {/* ---- 常見問題 ---- */}
+  <section class="border-t border-line bg-surface">
+    <div class="container-site py-16 md:py-24">
+      <div class="max-w-3xl" data-reveal>
+        <h2 class="heading-sub">常見問題</h2>
+        <div class="mt-8">
+          <FaqList items={SERVICE_FAQ} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  /* 常見搭配服務 pill（可點）：44px 觸控高度；hover／focus 轉品牌藍邊框與文字 */
+  .svc-pill-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      border-color 180ms ease,
+      color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .svc-pill-link:hover,
+  .svc-pill-link:focus-visible {
+    border-color: var(--color-brand);
+    background-color: var(--reach-blue-50);
+    color: var(--color-brand);
+  }
+
+  .svc-pill-link:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-pill-link {
+      transition: none;
+    }
+  }
+</style>

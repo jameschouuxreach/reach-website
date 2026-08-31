@@ -1,0 +1,122 @@
+---
+/**
+ * 常見專案類型：探索型三卡＋優化型三卡，/services/ 與四個服務類別頁重用同一組內容。
+ * - 文案一律取自 src/data/services.ts，不接受頁面自行傳入另一份。
+ * - 根節點固定 id="project-types"（專案頁「常見專案類型」返回入口），同一頁只能出現一次。
+ * - 標題階層：H2（區塊）→ H3（群組名稱）→ H4（專案卡）；showIntro=false 時 H2 仍以 sr-only 保留，避免跳級。
+ * - showClosingCta：區塊末尾加「還不確定自己屬於哪一種專案？」收尾（§7.4）。
+ * - 群組標題下為一行副標（2026-08-31 業主指示，取代規格原本的多段群組說明）。
+ */
+import {
+  PROJECT_FAMILIES,
+  PROJECT_FAMILY_ORDER,
+  PROJECT_TYPES_ANCHOR,
+  getProjectTypesByFamily,
+} from '../../data/services';
+import ProjectTypeCard from './ProjectTypeCard.astro';
+
+interface Props {
+  showIntro?: boolean;
+  showClosingCta?: boolean;
+}
+
+const { showIntro = true, showClosingCta = true } = Astro.props;
+
+const groups = PROJECT_FAMILY_ORDER.map((family) => ({
+  family,
+  ...PROJECT_FAMILIES[family],
+  projects: getProjectTypesByFamily(family),
+}));
+---
+
+<section id={PROJECT_TYPES_ANCHOR} class="svc-project-types border-t border-line bg-page">
+  <div class="container-site py-16 md:py-24">
+    {
+      showIntro ? (
+        <div class="max-w-3xl" data-reveal>
+          <p class="flex items-baseline gap-3">
+            <span class="text-base font-bold text-brand">常見專案類型</span>
+            <span class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted" aria-hidden="true">
+              COMMON ENGAGEMENTS
+            </span>
+          </p>
+          <h2 class="heading-section mt-4">從你的問題和需求出發，看看哪種專案適合你</h2>
+          <p class="mt-4 text-lg leading-relaxed text-ink-secondary md:mt-5">
+            專案通常組合多種項目來有效達成目標，不理解服務沒關係，看看以下哪類專案與你的情況比較相似。
+          </p>
+        </div>
+      ) : (
+        <h2 class="sr-only">常見專案類型</h2>
+      )
+    }
+
+    {
+      groups.map((group, groupIndex) => (
+        <div
+          class:list={[
+            'svc-group',
+            groupIndex === 0 ? (showIntro ? 'mt-12 md:mt-16' : '') : 'mt-20 md:mt-24',
+          ]}
+          data-reveal
+        >
+          <div class="max-w-3xl">
+            <h3 class="heading-sub">{group.label}</h3>
+            <p class="mt-2 text-lg font-medium leading-relaxed text-ink-secondary">{group.subtitle}</p>
+          </div>
+          <div class="mt-8 grid gap-6 md:mt-10 md:grid-cols-2 lg:grid-cols-3">
+            {group.projects.map((project) => (
+              <ProjectTypeCard {...project} headingLevel="h4" />
+            ))}
+          </div>
+        </div>
+      ))
+    }
+
+    {
+      showClosingCta && (
+        <div
+          class="svc-closing mt-16 rounded-2xl border border-accent-100 bg-accent px-6 py-10 text-center md:mt-24 md:px-12 md:py-14"
+          data-reveal
+        >
+          <h2 class="heading-sub">還不確定自己屬於哪一種專案？</h2>
+          <p class="mx-auto mt-4 max-w-2xl leading-relaxed text-ink-secondary">
+            告訴我們目前遇到的問題、希望達成的目標與預計時程。我們會協助判斷適合的專案類型，並組合真正需要的服務項目。
+          </p>
+          <p class="mt-8">
+            <a href="/contact/" class="btn-primary svc-closing-cta rounded-full px-7">
+              與我們討論需求
+              <span class="cta-arrow" aria-hidden="true">→</span>
+            </a>
+          </p>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  /* 由專案頁返回 /services/#project-types 時避開 sticky Header（72px＋緩衝） */
+  .svc-project-types {
+    scroll-margin-top: 88px;
+  }
+
+  .svc-closing-cta .cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  .svc-closing-cta:hover .cta-arrow,
+  .svc-closing-cta:focus-visible .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-closing-cta .cta-arrow {
+      transition: none;
+    }
+
+    .svc-closing-cta:hover .cta-arrow,
+    .svc-closing-cta:focus-visible .cta-arrow {
+      transform: none;
+    }
+  }
+</style>

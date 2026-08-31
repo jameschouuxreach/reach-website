@@ -1,0 +1,38 @@
+---
+/**
+ * 服務子項目說明卡（服務類別頁用）：<article id={slug}>，不是連結卡。
+ * - 專案頁的「常見搭配服務」pill 會連回此 anchor，scroll-margin-top 預留 152px 避開 sticky Header＋切換列。
+ * - 品牌藍索引取代多彩 icon；長文自然增高，不做 line clamp。
+ * - :target 時以淡藍底＋品牌藍邊框標示被連到的卡片。
+ */
+import type { ServiceItem } from '../../data/services';
+
+interface Props extends ServiceItem {
+  headingLevel?: 'h2' | 'h3';
+  /** 品牌藍索引（1 起算），僅裝飾 */
+  index?: number;
+}
+
+const { slug, title, description, headingLevel = 'h3', index } = Astro.props;
+const Heading = headingLevel;
+const indexLabel = typeof index === 'number' ? String(index).padStart(2, '0') : undefined;
+---
+
+<article id={slug} class="svc-item-card card flex h-full flex-col p-6 md:p-8">
+  {indexLabel && <p class="text-sm font-bold tabular-nums text-brand" aria-hidden="true">{indexLabel}</p>}
+  <Heading class:list={['text-[1.375rem] font-bold text-ink md:text-2xl', indexLabel ? 'mt-3' : '']}>
+    {title}
+  </Heading>
+  <p class="mt-3 leading-relaxed text-ink-secondary">{description}</p>
+</article>
+
+<style>
+  .svc-item-card {
+    scroll-margin-top: 152px;
+  }
+
+  .svc-item-card:target {
+    background-color: var(--reach-blue-50);
+    border-color: var(--color-brand);
+  }
+</style>

@@ -1,0 +1,209 @@
+---
+/**
+ * 同層快速切換列（返回上層＋同層頁籤），置於全站 Header 下方 sticky。
+ * - 使用 <nav aria-label>；返回入口與頁籤皆為原生 <a>，點擊後導向另一個 URL，故不用 role="tablist"。
+ * - 它包含同層頁面，不符合 breadcrumb 的祖先階層語意，故不標記為 breadcrumb。
+ * - active：品牌藍＋粗體＋2px 底線＋aria-current="page"（不只靠顏色）。
+ * - 內容超出寬度時只在元件內水平捲動，不造成整頁 overflow；末端保留 24px padding 提示可捲動，不用漸層遮罩。
+ * - 初次載入時以 JS 將 active 項目捲入可視範圍（最多 240ms）；無 JS 或 reduced-motion 時直接定位／不動。
+ */
+interface NavItem {
+  label: string;
+  href: string;
+  active: boolean;
+}
+
+interface Props {
+  ariaLabel: string;
+  backLabel: string;
+  backHref: string;
+  items: NavItem[];
+}
+
+const { ariaLabel, backLabel, backHref, items } = Astro.props;
+---
+
+<nav aria-label={ariaLabel} class="scn">
+  <div class="container-site">
+    <div class="scn-scroller" data-context-nav>
+      <a href={backHref} class="scn-back">
+        <span class="scn-back-arrow" aria-hidden="true">←</span>
+        {backLabel}
+      </a>
+      <span class="scn-divider scn-divider-strong" aria-hidden="true"></span>
+      {
+        items.map((item, index) => (
+          <>
+            {index > 0 && <span class="scn-divider" aria-hidden="true" />}
+            <a href={item.href} class="scn-tab" aria-current={item.active ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </>
+        ))
+      }
+    </div>
+  </div>
+</nav>
+
+<style>
+  .scn {
+    position: sticky;
+    top: 64px; /* 手機 Header 高度 */
+    z-index: 30; /* 低於 Header（z-40）、高於頁面內容 */
+    background-color: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 768px) {
+    .scn {
+      top: 72px; /* 桌機 Header 高度 */
+    }
+  }
+
+  .scn-scroller {
+    /* 與 .container-site 相同的左右內距：讓捲動區貼齊版心外緣，內容仍對齊版心 */
+    --scn-pad: clamp(1.25rem, 4vw, 2.5rem);
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    min-height: 64px;
+    margin-inline: calc(var(--scn-pad) * -1);
+    padding-inline-start: var(--scn-pad);
+    padding-inline-end: calc(var(--scn-pad) + 24px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .scn-scroller::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scn-back,
+  .scn-tab {
+    position: relative;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 0.875rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color 180ms ease;
+  }
+
+  .scn-back {
+    gap: 0.375rem;
+    padding-inline-start: 0;
+  }
+
+  .scn-back:hover,
+  .scn-back:focus-visible,
+  .scn-tab:hover,
+  .scn-tab:focus-visible {
+    color: var(--color-text);
+  }
+
+  .scn-back:focus-visible,
+  .scn-tab:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: -2px; /* 內縮，避免被 overflow 裁切 */
+    border-radius: 6px;
+  }
+
+  .scn-tab[aria-current='page'] {
+    color: var(--color-brand);
+    font-weight: 700;
+  }
+
+  .scn-tab[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 0.875rem;
+    right: 0.875rem;
+    bottom: 0;
+    height: 2px;
+    background-color: var(--color-brand);
+  }
+
+  .scn-back-arrow {
+    display: inline-block;
+    transition: transform 200ms ease;
+  }
+
+  .scn-back:hover .scn-back-arrow,
+  .scn-back:focus-visible .scn-back-arrow {
+    transform: translateX(-3px);
+  }
+
+  .scn-divider {
+    flex: 0 0 auto;
+    align-self: center;
+    width: 1px;
+    height: 1rem;
+    margin-inline: 0.125rem;
+    background-color: var(--color-border);
+  }
+
+  .scn-divider-strong {
+    height: 1.5rem;
+    margin-inline: 0.625rem 0.5rem;
+    background-color: var(--neutral-300);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scn-back,
+    .scn-tab,
+    .scn-back-arrow {
+      transition: none;
+    }
+
+    .scn-back:hover .scn-back-arrow,
+    .scn-back:focus-visible .scn-back-arrow {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * 初次載入：若切換列已溢出，把 active 項目置中捲入元件可視區（只捲動元件本身，不動頁面）。
+   * reduced-motion 直接定位；否則以 240ms ease-out 平滑捲動。
+   */
+  function revealActiveTab(scroller: HTMLElement): void {
+    const active = scroller.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!active) return;
+
+    const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+    if (maxScroll <= 0) return;
+
+    const centered = active.offsetLeft - (scroller.clientWidth - active.offsetWidth) / 2;
+    const target = Math.min(maxScroll, Math.max(0, centered));
+    const start = scroller.scrollLeft;
+    const delta = target - start;
+    if (Math.abs(delta) < 1) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      scroller.scrollLeft = target;
+      return;
+    }
+
+    const duration = 240;
+    const startedAt = performance.now();
+    const easeOut = (t: number): number => 1 - Math.pow(1 - t, 3);
+
+    const step = (now: number): void => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      scroller.scrollLeft = start + delta * easeOut(progress);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-context-nav]').forEach(revealActiveTab);
+</script>

@@ -1,0 +1,95 @@
+---
+/**
+ * 常見問題（六個專案類型頁共用）：原生 <details>／<summary>，不依賴 JavaScript。
+ * - 一次可開啟多題，不強制 accordion 單開。
+ * - summary 觸控高度至少 52px，有明確 focus-visible。
+ * - 展開只做圖示旋轉 45°（＋ → ×）與顏色變化，不做高度量測動畫；reduced-motion 取消 transition。
+ * - 問答完整存在 HTML。
+ */
+import type { FaqItem } from '../../data/services';
+
+interface Props {
+  items: FaqItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="faq-list border-y border-line">
+  {
+    items.map((item) => (
+      <details class="faq-item">
+        <summary class="faq-summary">
+          <span class="faq-question">{item.question}</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </summary>
+        <div class="faq-answer">
+          <p>{item.answer}</p>
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .faq-item + .faq-item {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .faq-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 52px;
+    padding-block: 0.875rem;
+    cursor: pointer;
+    list-style: none;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--color-text);
+    transition: color 180ms ease;
+  }
+
+  .faq-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-summary:hover,
+  .faq-item[open] > .faq-summary {
+    color: var(--color-brand);
+  }
+
+  .faq-summary:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  .faq-icon {
+    flex: 0 0 auto;
+    color: var(--color-brand);
+    transition: transform 180ms ease;
+  }
+
+  .faq-item[open] .faq-icon {
+    transform: rotate(45deg);
+  }
+
+  .faq-answer {
+    padding-block: 0.25rem 1.375rem;
+    max-width: 65ch;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq-summary,
+    .faq-icon {
+      transition: none;
+    }
+  }
+</style>

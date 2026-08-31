@@ -1,0 +1,98 @@
+---
+/**
+ * 服務類別卡（/services/ 總覽用）：整張卡為單一 <a>，內部子項目 pills 只作資訊展示、不可點。
+ * 內容順序：類別標題 → 副標 → 子項目 pills → 了解更多（2026-08-31 業主指示拿掉英文 eyebrow）。
+ * 卡片高度由同列最高卡決定（grid stretch），CTA 以 mt-auto 對齊底部。
+ * headingLevel 依頁面結構傳入：/services/ 的區塊標題已是 H1，卡片標題用 H2 避免跳級。
+ */
+import type { ServiceCategory } from '../../data/services';
+import { getServiceCategoryPath } from '../../data/services';
+
+interface Props extends ServiceCategory {
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { slug, title, subtitle, items, headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
+const href = getServiceCategoryPath(slug);
+---
+
+<a href={href} class="svc-link-card card flex h-full flex-col p-6 no-underline md:p-8">
+  <Heading class="svc-card-title text-2xl font-bold text-ink md:text-[1.75rem]">{title}</Heading>
+  <p class="mt-3 text-[17px] font-semibold leading-relaxed text-ink md:text-lg">{subtitle}</p>
+  <ul class="mt-5 flex flex-wrap gap-2">
+    {
+      items.map((item) => (
+        <li class="inline-flex min-h-8 items-center rounded-full border border-line bg-surface px-3.5 py-1 text-sm text-ink-secondary">
+          {item.title}
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-auto pt-7">
+    <span class="svc-card-cta inline-flex items-center gap-1.5 font-semibold text-ink-secondary">
+      了解更多
+      <span class="cta-arrow" aria-hidden="true">→</span>
+    </span>
+  </p>
+</a>
+
+<style>
+  .svc-link-card {
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      transform 120ms ease;
+  }
+
+  .svc-link-card:hover,
+  .svc-link-card:focus-visible {
+    background-color: var(--reach-blue-50);
+    border-color: var(--color-brand);
+  }
+
+  .svc-link-card:active {
+    transform: translateY(1px);
+  }
+
+  .svc-link-card:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 3px;
+  }
+
+  .svc-card-title,
+  .svc-card-cta {
+    transition: color 200ms ease;
+  }
+
+  .svc-link-card:hover .svc-card-title,
+  .svc-link-card:focus-visible .svc-card-title,
+  .svc-link-card:hover .svc-card-cta,
+  .svc-link-card:focus-visible .svc-card-cta {
+    color: var(--color-brand);
+  }
+
+  .svc-card-cta .cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  .svc-link-card:hover .cta-arrow,
+  .svc-link-card:focus-visible .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-link-card,
+    .svc-card-title,
+    .svc-card-cta,
+    .svc-card-cta .cta-arrow {
+      transition: none;
+    }
+
+    .svc-link-card:active,
+    .svc-link-card:hover .cta-arrow,
+    .svc-link-card:focus-visible .cta-arrow {
+      transform: none;
+    }
+  }
+</style>

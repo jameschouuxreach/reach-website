@@ -1,0 +1,89 @@
+---
+/**
+ * 服務類別頁（第二層，四頁由 getStaticPaths 產出）：
+ * Header → ServiceContextNav（返回服務項目＋四類切換）→ 類別 Hero → 子項目卡（無區塊標題，卡片標題即 H2）
+ * →（體驗設計）服務界線說明 → 常見專案類型 → 收尾 CTA → Footer。
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ServiceContextNav from '../../components/services/ServiceContextNav.astro';
+import ServiceItemCard from '../../components/services/ServiceItemCard.astro';
+import ProjectTypeGroups from '../../components/services/ProjectTypeGroups.astro';
+import {
+  SERVICE_CATEGORIES,
+  SERVICES_BASE_PATH,
+  getServiceCategoryPath,
+  type ServiceCategory,
+} from '../../data/services';
+
+export const getStaticPaths = (() =>
+  SERVICE_CATEGORIES.map((category) => ({
+    params: { slug: category.slug },
+    props: { category },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  category: ServiceCategory;
+}
+
+const { category } = Astro.props;
+
+const navItems = SERVICE_CATEGORIES.map((item) => ({
+  label: item.title,
+  href: getServiceCategoryPath(item.slug),
+  active: item.slug === category.slug,
+}));
+
+// 類別頁 description：副標＋類別說明（§16.1）
+const description = `${category.subtitle}。${category.overview}`;
+
+// 子項目卡桌機欄數：6／3 個 → 3 欄；2／4 個 → 2 欄，避免最後一列孤卡
+const desktopColumns = category.items.length % 3 === 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-2';
+---
+
+<BaseLayout title={`${category.title}｜服務內容`} description={description}>
+  <ServiceContextNav
+    ariaLabel="服務類別切換"
+    backLabel="服務項目"
+    backHref={SERVICES_BASE_PATH}
+    items={navItems}
+  />
+
+  {/* ---- 類別 Hero ---- */}
+  <section class="border-b border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand">{category.eyebrow}</p>
+      <h1 class="heading-section mt-4 max-w-3xl">{category.title}</h1>
+      <p class="mt-4 max-w-3xl text-xl font-semibold leading-relaxed text-ink md:text-2xl">{category.subtitle}</p>
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed text-ink-secondary">{category.overview}</p>
+    </div>
+  </section>
+
+  {/* ---- 子項目卡（2026-08-31 業主指示拿掉「這類服務包含什麼」標題；卡片標題升為 H2 維持階層）---- */}
+  <section class="bg-page">
+    <div class="container-site py-16 md:py-24">
+      {/* 子項目卡是專案頁 pill 的 anchor 目標，不做進場位移：否則瀏覽器會以 translateY 中的位置計算 anchor，
+          reveal 完成後卡片上移 18px 而被 sticky 切換列遮住 */}
+      <div class:list={['grid gap-6 md:grid-cols-2', desktopColumns]}>
+        {
+          category.items.map((item, index) => (
+            <ServiceItemCard {...item} index={index + 1} headingLevel="h2" />
+          ))
+        }
+      </div>
+      {
+        category.boundaryNote && (
+          <p
+            class="mt-8 max-w-3xl border-l-2 border-brand pl-5 text-[17px] leading-relaxed text-ink md:mt-10 md:text-lg"
+            data-reveal
+          >
+            {category.boundaryNote}
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  {/* ---- 常見專案類型（與 /services/ 同一組）＋收尾 CTA ---- */}
+  <ProjectTypeGroups showIntro showClosingCta />
+</BaseLayout>

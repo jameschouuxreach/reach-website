@@ -1,0 +1,114 @@
+---
+/**
+ * 專案流程（2026-09-01 業主指示，參考悠識「PROCESS」的呈現）：
+ * - ≥1024px：五個步驟等寬並排，品牌藍圓形序號落在一條貫穿圓心的水平連線上，標題與說明在下方。
+ * - <1024px：改為垂直時間軸——圓形序號在左、直線往下連到下一步，標題與說明在右，手機／平板皆可讀。
+ * - 使用 <ol> 保留順序語意；圓形內的序號為可見文字，連線為純裝飾。
+ */
+import type { ProjectStep } from '../../data/services';
+
+interface Props {
+  steps: ProjectStep[];
+}
+
+const { steps } = Astro.props;
+---
+
+<ol class="svc-steps" style={`--steps: ${steps.length}`}>
+  {
+    steps.map((step, index) => (
+      <li class="svc-step">
+        <span class="svc-step-num">{String(index + 1).padStart(2, '0')}</span>
+        <div class="svc-step-body">
+          <h3 class="text-lg font-bold text-ink md:text-xl">{step.title}</h3>
+          <p class="mt-2 text-[15px] leading-relaxed text-ink-secondary md:text-base">{step.body}</p>
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .svc-steps {
+    --step-size: 2.75rem; /* 44px 圓形序號 */
+    --step-gap: 1.5rem;
+    --step-line: var(--neutral-300);
+    position: relative;
+    display: grid;
+    gap: var(--step-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* ---- 垂直時間軸（預設，<1024px）---- */
+  .svc-step {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--step-size) minmax(0, 1fr);
+    column-gap: 1rem;
+    align-items: start;
+  }
+
+  .svc-step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--step-size) / 2 - 1px);
+    top: var(--step-size);
+    bottom: calc(var(--step-gap) * -1);
+    width: 2px;
+    background-color: var(--step-line);
+  }
+
+  .svc-step-num {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--step-size);
+    height: var(--step-size);
+    border-radius: 9999px;
+    background-color: var(--color-brand);
+    color: var(--neutral-0);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .svc-step-body {
+    padding-top: 0.625rem; /* 標題與圓心對齊 */
+  }
+
+  /* ---- 水平流程（≥1024px）---- */
+  @media (min-width: 1024px) {
+    .svc-steps {
+      grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
+    }
+
+    /* 貫穿所有圓心的一條連線：從第一個圓心到最後一個圓心 */
+    .svc-steps::before {
+      content: '';
+      position: absolute;
+      top: calc(var(--step-size) / 2 - 1px);
+      left: calc(var(--step-size) / 2);
+      right: calc((100% - (var(--steps) - 1) * var(--step-gap)) / var(--steps) - var(--step-size) / 2);
+      height: 2px;
+      background-color: var(--step-line);
+    }
+
+    .svc-step {
+      display: block;
+    }
+
+    .svc-step:not(:last-child)::before {
+      display: none;
+    }
+
+    .svc-step-body {
+      padding-top: 1.25rem;
+      padding-right: 0.5rem;
+    }
+  }
+</style>

@@ -44,16 +44,24 @@ export interface ProjectType {
   subtitle: string;
   /** 適合以下情況（三點列表，2026-09-01 業主指示；每點精簡到 13–15 字，卡片內單行可容） */
   fit: string[];
+  /** 我們會如何協助（2026-09-01 起頁面改以 steps「專案流程」呈現，此欄保留未顯示） */
   approach: string;
   example: string;
   serviceItemSlugs: string[];
   /** 專案目標：三張有標題的卡片（2026-09-01 業主提供） */
   goals: ProjectGoal[];
+  /** 專案流程：五個步驟（序號由順序產生；2026-09-01 業主提供） */
+  steps: ProjectStep[];
   value: string;
   relatedCases: RelatedCaseReference[];
 }
 
 export interface ProjectGoal {
+  title: string;
+  body: string;
+}
+
+export interface ProjectStep {
   title: string;
   body: string;
 }
@@ -268,6 +276,13 @@ export const PROJECT_TYPES: ProjectType[] = [
         body: '將研究發現收斂成可理解的結論。協助團隊比較不同方向的影響與優先性。減少憑直覺決策所帶來的風險。',
       },
     ],
+    steps: [
+      { title: '對焦議題', body: '釐清想解決的疑問、決策情境與研究範圍，確認這次真正需要回答的問題。' },
+      { title: '規劃研究', body: '依據議題選擇研究方法、目標受眾與執行方式，建立清楚的研究計畫。' },
+      { title: '執行研究', body: '透過訪談、問卷或焦點團體等方式，蒐集受眾的真實經驗與觀點。' },
+      { title: '找出原因', body: '整合研究資料，辨認問題背後的影響因素、需求差異與關鍵模式。' },
+      { title: '形成決策', body: '將洞察轉化為清楚結論與行動建議，協助團隊判斷下一步方向。' },
+    ],
     value: '深入理解一個關鍵議題，讓下一步決策有更清楚的方向與依據。',
     // 正式案例名稱與公開範圍需另行確認，公開頁只顯示候選名稱與「案例內容整理中」
     relatedCases: [{ name: '慈濟', status: 'preparing' }],
@@ -310,6 +325,13 @@ export const PROJECT_TYPES: ProjectType[] = [
         body: '串連品牌、內容、服務與體驗設計。讓各項決策朝向共同目標發展。避免不同環節各自推進，最後難以形成完整體驗。',
       },
     ],
+    steps: [
+      { title: '對齊目標', body: '釐清產品構想、商業目標與目前未知，建立專案共同探索的範圍。' },
+      { title: '盤點全貌', body: '整理市場、品牌、服務與既有資源，理解產品目前所處的發展脈絡。' },
+      { title: '深入受眾', body: '透過質性與量化研究，了解目標受眾、核心需求與真實使用情境。' },
+      { title: '收斂定位', body: '整合研究結果，釐清產品角色、品牌價值與優先回應的需求。' },
+      { title: '整合方向', body: '串連品牌、內容、服務與體驗，形成後續發展與投入的整體方向。' },
+    ],
     value: '從受眾、定位到體驗建立整合性理解，讓產品與服務更有把握地進入下一階段。',
     // 本次唯一已確認可點的關聯案例
     relatedCases: [
@@ -349,6 +371,13 @@ export const PROJECT_TYPES: ProjectType[] = [
         title: '讓重要決策保有專業依據',
         body: '結合研究觀點與體驗專業，協助團隊評估不同方案。讓討論建立在共同的判斷原則上。減少反覆爭論與方向來回變動。',
       },
+    ],
+    steps: [
+      { title: '初步診斷', body: '了解產品現況、團隊目標與目前限制，找出最需要優先協助的議題。' },
+      { title: '建立節奏', body: '依據開發與迭代週期，建立固定的討論、檢視與決策協作方式。' },
+      { title: '持續檢視', body: '參與關鍵討論並檢視產品進展，及早發現體驗風險與方向偏移。' },
+      { title: '重點探索', body: '針對高風險或尚未釐清的問題，安排必要的快速研究與體驗診斷。' },
+      { title: '校正方向', body: '提出當期調整建議與下一步重點，並隨產品迭代持續循環檢視。' },
     ],
     value: '在快速變動中保留專業判斷，減少反覆試錯與方向偏移。',
     // 正式專案名稱與公開範圍需另行確認
@@ -390,6 +419,13 @@ export const PROJECT_TYPES: ProjectType[] = [
         body: '將不同單位的需求與限制放在同一張圖上。建立共同理解與改善優先順序。找出兼顧使用者需求與組織現況的可行方向。',
       },
     ],
+    steps: [
+      { title: '界定範圍', body: '確認服務涵蓋的使用者、部門、系統與接觸點，建立共同討論邊界。' },
+      { title: '理解多方', body: '訪談使用者與關鍵利害關係人，理解各方需求、任務與現實限制。' },
+      { title: '描繪全局', body: '整理使用者旅程、前後台流程、組織分工與系統之間的關係。' },
+      { title: '找出施力點', body: '辨認服務斷點、責任交界與相互影響，排定最值得改善的位置。' },
+      { title: '共擬路徑', body: '與相關單位對齊優先順序與分工，形成跨部門可推動的改善方向。' },
+    ],
     value: '讓團隊共同看見完整服務系統，找到真正有影響力的改善切入點。',
     // 案例適配性與公開範圍需另行確認
     relatedCases: [{ name: '工商憑證', status: 'preparing' }],
@@ -429,6 +465,13 @@ export const PROJECT_TYPES: ProjectType[] = [
         body: '建立可持續使用的分類與命名原則。讓內部團隊知道新內容應放在哪裡。避免網站隨業務成長再次變得混亂。',
       },
     ],
+    steps: [
+      { title: '盤點內容', body: '整理現有內容、功能、分類與命名，掌握架構混亂及重複發生的位置。' },
+      { title: '理解尋找', body: '了解使用者的資訊需求、尋找方式與常見任務，辨認現有架構的落差。' },
+      { title: '重建架構', body: '重新規劃分類、命名、層級與導覽，建立更符合使用者理解的架構。' },
+      { title: '檢視調整', body: '依專案需要進行分類檢視或樹狀測試，找出理解落差並調整架構。' },
+      { title: '建立原則', body: '交付資訊架構與命名原則，協助團隊後續管理、維護與擴充內容。' },
+    ],
     value: '讓資訊重新有清楚的分類與尋找路徑，也為後續內容成長保留一致架構。',
     // 相關案例候選尚未確認：只顯示「相關案例／案例內容整理中」，不顯示虛構客戶或專案名稱
     relatedCases: [{ name: '相關案例', status: 'preparing' }],
@@ -467,6 +510,13 @@ export const PROJECT_TYPES: ProjectType[] = [
         title: '讓重要任務更容易完成',
         body: '將改善資源集中在最影響任務完成的環節。降低操作過程中的疑惑與阻礙。讓整體流程更清楚、順暢且容易掌握。',
       },
+    ],
+    steps: [
+      { title: '鎖定任務', body: '確認需要改善的關鍵任務、使用對象與流程範圍，聚焦本次優化目標。' },
+      { title: '觀察操作', body: '邀請代表性使用者完成真實任務，觀察卡關、錯誤與中斷的位置。' },
+      { title: '診斷卡點', body: '分析流程、資訊與介面問題，判斷各項阻礙的影響與改善優先性。' },
+      { title: '提出改善', body: '將研究洞察轉化為流程、資訊與關鍵介面的具體調整方向。' },
+      { title: '銜接落地', body: '整理改善優先順序與設計依據，協助內部或開發團隊理解並執行。' },
     ],
     value: '讓改善建立在真實操作證據上，優先處理最影響任務完成的關鍵節點。',
     // 正式案例內頁完成前只顯示候選名稱，不可點
@@ -601,6 +651,9 @@ function assertServicesData(): void {
     }
     if (project.goals.length === 0) {
       throw new Error(`[services] 專案類型「${project.title}」沒有專案目標`);
+    }
+    if (project.steps.length === 0) {
+      throw new Error(`[services] 專案類型「${project.title}」沒有專案流程`);
     }
     for (const slug of project.serviceItemSlugs) {
       if (!itemSlugs.has(slug)) {

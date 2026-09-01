@@ -42,12 +42,20 @@ export interface ProjectType {
   eyebrow: string;
   title: string;
   subtitle: string;
-  fit: string;
+  /** 適合以下情況（三點列表，2026-09-01 業主指示；每點精簡到 13–15 字，卡片內單行可容） */
+  fit: string[];
   approach: string;
   example: string;
   serviceItemSlugs: string[];
+  /** 專案目標：三張有標題的卡片（2026-09-01 業主提供） */
+  goals: ProjectGoal[];
   value: string;
   relatedCases: RelatedCaseReference[];
+}
+
+export interface ProjectGoal {
+  title: string;
+  body: string;
 }
 
 export interface FaqItem {
@@ -236,12 +244,30 @@ export const PROJECT_TYPES: ProjectType[] = [
     eyebrow: 'EXPLORATION PROJECT',
     title: '關鍵議題型',
     subtitle: '聚焦一個關鍵問題，讓下一步決策更清楚',
-    fit: '已有特定疑問、假設或品牌議題，想釐清背後原因或受眾想法。',
+    fit: [
+      '已有明確疑問、假設或品牌議題',
+      '尚未釐清問題原因與受眾看法',
+      '需要研究依據支持下一步決策',
+    ],
     approach:
       '我們聚焦單一議題進行研究，釐清影響因素、需求差異與可能方向，避免重要決策只建立在內部推測上。',
     example:
       '某電商品牌推出新產品，瀏覽與加入購物車表現正常，但實際購買轉換偏低；團隊需要進一步判斷問題來自產品理解、內容溝通，還是購買流程。',
     serviceItemSlugs: ['survey', 'in-depth-interview', 'focus-group', 'co-creation-workshop'],
+    goals: [
+      {
+        title: '釐清關鍵議題背後的真正原因',
+        body: '從表面現象往下追查，理解問題如何發生。辨認真正影響結果的關鍵因素。避免投入資源後，才發現處理了錯誤的問題。',
+      },
+      {
+        title: '理解不同受眾的需求與觀點',
+        body: '梳理不同受眾面對議題時的想法與行為。看見彼此的共識、差異與在意重點。讓後續方向不只反映內部觀點。',
+      },
+      {
+        title: '建立下一步決策的清楚依據',
+        body: '將研究發現收斂成可理解的結論。協助團隊比較不同方向的影響與優先性。減少憑直覺決策所帶來的風險。',
+      },
+    ],
     value: '深入理解一個關鍵議題，讓下一步決策有更清楚的方向與依據。',
     // 正式案例名稱與公開範圍需另行確認，公開頁只顯示候選名稱與「案例內容整理中」
     relatedCases: [{ name: '慈濟', status: 'preparing' }],
@@ -252,7 +278,11 @@ export const PROJECT_TYPES: ProjectType[] = [
     eyebrow: 'EXPLORATION PROJECT',
     title: '全面探索型',
     subtitle: '從受眾、需求到品牌與服務，建立完整發展方向',
-    fit: '已有產品或服務構想，卻還不清楚目標受眾、核心需求、品牌定位與整體體驗方向。',
+    fit: [
+      '已有產品構想，但發展方向模糊',
+      '尚未釐清受眾、需求或品牌定位',
+      '需要整合研究、策略與設計方向',
+    ],
     approach:
       '從使用者研究開始，整合服務、品牌、內容與體驗設計，建立一套彼此連貫、可持續發展的方向。',
     example:
@@ -266,6 +296,20 @@ export const PROJECT_TYPES: ProjectType[] = [
       'information-architecture',
       'interface-prototype-design',
     ],
+    goals: [
+      {
+        title: '確認目標受眾與核心需求',
+        body: '盤點可能的受眾與使用情境。釐清真正需要優先回應的問題。協助團隊把資源集中在最重要的對象與需求。',
+      },
+      {
+        title: '釐清產品、品牌與服務定位',
+        body: '整合受眾需求、產品特性與組織目標。找出產品應扮演的角色與核心價值。建立對內能對齊、對外能被理解的定位。',
+      },
+      {
+        title: '建立一致的整體發展方向',
+        body: '串連品牌、內容、服務與體驗設計。讓各項決策朝向共同目標發展。避免不同環節各自推進，最後難以形成完整體驗。',
+      },
+    ],
     value: '從受眾、定位到體驗建立整合性理解，讓產品與服務更有把握地進入下一階段。',
     // 本次唯一已確認可點的關聯案例
     relatedCases: [
@@ -278,7 +322,11 @@ export const PROJECT_TYPES: ProjectType[] = [
     eyebrow: 'EXPLORATION PROJECT',
     title: '顧問陪跑型',
     subtitle: '在快速發展中，持續有人替體驗方向把關',
-    fit: '處於發展初期、需求快速變動，沒有太多時間資源進行完整研究。',
+    fit: [
+      '產品仍在探索或快速迭代階段',
+      '缺少研究時間或內部體驗專業',
+      '需要顧問持續把關與校正方向',
+    ],
     approach: '以固定節奏參與關鍵討論，協助釐清問題、辨認風險、安排必要研究並校正設計方向。',
     example:
       '某軟體服務在發展初期快速推出新功能，沒有足夠時間與資源執行完整研究，但仍希望有專業角色持續替操作體驗與產品方向把關。',
@@ -287,6 +335,20 @@ export const PROJECT_TYPES: ProjectType[] = [
       'continuous-improvement-consulting',
       'rapid-experience-diagnostic',
       'interface-prototype-design',
+    ],
+    goals: [
+      {
+        title: '持續校正產品與體驗方向',
+        body: '定期檢視產品進展與需求變化。協助團隊判斷目前方向是否仍回應真實需求。避免快速迭代讓體驗逐漸失去焦點。',
+      },
+      {
+        title: '及早發現迭代中的關鍵風險',
+        body: '在重要功能與設計決策發生時提供專業檢視。提早辨認可能影響理解與操作的問題。讓團隊能在投入更多資源前及時調整。',
+      },
+      {
+        title: '讓重要決策保有專業依據',
+        body: '結合研究觀點與體驗專業，協助團隊評估不同方案。讓討論建立在共同的判斷原則上。減少反覆爭論與方向來回變動。',
+      },
     ],
     value: '在快速變動中保留專業判斷，減少反覆試錯與方向偏移。',
     // 正式專案名稱與公開範圍需另行確認
@@ -298,7 +360,11 @@ export const PROJECT_TYPES: ProjectType[] = [
     eyebrow: 'OPTIMIZATION PROJECT',
     title: '跨域整合型',
     subtitle: '看清線上、線下與多方角色如何彼此影響',
-    fit: '服務橫跨不同部門、角色、系統與接觸點，單看介面已無法解釋問題的組織。',
+    fit: [
+      '服務橫跨多個部門、角色或系統',
+      '局部改善後，整體問題仍然存在',
+      '需要對齊多方並找出關鍵施力點',
+    ],
     approach:
       '盤點使用者旅程、前台服務、後台流程、組織分工與系統限制，找出彼此依賴關係與能牽動全局的改善施力點。',
     example:
@@ -310,6 +376,20 @@ export const PROJECT_TYPES: ProjectType[] = [
       'usability-testing',
       'service-blueprint-integration',
     ],
+    goals: [
+      {
+        title: '看清角色、流程與系統關係',
+        body: '盤點使用者、前後台人員、流程與系統之間的互動。看見各環節如何彼此牽動。避免只處理局部問題，卻忽略整體影響。',
+      },
+      {
+        title: '找出服務斷點與責任交界',
+        body: '辨認資訊、任務與責任在交接時發生的落差。釐清問題來自流程、分工還是系統限制。讓團隊知道真正需要協調的位置。',
+      },
+      {
+        title: '建立跨部門可推動的改善方向',
+        body: '將不同單位的需求與限制放在同一張圖上。建立共同理解與改善優先順序。找出兼顧使用者需求與組織現況的可行方向。',
+      },
+    ],
     value: '讓團隊共同看見完整服務系統，找到真正有影響力的改善切入點。',
     // 案例適配性與公開範圍需另行確認
     relatedCases: [{ name: '工商憑證', status: 'preparing' }],
@@ -320,7 +400,11 @@ export const PROJECT_TYPES: ProjectType[] = [
     eyebrow: 'OPTIMIZATION PROJECT',
     title: '架構重整型',
     subtitle: '讓持續增加的內容與功能，重新變得清楚好找',
-    fit: '網站或系統長期累積內容與功能，導致內容雜亂難找。',
+    fit: [
+      '內容與功能長期累積、逐漸混亂',
+      '分類、命名或導覽開始失去邏輯',
+      '使用者難找，內部也難以管理',
+    ],
     approach:
       '從使用者尋找資訊的方式出發，驗證分類與命名，重新建立能理解、能尋找，也能支撐後續擴充的資訊架構。',
     example:
@@ -330,6 +414,20 @@ export const PROJECT_TYPES: ProjectType[] = [
       'information-architecture-testing',
       'information-architecture',
       'content-strategy',
+    ],
+    goals: [
+      {
+        title: '重整內容分類、命名與層級',
+        body: '盤點現有內容、功能與彼此關係。從使用者的理解方式重新整理分類與名稱。讓網站與系統重新建立清楚一致的結構。',
+      },
+      {
+        title: '建立直覺清楚的尋找路徑',
+        body: '理解使用者會如何尋找資訊與判斷入口。調整導覽、分類與頁面層級。減少反覆嘗試與找不到資訊的情況。',
+      },
+      {
+        title: '支援後續內容管理與擴充',
+        body: '建立可持續使用的分類與命名原則。讓內部團隊知道新內容應放在哪裡。避免網站隨業務成長再次變得混亂。',
+      },
     ],
     value: '讓資訊重新有清楚的分類與尋找路徑，也為後續內容成長保留一致架構。',
     // 相關案例候選尚未確認：只顯示「相關案例／案例內容整理中」，不顯示虛構客戶或專案名稱
@@ -341,7 +439,11 @@ export const PROJECT_TYPES: ProjectType[] = [
     eyebrow: 'OPTIMIZATION PROJECT',
     title: '流程優化型',
     subtitle: '找出操作卡點，讓重要任務更順利完成',
-    fit: '已有成熟產品，使用者卻持續出現使用問題，導致中途放棄或詢問客服的比例高。',
+    fit: [
+      '現有網站或系統已可正常運作',
+      '仍常出現卡關、錯誤或中途放棄',
+      '需要找出阻礙並排定改善順序',
+    ],
     approach:
       '觀察使用者完成真實任務的過程，辨認流程、資訊與介面中的阻礙，並將問題轉化為可排優先序的改善方向。',
     example:
@@ -351,6 +453,20 @@ export const PROJECT_TYPES: ProjectType[] = [
       'information-architecture',
       'interface-prototype-design',
       'implementation-consulting',
+    ],
+    goals: [
+      {
+        title: '找出操作卡點與中斷原因',
+        body: '觀察使用者如何完成真實任務。辨認卡關、錯誤與中途放棄發生的位置。釐清問題來自流程、資訊還是介面。',
+      },
+      {
+        title: '優化關鍵步驟與資訊呈現',
+        body: '重新檢視任務順序、操作指引與畫面資訊。減少不必要的步驟與理解負擔。讓使用者更清楚目前狀態與下一步行動。',
+      },
+      {
+        title: '讓重要任務更容易完成',
+        body: '將改善資源集中在最影響任務完成的環節。降低操作過程中的疑惑與阻礙。讓整體流程更清楚、順暢且容易掌握。',
+      },
     ],
     value: '讓改善建立在真實操作證據上，優先處理最影響任務完成的關鍵節點。',
     // 正式案例內頁完成前只顯示候選名稱，不可點
@@ -482,6 +598,9 @@ function assertServicesData(): void {
 
     if (project.serviceItemSlugs.length === 0) {
       throw new Error(`[services] 專案類型「${project.title}」沒有搭配服務`);
+    }
+    if (project.goals.length === 0) {
+      throw new Error(`[services] 專案類型「${project.title}」沒有專案目標`);
     }
     for (const slug of project.serviceItemSlugs) {
       if (!itemSlugs.has(slug)) {

@@ -50,27 +50,24 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => ({
       )
     }
 
-    {
-      groups.map((group, groupIndex) => (
-        <div
-          class:list={[
-            'svc-group',
-            groupIndex === 0 ? (showIntro ? 'mt-12 md:mt-16' : '') : 'mt-20 md:mt-24',
-          ]}
-          data-reveal
-        >
-          <div class="max-w-3xl">
-            <h3 class="heading-sub">{group.label}</h3>
-            <p class="mt-2 text-lg font-medium leading-relaxed text-ink-secondary">{group.subtitle}</p>
+    {/* 兩個群組共用同一個 data-reveal：探索型進入視窗時，優化型同時出現（2026-09-01 業主指示） */}
+    <div class:list={[showIntro ? 'mt-12 md:mt-16' : '']} data-reveal>
+      {
+        groups.map((group, groupIndex) => (
+          <div class:list={['svc-group', groupIndex > 0 ? 'mt-20 md:mt-24' : '']}>
+            <div class="max-w-3xl">
+              <h3 class="heading-sub">{group.label}</h3>
+              <p class="mt-2 text-lg font-medium leading-relaxed text-ink-secondary">{group.subtitle}</p>
+            </div>
+            <div class="mt-8 grid gap-6 md:mt-10 md:grid-cols-2 lg:grid-cols-3">
+              {group.projects.map((project) => (
+                <ProjectTypeCard {...project} headingLevel="h4" />
+              ))}
+            </div>
           </div>
-          <div class="mt-8 grid gap-6 md:mt-10 md:grid-cols-2 lg:grid-cols-3">
-            {group.projects.map((project) => (
-              <ProjectTypeCard {...project} headingLevel="h4" />
-            ))}
-          </div>
-        </div>
-      ))
-    }
+        ))
+      }
+    </div>
 
     {
       showClosingCta && (

@@ -2,7 +2,7 @@
 /**
  * 專案類型頁（第二層，六頁由 getStaticPaths 產出）：
  * Header → ServiceContextNav（返回常見專案類型＋六類切換）→ 專案 Hero
- * → 專案完整內容（適合誰｜常見情境舉例 → 我們會如何協助 → 此專案通常包含哪些執行項目？→ 預期成效；2026-09-01 業主指示調整）
+ * → 專案完整內容（適合以下情況｜常見情境舉例 → 專案目標 → 我們會如何協助 → 此專案通常包含哪些執行項目？→ 預期成效；2026-09-01 業主指示調整）
  * → 相關案例 → 常見問題 → 既有 ContactCta → Footer。
  */
 import type { GetStaticPaths } from 'astro';
@@ -53,8 +53,8 @@ const relatedCases = project.relatedCases.map((reference) => {
   return published ? { kind: 'published' as const, data: published } : { kind: 'preparing' as const, name: reference.name };
 });
 
-// 專案頁 description：副標＋適合誰（§16.1）
-const description = `${project.subtitle}。${project.fit}`;
+// 專案頁 description：副標＋適合以下情況（§16.1；fit 改列點後以「；」串接）
+const description = `${project.subtitle}。適合以下情況：${project.fit.join('；')}。`;
 ---
 
 <BaseLayout title={`${project.title}｜常見專案類型`} description={description}>
@@ -79,16 +79,36 @@ const description = `${project.subtitle}。${project.fit}`;
   {/* ---- 專案完整內容 ---- */}
   <section class="bg-surface">
     <div class="container-site py-16 md:py-24">
-      {/* 適合誰｜常見情境舉例：桌機兩欄、手機單欄。舉例為小型藍色標題＋Blue 50 底框（不用引號造型或假客戶照片） */}
+      {/* 適合以下情況｜常見情境舉例：桌機兩欄、手機單欄。舉例為小型藍色標題＋Blue 50 底框（不用引號造型或假客戶照片） */}
       <div class="grid gap-10 md:grid-cols-2 md:gap-12" data-reveal>
         <div>
-          <h2 class="heading-sub">適合誰</h2>
-          <p class="mt-4 text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.fit}</p>
+          <h2 class="heading-sub">適合以下情況</h2>
+          <ul class="mt-4 list-disc space-y-2 pl-5 text-[17px] leading-relaxed text-ink-secondary marker:text-brand md:text-lg">
+            {project.fit.map((line) => <li>{line}</li>)}
+          </ul>
         </div>
         <div class="rounded-2xl border border-accent-100 bg-accent p-6 md:p-7">
           <h2 class="text-sm font-bold tracking-wide text-brand">常見情境舉例</h2>
           <p class="mt-3 text-[17px] leading-relaxed text-ink md:text-lg">{project.example}</p>
         </div>
+      </div>
+
+      {/* 專案目標：三張有標題的非互動卡片（2026-09-01 業主指示新增，置於「我們會如何協助」之上） */}
+      <div class="mt-12 md:mt-16" data-reveal>
+        <h2 class="heading-sub">專案目標</h2>
+        <ul class="mt-6 grid gap-5 md:mt-8 md:grid-cols-2 lg:grid-cols-3">
+          {
+            project.goals.map((goal, index) => (
+              <li class="card flex flex-col p-6 md:p-7">
+                <p class="text-sm font-bold tabular-nums text-brand" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </p>
+                <h3 class="mt-3 text-lg font-bold text-ink md:text-xl">{goal.title}</h3>
+                <p class="mt-3 text-[15px] leading-relaxed text-ink-secondary md:text-base">{goal.body}</p>
+              </li>
+            ))
+          }
+        </ul>
       </div>
 
       {/* 我們會如何協助 */}

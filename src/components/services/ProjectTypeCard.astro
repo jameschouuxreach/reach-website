@@ -1,7 +1,7 @@
 ---
 /**
  * 專案類型摘要卡（探索型／優化型各三張）：整張卡為單一 <a>，內部 CTA 為 <span>。
- * 內容順序：專案類型標題 → 副標 → 小標「適合誰」→ fit 內文 → 查看專案說明。
+ * 內容順序：專案類型標題 → 副標 → 小標「適合誰」→ fit 內文 → 查看說明。
  * headingLevel 依頁面結構傳入（ProjectTypeGroups 內的群組標題為 H3，卡片標題用 H4，避免跳級）。
  * 右下角以該專案類型標誌作裝飾（2026-08-31 業主指示）：標誌不完整呈現，被卡片右下邊裁切、只露出左上部分；
  * 純裝飾且置於內容之下（isolate＋z-index:-1），不影響文字可讀性與點擊。
@@ -27,7 +27,7 @@ const href = getProjectTypePath(slug);
   <p class="mt-1.5 leading-relaxed text-ink-secondary">{fit}</p>
   <p class="mt-auto pt-7">
     <span class="svc-card-cta inline-flex items-center gap-1.5 font-semibold text-ink-secondary">
-      查看專案說明
+      查看說明
       <span class="cta-arrow" aria-hidden="true">→</span>
     </span>
   </p>

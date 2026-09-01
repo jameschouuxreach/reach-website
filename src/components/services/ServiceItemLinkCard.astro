@@ -1,0 +1,113 @@
+---
+/**
+ * 專案頁「此專案通常包含哪些執行項目？」的服務項目卡（2026-09-01 業主指示：由 pill 改為卡片）。
+ * - 整卡為單一 <a>，連至服務類別頁對應 anchor（/services/{category}/#{item}）。
+ * - 上方為所屬服務類別標籤（四類四色）、項目名稱（H3）、與服務類別頁相同的說明內文。
+ * - 標籤色為業主要求「四類用不同顏色區隔」而加入的低飽和色，僅用於此標籤；文字對比皆 ≥ 4.5:1。
+ */
+import type { ResolvedServiceItem } from '../../data/services';
+
+type Props = ResolvedServiceItem;
+
+const { category, item, href } = Astro.props;
+---
+
+<a href={href} class="svc-item-link card flex h-full w-full flex-col p-5 no-underline md:p-6" data-category={category.slug}>
+  <p class="svc-item-tag">{category.title}</p>
+  <h3 class="svc-item-title mt-3 flex items-start justify-between gap-3 text-lg font-bold text-ink md:text-xl">
+    <span>{item.title}</span>
+    <span class="cta-arrow mt-0.5 shrink-0 text-base font-semibold text-ink-muted" aria-hidden="true">→</span>
+  </h3>
+  <p class="mt-2 text-[15px] leading-relaxed text-ink-secondary md:text-base">{item.description}</p>
+</a>
+
+<style>
+  .svc-item-link {
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      transform 120ms ease;
+  }
+
+  .svc-item-link:hover,
+  .svc-item-link:focus-visible {
+    background-color: var(--reach-blue-50);
+    border-color: var(--color-brand);
+  }
+
+  .svc-item-link:active {
+    transform: translateY(1px);
+  }
+
+  .svc-item-link:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 3px;
+  }
+
+  .svc-item-title,
+  .svc-item-title .cta-arrow {
+    transition:
+      color 200ms ease,
+      transform 200ms ease;
+  }
+
+  .svc-item-link:hover .svc-item-title,
+  .svc-item-link:focus-visible .svc-item-title,
+  .svc-item-link:hover .cta-arrow,
+  .svc-item-link:focus-visible .cta-arrow {
+    color: var(--color-brand);
+  }
+
+  .svc-item-link:hover .cta-arrow,
+  .svc-item-link:focus-visible .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  /* ---- 服務類別標籤：四類四色（淡底＋深字） ---- */
+  .svc-item-tag {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    min-height: 1.5rem;
+    padding-inline: 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .svc-item-link[data-category='research'] .svc-item-tag {
+    background-color: var(--reach-blue-100);
+    color: var(--reach-blue-700);
+  }
+
+  .svc-item-link[data-category='experience-design'] .svc-item-tag {
+    background-color: #ddf4f0; /* 青綠 */
+    color: #0f6e63;
+  }
+
+  .svc-item-link[data-category='brand-service-strategy'] .svc-item-tag {
+    background-color: #ece8fd; /* 紫 */
+    color: #5a32b4;
+  }
+
+  .svc-item-link[data-category='experience-consulting'] .svc-item-tag {
+    background-color: #fdeedc; /* 暖橘 */
+    color: #9a4b12;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-item-link,
+    .svc-item-title,
+    .svc-item-title .cta-arrow {
+      transition: none;
+    }
+
+    .svc-item-link:active,
+    .svc-item-link:hover .cta-arrow,
+    .svc-item-link:focus-visible .cta-arrow {
+      transform: none;
+    }
+  }
+</style>

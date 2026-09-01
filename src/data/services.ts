@@ -127,7 +127,8 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     slug: 'experience-design',
     eyebrow: 'EXPERIENCE DESIGN',
     title: '體驗設計',
-    subtitle: '把研究洞察轉成清楚、可驗證，也能銜接開發的體驗方向',
+    // 2026-09-01 業主指示改寫（結尾句號依其他三類副標慣例省略）
+    subtitle: '將研究洞察轉化為具體、可落地的網頁與系統設計，讓操作更直覺順暢',
     overview:
       '從資訊如何被找到，到流程如何被完成，將研究結果轉化為具體的架構、互動與關鍵介面，讓團隊能看見並驗證改善方向。',
     items: [

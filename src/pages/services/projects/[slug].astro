@@ -2,7 +2,7 @@
 /**
  * 專案類型頁（第二層，六頁由 getStaticPaths 產出）：
  * Header → ServiceContextNav（返回常見專案類型＋六類切換）→ 專案 Hero
- * → 專案完整內容（適合誰／我們會如何協助／常見情境舉例／常見搭配服務／決策價值）
+ * → 專案完整內容（適合誰｜常見情境舉例 → 我們會如何協助 → 此專案通常包含哪些執行項目？→ 預期成效；2026-09-01 業主指示調整）
  * → 相關案例 → 常見問題 → 既有 ContactCta → Footer。
  */
 import type { GetStaticPaths } from 'astro';
@@ -13,6 +13,7 @@ import ServiceContextNav from '../../../components/services/ServiceContextNav.as
 import FaqList from '../../../components/services/FaqList.astro';
 import RelatedCasePlaceholder from '../../../components/services/RelatedCasePlaceholder.astro';
 import ProjectGlyph from '../../../components/services/ProjectGlyph.astro';
+import ServiceItemLinkCard from '../../../components/services/ServiceItemLinkCard.astro';
 import {
   PROJECT_TYPES,
   PROJECT_TYPES_HREF,
@@ -41,8 +42,10 @@ const navItems = PROJECT_TYPES.map((item) => ({
   active: item.slug === project.slug,
 }));
 
-// 搭配服務：由 slug 反查類別與 anchor，不硬編碼名稱
+// 執行項目：由 slug 反查類別、說明與 anchor，不硬編碼名稱
 const services = resolveServiceItems(project.serviceItemSlugs);
+// 執行項目卡桌機欄數：5 個以上 3 欄，4 個以下 2 欄（避免 3＋1 孤卡）
+const serviceColumns = services.length >= 5 ? 'lg:grid-cols-3' : 'lg:grid-cols-2';
 
 // 相關案例：published 且能在 CASES 找到者用 CaseCard；其餘一律顯示整理中（不輸出連結）
 const relatedCases = project.relatedCases.map((reference) => {
@@ -76,42 +79,45 @@ const description = `${project.subtitle}。${project.fit}`;
   {/* ---- 專案完整內容 ---- */}
   <section class="bg-surface">
     <div class="container-site py-16 md:py-24">
-      {/* 適合誰／我們會如何協助：桌機兩欄、手機單欄 */}
+      {/* 適合誰｜常見情境舉例：桌機兩欄、手機單欄。舉例為小型藍色標題＋Blue 50 底框（不用引號造型或假客戶照片） */}
       <div class="grid gap-10 md:grid-cols-2 md:gap-12" data-reveal>
         <div>
           <h2 class="heading-sub">適合誰</h2>
           <p class="mt-4 text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.fit}</p>
         </div>
-        <div>
-          <h2 class="heading-sub">我們會如何協助</h2>
-          <p class="mt-4 text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.approach}</p>
+        <div class="rounded-2xl border border-accent-100 bg-accent p-6 md:p-7">
+          <h2 class="text-sm font-bold tracking-wide text-brand">常見情境舉例</h2>
+          <p class="mt-3 text-[17px] leading-relaxed text-ink md:text-lg">{project.example}</p>
         </div>
       </div>
 
-      {/* 常見情境舉例：Blue 50 底、1px Blue 100 邊框，不用引號造型或假客戶照片 */}
-      <div class="mt-12 rounded-2xl border border-accent-100 bg-accent p-6 md:mt-16 md:p-10" data-reveal>
-        <h2 class="heading-sub">常見情境舉例</h2>
-        <p class="mt-4 max-w-3xl text-[17px] leading-relaxed text-ink md:text-lg">{project.example}</p>
+      {/* 我們會如何協助 */}
+      <div class="mt-12 md:mt-16" data-reveal>
+        <h2 class="heading-sub">我們會如何協助</h2>
+        <p class="mt-4 max-w-3xl text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.approach}</p>
       </div>
 
-      {/* 常見搭配服務：可換行 pill，每個連至服務類別頁對應 anchor */}
+      {/* 執行項目：卡片（類別標籤＋項目名稱＋與服務類別頁相同的說明），整卡連至服務類別頁對應 anchor */}
       <div class="mt-12 md:mt-16" data-reveal>
-        <h2 class="heading-sub">常見搭配服務</h2>
-        <ul class="mt-5 flex flex-wrap gap-3">
+        <h2 class="heading-sub">此專案通常包含哪些執行項目？</h2>
+        <p class="mt-4 max-w-3xl text-[17px] leading-relaxed text-ink-secondary md:text-lg">
+          以下為常見執行項目，並非每個專案都需全部包含。我們會在釐清需求後，依據專案目標、預算與時程，規劃合適的執行組合。
+        </p>
+        <ul class:list={['mt-6 grid gap-5 md:mt-8 md:grid-cols-2', serviceColumns]}>
           {
-            services.map(({ item, href }) => (
-              <li>
-                <a href={href} class="svc-pill-link">{item.title}</a>
+            services.map((service) => (
+              <li class="flex">
+                <ServiceItemLinkCard {...service} />
               </li>
             ))
           }
         </ul>
       </div>
 
-      {/* 決策價值：大一級文字收束，不寫成保證成效、KPI 或 ROI */}
+      {/* 預期成效：內文樣式，不寫成保證成效、KPI 或 ROI */}
       <div class="mt-12 md:mt-16" data-reveal>
-        <h2 class="heading-sub">這類專案帶來的決策價值</h2>
-        <p class="mt-4 max-w-3xl text-xl font-semibold leading-relaxed text-ink md:text-2xl">{project.value}</p>
+        <h2 class="heading-sub">預期成效</h2>
+        <p class="mt-4 max-w-3xl text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.value}</p>
       </div>
     </div>
   </section>
@@ -168,40 +174,4 @@ const description = `${project.subtitle}。${project.fit}`;
     }
   }
 
-  /* 常見搭配服務 pill（可點）：44px 觸控高度；hover／focus 轉品牌藍邊框與文字 */
-  .svc-pill-link {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    padding-inline: 1rem;
-    border-radius: 9999px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-surface);
-    color: var(--color-text);
-    font-size: 0.9375rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition:
-      border-color 180ms ease,
-      color 180ms ease,
-      background-color 180ms ease;
-  }
-
-  .svc-pill-link:hover,
-  .svc-pill-link:focus-visible {
-    border-color: var(--color-brand);
-    background-color: var(--reach-blue-50);
-    color: var(--color-brand);
-  }
-
-  .svc-pill-link:focus-visible {
-    outline: 2px solid var(--reach-blue-300);
-    outline-offset: 2px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .svc-pill-link {
-      transition: none;
-    }
-  }
 </style>

@@ -3,6 +3,7 @@
  * 服務類別卡（/services/ 總覽用）：整張卡為單一 <a>，內部子項目 pills 只作資訊展示、不可點。
  * 內容順序：類別標題 → 副標 → 子項目 pills → 了解更多（2026-08-31 業主指示拿掉英文 eyebrow）。
  * 卡片高度由同列最高卡決定（grid stretch），CTA 以 mt-auto 對齊底部。
+ * 標題字級 20→24px（2026-08-31 業主指示由 24→28px 降一階）。
  * headingLevel 依頁面結構傳入：/services/ 的區塊標題已是 H1，卡片標題用 H2 避免跳級。
  */
 import type { ServiceCategory } from '../../data/services';
@@ -18,7 +19,7 @@ const href = getServiceCategoryPath(slug);
 ---
 
 <a href={href} class="svc-link-card card flex h-full flex-col p-6 no-underline md:p-8">
-  <Heading class="svc-card-title text-2xl font-bold text-ink md:text-[1.75rem]">{title}</Heading>
+  <Heading class="svc-card-title text-xl font-bold text-ink md:text-2xl">{title}</Heading>
   <p class="mt-3 text-[17px] font-semibold leading-relaxed text-ink md:text-lg">{subtitle}</p>
   <ul class="mt-5 flex flex-wrap gap-2">
     {

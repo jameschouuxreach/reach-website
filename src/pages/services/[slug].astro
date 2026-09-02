@@ -2,16 +2,22 @@
 /**
  * 服務類別頁（第二層，四頁由 getStaticPaths 產出）：
  * Header → ServiceContextNav（返回服務項目＋四類切換）→ 類別 Hero → 子項目卡（無區塊標題，卡片標題即 H2）
- * →（體驗設計）服務界線說明 → 常見專案類型 → 收尾 CTA → Footer。
+ * →（體驗設計）服務界線說明 → 這些執行項目，常見於哪些專案？（tab 切換）→ 相關案例 → ContactCta → Footer。
+ * 2026-09-02 業主指示：原「常見專案類型」區塊改為執行項目 tab ＋對應專案卡，並新增相關案例區塊。
  */
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ServiceContextNav from '../../components/services/ServiceContextNav.astro';
 import ServiceItemCard from '../../components/services/ServiceItemCard.astro';
-import ProjectTypeGroups from '../../components/services/ProjectTypeGroups.astro';
+import ServiceItemProjectTabs from '../../components/services/ServiceItemProjectTabs.astro';
+import RelatedCasePlaceholder from '../../components/services/RelatedCasePlaceholder.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import ContactCta from '../../components/ContactCta.astro';
 import {
+  PROJECT_TYPES,
   SERVICE_CATEGORIES,
   SERVICES_BASE_PATH,
+  getPublishedCase,
   getServiceCategoryPath,
   type ServiceCategory,
 } from '../../data/services';
@@ -39,6 +45,20 @@ const description = `${category.subtitle}。${category.overview}`;
 
 // 子項目卡桌機欄數：6／3 個 → 3 欄；2／4 個 → 2 欄，避免最後一列孤卡
 const desktopColumns = category.items.length % 3 === 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-2';
+
+// 相關案例：彙整引用本類別執行項目的專案 relatedCases，依名稱去重；
+// 名稱未定的「相關案例」佔位（架構重整型）不列入彙整清單
+const categoryProjects = PROJECT_TYPES.filter((project) =>
+  project.serviceItemSlugs.some((slug) => category.items.some((item) => item.slug === slug)),
+);
+const seenCaseNames = new Set<string>();
+const relatedCases = categoryProjects
+  .flatMap((project) => project.relatedCases)
+  .filter((ref) => ref.name !== '相關案例' && !seenCaseNames.has(ref.name) && Boolean(seenCaseNames.add(ref.name)))
+  .map((ref) => {
+    const data = ref.status === 'published' ? getPublishedCase(ref) : undefined;
+    return data ? { kind: 'published' as const, data } : { kind: 'preparing' as const, name: ref.name };
+  });
 ---
 
 <BaseLayout title={`${category.title}｜服務內容`} description={description}>
@@ -84,6 +104,31 @@ const desktopColumns = category.items.length % 3 === 0 ? 'lg:grid-cols-3' : 'lg:
     </div>
   </section>
 
-  {/* ---- 常見專案類型（與 /services/ 同一組）＋收尾 CTA ---- */}
-  <ProjectTypeGroups showIntro showClosingCta />
+  {/* ---- 這些執行項目，常見於哪些專案？（tab 依執行項目切換對應專案卡）---- */}
+  <section class="border-t border-line bg-surface">
+    <div class="container-site py-16 md:py-24">
+      <h2 class="heading-section" data-reveal>這些執行項目，常見於哪些專案？</h2>
+      <div class="mt-8 md:mt-10" data-reveal>
+        <ServiceItemProjectTabs category={category} />
+      </div>
+    </div>
+  </section>
+
+  {/* ---- 相關案例（彙整自引用本類別項目的專案；與專案頁同款卡片）---- */}
+  {
+    relatedCases.length > 0 && (
+      <section class="border-t border-line bg-page">
+        <div class="container-site py-16 md:py-24">
+          <h2 class="heading-sub" data-reveal>相關案例</h2>
+          <div class="mt-8 grid gap-x-8 gap-y-12 md:mt-10 md:grid-cols-2" data-reveal>
+            {relatedCases.map((entry) =>
+              entry.kind === 'published' ? <CaseCard {...entry.data} /> : <RelatedCasePlaceholder name={entry.name} />,
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <ContactCta />
 </BaseLayout>

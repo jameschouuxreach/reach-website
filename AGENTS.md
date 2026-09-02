@@ -19,6 +19,7 @@ Manage the background server with `astro dev stop`, `astro dev status`, and `ast
 - `reach-web-v2` → https://jameschouuxreach.github.io/reach-website/v2/
 - `reach-web-v2-1` → https://jameschouuxreach.github.io/reach-website/v2-1/ （v2 首頁改版快照：Logo 移至 Hero 下、使命區具體舉例卡、服務對象文案）
 - `reach-web-v2-2` → https://jameschouuxreach.github.io/reach-website/v2-2/ （2026-08-28 快照：案例卡 C 版改小標＋五 tag、使命區 v5 無捲動鎖定只留 tabs、服務區新增四個服務範疇 pill）
+- `service-v1` → https://jameschouuxreach.github.io/reach-website/v2-3/ （2026-09-02 快照：服務內容三層資訊架構——/services/ 總覽＋四類別頁＋六專案頁，含專案標誌、專案目標、專案流程、執行項目 tab 與相關案例）
 
 腳本會自動 build、用 `scripts/prefix-base.mjs` 補上 Pages 子路徑前綴、把成品同步進 gh-pages 對應位置後 push。原始碼一律維持根路徑寫法（`/images/...`），不要把前綴寫進原始碼。要再多掛一個版本時，在 `scripts/deploy.sh` 的 branch 對應表加一行、並在 `scripts/entry/index.html` 的版本清單加一張卡（在 main 上改、部署 main 生效）。
 

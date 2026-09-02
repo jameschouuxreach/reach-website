@@ -6,6 +6,7 @@
 #   reach-web-v2   → /v2/   https://jameschouuxreach.github.io/reach-website/v2/
 #   reach-web-v2-1 → /v2-1/ https://jameschouuxreach.github.io/reach-website/v2-1/
 #   reach-web-v2-2 → /v2-2/ https://jameschouuxreach.github.io/reach-website/v2-2/
+#   service-v1     → /v2-3/ https://jameschouuxreach.github.io/reach-website/v2-3/
 #
 # 新增一個要並存的版本：在下方對應表加一行 branch↔子資料夾，
 # 並在 scripts/entry/index.html 的版本清單加一張卡（在 main 上改、部署 main 生效）。
@@ -24,9 +25,10 @@ case "$BRANCH" in
   reach-web-v2)   SUBDIR="v2" ;;
   reach-web-v2-1) SUBDIR="v2-1" ;;
   reach-web-v2-2) SUBDIR="v2-2" ;;
+  service-v1)     SUBDIR="v2-3" ;;
   *)
     echo "錯誤：branch「${BRANCH}」沒有對應的部署位置。" >&2
-    echo "請 checkout 到 main、reach-web-v2、reach-web-v2-1 或 reach-web-v2-2 再部署，或先在 scripts/deploy.sh 的對應表加上這個 branch。" >&2
+    echo "請 checkout 到 main、reach-web-v2、reach-web-v2-1、reach-web-v2-2 或 service-v1 再部署，或先在 scripts/deploy.sh 的對應表加上這個 branch。" >&2
     exit 1 ;;
 esac
 

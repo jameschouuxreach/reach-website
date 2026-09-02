@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # 部署目前 branch 的 build 成品到 GitHub Pages（gh-pages branch）。
 # 部署位置由目前 branch 自動決定，checkout 好 branch 直接跑 ./scripts/deploy.sh 即可：
-#   main           → 網站根         https://jameschouuxreach.github.io/reach-website-v1/
-#   reach-web-v2   → /v2/ 子資料夾   https://jameschouuxreach.github.io/reach-website-v1/v2/
-#   reach-web-v2-1 → /v2-1/ 子資料夾 https://jameschouuxreach.github.io/reach-website-v1/v2-1/
-#   reach-web-v2-2 → /v2-2/ 子資料夾 https://jameschouuxreach.github.io/reach-website-v1/v2-2/
-#   service-v1     → /v2-3/ 子資料夾 https://jameschouuxreach.github.io/reach-website-v1/v2-3/
+#   main           → 網站根         https://jameschouuxreach.github.io/reach-website/
+#   reach-web-v2   → /v2/ 子資料夾   https://jameschouuxreach.github.io/reach-website/v2/
+#   reach-web-v2-1 → /v2-1/ 子資料夾 https://jameschouuxreach.github.io/reach-website/v2-1/
+#   reach-web-v2-2 → /v2-2/ 子資料夾 https://jameschouuxreach.github.io/reach-website/v2-2/
+#   service-v1     → /v2-3/ 子資料夾 https://jameschouuxreach.github.io/reach-website/v2-3/
 #
 # 新增一個要並存的版本：在下方對應表加一行 branch↔子資料夾，
 # 並把子資料夾名加進 KEEP_DIRS（根部署時不會被蓋掉的資料夾）。
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-REPO_BASE="/reach-website-v1"
+REPO_BASE="/reach-website"
 KEEP_DIRS=(v2 v2-1 v2-2 v2-3)
 SUBDIR_ARG="${1:-}"
 
@@ -38,7 +38,7 @@ if [[ -n "$SUBDIR_ARG" && "$SUBDIR_ARG" != "$SUBDIR" ]]; then
   exit 1
 fi
 
-echo "部署 ${BRANCH}（${SHA}）→ https://jameschouuxreach.github.io/reach-website-v1${SUBDIR:+/${SUBDIR}}/"
+echo "部署 ${BRANCH}（${SHA}）→ https://jameschouuxreach.github.io/reach-website${SUBDIR:+/${SUBDIR}}/"
 
 npm run build
 node scripts/prefix-base.mjs "${REPO_BASE}${SUBDIR:+/${SUBDIR}}" dist
@@ -69,5 +69,5 @@ if git diff --cached --quiet; then
 else
   git commit -m "Deploy ${BRANCH} (${SHA})${SUBDIR:+ to /${SUBDIR}}"
   git push origin gh-pages
-  echo "已部署：https://jameschouuxreach.github.io/reach-website-v1${SUBDIR:+/${SUBDIR}}/"
+  echo "已部署：https://jameschouuxreach.github.io/reach-website${SUBDIR:+/${SUBDIR}}/"
 fi

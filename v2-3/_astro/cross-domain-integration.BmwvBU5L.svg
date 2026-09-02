@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- 跨域整合型：多方角色彼此牽連。四個節點；左上與右下以頸部相連，
+       頸部兩側各為以右上圓心、左下圓心為圓心的四分之一圓弧（半徑 50＝圓心距 86 − 半徑 36，恰與左上／右下圓相切）。
+       色彩＝Reach Blue 200／300 -->
+  <path d="M93 57A50 50 0 0 0 143 107L107 143A50 50 0 0 0 57 93Z" fill="#BED1FF"/>
+  <circle cx="57" cy="57" r="36" fill="#BED1FF"/>
+  <circle cx="143" cy="57" r="36" fill="#8EB0FF"/>
+  <circle cx="57" cy="143" r="36" fill="#BED1FF"/>
+  <circle cx="143" cy="143" r="36" fill="#BED1FF"/>
+</svg>

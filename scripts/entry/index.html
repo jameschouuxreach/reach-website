@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>致遠官網版本預覽</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --card: #ffffff;
+    --ink: #16181d;
+    --ink-2: #5a6070;
+    --line: #e4e7ec;
+    --accent: #0B5CFF;
+    --accent-ink: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101216;
+      --card: #191c22;
+      --ink: #eceef2;
+      --ink-2: #9aa1b0;
+      --line: #2a2e37;
+      --accent: #4d86ff;
+      --accent-ink: #0e1320;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 72px 24px 96px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin: 0 0 12px;
+  }
+  h1 { font-size: 28px; font-weight: 700; margin: 0 0 8px; letter-spacing: .01em; }
+  .lead { color: var(--ink-2); font-size: 15px; margin: 0 0 40px; }
+  .versions { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .card {
+    display: grid; grid-template-columns: 84px 1fr; gap: 18px; align-items: start;
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 22px 24px; text-decoration: none; color: inherit;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .ver { font-size: 22px; font-weight: 700; letter-spacing: .02em; color: var(--accent); }
+  .card h2 { font-size: 16px; font-weight: 600; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px; font-weight: 600; letter-spacing: .04em;
+    padding: 2px 9px; border-radius: 999px;
+    background: var(--accent); color: var(--accent-ink);
+  }
+  .tag.snap { background: transparent; color: var(--ink-2); border: 1px solid var(--line); }
+  .card p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+  .foot { margin-top: 48px; font-size: 12.5px; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 20px; }
+  @media (max-width: 480px) {
+    .card { grid-template-columns: 1fr; gap: 6px; }
+    .wrap { padding-top: 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Reach Experience Design</p>
+  <h1>致遠官網版本預覽</h1>
+  <p class="lead">內部比較用的多版本預覽站，非正式官網。點選任一版本進入其首頁。</p>
+
+  <ul class="versions">
+    <li><a class="card" href="./v1/">
+      <span class="ver">v1</span>
+      <span>
+        <h2>基準版 <span class="tag">main</span></h2>
+        <p>依 v1 開發規格完成的完整八路由網站，含四幕 Hero 自動輪播與使命區改版定稿（2026-08-25 併入 main）。後續改版都以此為比較基準。</p>
+      </span>
+    </a></li>
+    <li><a class="card" href="./v2/">
+      <span class="ver">v2</span>
+      <span>
+        <h2>開發中 <span class="tag">reach-web-v2</span></h2>
+        <p>持續開發分支的最新狀態，內容隨時變動。含首頁案例卡改為好齡居 C 版（小瑜觀點）等後續調整。</p>
+      </span>
+    </a></li>
+    <li><a class="card" href="./v2-1/">
+      <span class="ver">v2-1</span>
+      <span>
+        <h2>快照・2026-08-27 <span class="tag snap">reach-web-v2-1</span></h2>
+        <p>Logo 牆移至 Hero 下方、使命區加入具體舉例卡、服務對象文案調整。</p>
+      </span>
+    </a></li>
+    <li><a class="card" href="./v2-2/">
+      <span class="ver">v2-2</span>
+      <span>
+        <h2>快照・2026-08-28 <span class="tag snap">reach-web-v2-2</span></h2>
+        <p>案例卡改 C 版式（小標＋五標籤）、使命區 v5 改為 tabs 無捲動鎖定、服務區新增四個服務範疇 pill。</p>
+      </span>
+    </a></li>
+    <li><a class="card" href="./v2-3/">
+      <span class="ver">v2-3</span>
+      <span>
+        <h2>快照・2026-09-02 <span class="tag snap">service-v1</span></h2>
+        <p>服務內容三層資訊架構：服務總覽、四個服務類別頁與六個專案類型頁，含專案標誌、專案目標、專案流程與執行項目對應專案。</p>
+      </span>
+    </a></li>
+  </ul>
+
+  <p class="foot">此入口頁的正本在 site-v1 repo 的 <code>scripts/entry/index.html</code>（main 分支），部署 main 時自動同步。</p>
+</div>
+</body>
+</html>

@@ -33,7 +33,7 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => ({
   <div class="container-site py-16 md:py-24">
     {
       showIntro ? (
-        <div class="max-w-3xl" data-reveal>
+        <div class="max-w-3xl">
           <p class="flex items-baseline gap-3">
             <span class="text-base font-bold text-brand">常見專案類型</span>
             <span class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted" aria-hidden="true">
@@ -50,8 +50,8 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => ({
       )
     }
 
-    {/* 兩個群組共用同一個 data-reveal：探索型進入視窗時，優化型同時出現（2026-09-01 業主指示） */}
-    <div class:list={[showIntro ? 'mt-12 md:mt-16' : '']} data-reveal>
+    {/* 不做進場淡入，捲到即完整呈現（2026-08-28 業主指示；原兩群組共用一個 data-reveal） */}
+    <div class:list={[showIntro ? 'mt-12 md:mt-16' : '']}>
       {
         groups.map((group, groupIndex) => (
           <div class:list={['svc-group', groupIndex > 0 ? 'mt-20 md:mt-24' : '']}>

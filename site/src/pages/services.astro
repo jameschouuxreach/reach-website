@@ -1,38 +1,50 @@
 ---
 /**
- * 服務內容總覽（第一層）：四個服務類別（2×2）→ 常見專案類型（探索型三卡＋優化型三卡）→ 收尾 CTA。
- * 2026-08-31 業主指示拿掉原頁首（H1＋導言），第一區標題升為本頁唯一 H1（2026-09-01 文案改為「四大專業面向，組合出適合你的專案」）。
- * 內容一律取自 src/data/services.ts；本頁不使用 ContactCta，收尾由 ProjectTypeGroups 的 showClosingCta 提供（§7.4、§8.1）。
+ * 服務內容總覽（第一層）：常見專案類型（探索型三卡＋優化型三卡）＋專案類型評估入口。
+ * - 「服務項目」四個服務類別（2×2 卡）區塊以 SHOW_SERVICE_CATEGORIES 旗標控制，2026-09-08 業主指示先關閉；
+ *   要加回來把旗標改成 true 即可，區塊程式碼保留在下方不刪。關閉期間常見專案類型的標題升為本頁唯一 H1（headingLevel="h1"）。
+ *   四個服務類別頁仍存在、仍在 sitemap，入口只剩六個專案頁「執行項目」的連結。
+ * - 沿革：2026-08-31 業主指示拿掉原頁首（H1＋導言），服務項目區標題升為本頁 H1（2026-09-01 文案改為「四大專業面向，組合出適合你的專案」）。
+ * - 內容一律取自 src/data/services.ts；本頁不使用 ContactCta，評估入口由 ProjectTypeGroups 的 showAssessment 提供。
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ServiceCategoryCard from '../components/services/ServiceCategoryCard.astro';
 import ProjectTypeGroups from '../components/services/ProjectTypeGroups.astro';
 import { SERVICE_CATEGORIES } from '../data/services';
+
+/** 「服務項目」區塊開關（2026-09-08 業主指示關閉；改 true 即恢復，常見專案類型標題會自動降回 H2） */
+const SHOW_SERVICE_CATEGORIES = false;
 ---
 
 <BaseLayout
   title="服務內容"
   description="致遠體驗設計以研究分析、體驗設計、品牌與服務策略及體驗顧問，依據問題、資源與發展階段組合適合的改善方法。"
 >
-  {/* ---- 四個服務類別（本頁 H1）---- */}
-  <section class="bg-page">
-    <div class="container-site py-16 md:py-24">
-      <div class="max-w-3xl" data-reveal>
-        <p class="flex items-baseline gap-3">
-          <span class="text-base font-bold text-brand">服務項目</span>
-          <span class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted" aria-hidden="true">OUR SERVICES</span>
-        </p>
-        <h1 class="heading-section mt-4">四大專業面向，組合出適合你的專案</h1>
-        <p class="mt-4 text-lg leading-relaxed text-ink-secondary md:mt-5">
-          我們會依照問題與情境，選擇真正必要的服務，而不是套用固定流程。
-        </p>
-      </div>
-      <div class="mt-8 grid gap-6 md:mt-10 md:grid-cols-2" data-reveal>
-        {SERVICE_CATEGORIES.map((category) => <ServiceCategoryCard {...category} headingLevel="h2" />)}
-      </div>
-    </div>
-  </section>
+  {/* ---- 四個服務類別（開啟時為本頁 H1）---- */}
+  {
+    SHOW_SERVICE_CATEGORIES && (
+      <section class="bg-page">
+        <div class="container-site py-16 md:py-24">
+          <div class="max-w-3xl" data-reveal>
+            <p class="flex items-baseline gap-3">
+              <span class="text-base font-bold text-brand">服務項目</span>
+              <span class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted" aria-hidden="true">
+                OUR SERVICES
+              </span>
+            </p>
+            <h1 class="heading-section mt-4">四大專業面向，組合出適合你的專案</h1>
+            <p class="mt-4 text-lg leading-relaxed text-ink-secondary md:mt-5">
+              我們會依照問題與情境，選擇真正必要的服務，而不是套用固定流程。
+            </p>
+          </div>
+          <div class="mt-8 grid gap-6 md:mt-10 md:grid-cols-2" data-reveal>
+            {SERVICE_CATEGORIES.map((category) => <ServiceCategoryCard {...category} headingLevel="h2" />)}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
-  {/* ---- 常見專案類型＋收尾 CTA ---- */}
-  <ProjectTypeGroups showIntro showClosingCta />
+  {/* ---- 常見專案類型（含評估入口）---- */}
+  <ProjectTypeGroups showIntro showAssessment headingLevel={SHOW_SERVICE_CATEGORIES ? 'h2' : 'h1'} />
 </BaseLayout>

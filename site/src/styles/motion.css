@@ -28,3 +28,13 @@ html.js [data-reveal].is-visible {
     transition: none;
   }
 }
+
+/* ---- 只作為畫記（螢光筆）動畫的進場觸發 ----
+   加在 data-reveal 元素上：仍由 reveal.ts 觀察、進場加 .is-visible、捲出重置，
+   但元素本身不淡入、不位移（業主 2026-08-28 指示常見專案類型不做進場淡入，
+   2026-09-08 又要群組標題的關鍵詞套首頁同款畫記，故需要「只觸發、不淡入」的變體）。 */
+html.js [data-reveal][data-reveal-mark] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}

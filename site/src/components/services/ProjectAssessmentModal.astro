@@ -2,6 +2,7 @@
 /**
  * 專案類型評估 Modal（《致遠官網-v1-專案類型評估Modal-增量開發規格》§5、§6、§9–§13）。
  * - 原生 <dialog>＋<form>：一題一頁、上方標籤／進度文字／細進度條／關閉鈕、下方「上一題／下一題／查看結果」。
+ * - 規格 §5.1 第一畫面的標題與說明已依 2026-09-08 業主指示移除：開啟後直接顯示第 1 題，dialog 可讀名稱取上方標籤（id="pa-label"）。
  * - 題目全部於 build 期渲染成 <fieldset>＋<legend>（第 2 題三個分支變體各一個 fieldset），由腳本控制顯示哪一個；
  *   六張結果卡也預先渲染（hidden），腳本依推薦結果顯示一至兩張並排序——文案與規則單一來源皆在 data/。
  * - build 期驗證：每個可推薦的 slug 都必須存在於 PROJECT_TYPES，找不到即拋錯讓 build 失敗（§14.2）。
@@ -30,19 +31,18 @@ const resultProjects: ProjectType[] = PROJECT_ASSESSMENT_SLUGS.map((slug) => {
   return project;
 });
 
-const { label, intro, buttons, contactHref, result, error } = ASSESSMENT_COPY;
+const { label, buttons, contactHref, result, error } = ASSESSMENT_COPY;
 ---
 
 <dialog
   id="project-assessment"
   class="pa-dialog"
-  aria-labelledby="pa-title"
-  aria-describedby="pa-desc"
+  aria-labelledby="pa-label"
   data-project-assessment
 >
   <header class="pa-header">
     <div class="pa-header-row">
-      <p class="pa-header-label">{label}</p>
+      <p class="pa-header-label" id="pa-label">{label}</p>
       <p class="pa-progress-text" data-pa-progress-text>{ASSESSMENT_COPY.progress(1, ASSESSMENT_MAX_STEPS)}</p>
       <button type="button" class="pa-close" aria-label={buttons.closeLabel} data-pa-close>
         <span aria-hidden="true">×</span>
@@ -59,10 +59,6 @@ const { label, intro, buttons, contactHref, result, error } = ASSESSMENT_COPY;
 
       {/* ---- 題目畫面 ---- */}
       <div data-pa-view="questions">
-        <div class="pa-intro" data-pa-intro>
-          <h2 id="pa-title" class="heading-sub pa-focus-target" tabindex="-1">{intro.title}</h2>
-          <p id="pa-desc" class="pa-desc">{intro.description}</p>
-        </div>
         {
           ASSESSMENT_QUESTIONS.map((question) => (
             <fieldset class="pa-question" data-pa-question={question.id} data-pa-step={question.step} hidden>
@@ -300,11 +296,7 @@ const { label, intro, buttons, contactHref, result, error } = ASSESSMENT_COPY;
     transform: none;
   }
 
-  /* ---- 第一個畫面：標題＋說明（第 2 題起隱藏，讓題目有更多空間）---- */
-  .pa-intro .heading-sub {
-    margin-top: 0.25rem;
-  }
-
+  /* ---- 說明文字（結果頁）與可程式化聚焦的標題／題幹 ---- */
   .pa-desc {
     margin-top: 0.75rem;
     color: var(--color-text-secondary);
@@ -327,10 +319,6 @@ const { label, intro, buttons, contactHref, result, error } = ASSESSMENT_COPY;
     padding: 0;
     border: 0;
     min-width: 0;
-  }
-
-  .pa-intro:not([hidden]) ~ .pa-question {
-    margin-top: 1.75rem;
   }
 
   .pa-legend {

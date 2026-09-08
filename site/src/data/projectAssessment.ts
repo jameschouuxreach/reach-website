@@ -167,21 +167,17 @@ export function getAssessmentQuestion(id: string): AssessmentQuestion | undefine
   return ASSESSMENT_QUESTIONS.find((question) => question.id === id);
 }
 
-/* ---------------------------------------------------------------- 鎖定文案（§4.1、§5、§9、§15） */
+/* ---------------------------------------------------------------- 鎖定文案（§4.1、§5、§9、§15；entry 與 §5.1 第一畫面已依 2026-09-08 業主指示調整） */
 
 export const ASSESSMENT_COPY = {
-  /** 服務頁第三區塊（評估入口） */
+  /** 服務頁收尾的評估入口（2026-09-08 業主指示：標題去掉「還」；副標由「哪個方案」改為「哪個專案」並加粗） */
   entry: {
-    title: '還不確定自己屬於哪一種專案？',
-    subtitle: '簡單回答幾個問題，評估你適合哪個方案',
+    title: '不確定自己屬於哪一種專案？',
+    subtitle: '簡單回答幾個問題，評估你適合哪個專案',
     cta: '開始評估',
   },
-  /** Modal 上方標籤與第一個畫面 */
+  /** Modal 上方標籤，同時是 dialog 的可讀名稱（規格 §5.1 的第一畫面標題與說明已依 2026-09-08 業主指示移除，開啟即顯示第 1 題） */
   label: '專案類型評估',
-  intro: {
-    title: '你的需求，適合從哪裡開始？',
-    description: '回答幾個簡單問題，我們會協助你找到合適的改善起點。',
-  },
   progress: (current: number, max: number = ASSESSMENT_MAX_STEPS) => `第 ${current} 題／最多 ${max} 題`,
   buttons: {
     next: '下一題',

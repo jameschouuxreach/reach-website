@@ -27,8 +27,6 @@ function initProjectAssessment(): void {
   const find = <T extends HTMLElement>(selector: string): T | null => dialog.querySelector<T>(selector);
   const form = find<HTMLFormElement>('[data-pa-form]');
   const body = find('[data-pa-body]');
-  const intro = find('[data-pa-intro]');
-  const introTitle = find('#pa-title');
   const views: Record<View, HTMLElement | null> = {
     questions: find('[data-pa-view="questions"]'),
     result: find('[data-pa-view="result"]'),
@@ -56,7 +54,7 @@ function initProjectAssessment(): void {
   });
 
   if (
-    !form || !body || !intro || !introTitle || !views.questions || !views.result || !views.error ||
+    !form || !body || !views.questions || !views.result || !views.error ||
     !progressText || !progressBar || !status || !prevButton || !nextButton || !restartButton ||
     !contactLink || !closeButton || !cardsContainer || !resultTitle || !errorMessage ||
     !advisoryNote || !advisoryNoteBadge || !scopeNote || fieldsets.length === 0
@@ -135,7 +133,6 @@ function initProjectAssessment(): void {
     const question = sequence[index];
 
     setView('questions');
-    intro.hidden = index !== 0;
     fieldsets.forEach((fieldset) => {
       const active = fieldset.dataset.paQuestion === question.id;
       fieldset.hidden = !active;
@@ -244,8 +241,7 @@ function initProjectAssessment(): void {
     reset();
     dialog.showModal();
     document.documentElement.classList.add('pa-lock');
-    renderQuestion(false);
-    focusElement(introTitle);
+    renderQuestion(); // 無標題畫面（2026-09-08 業主指示），開啟即聚焦第 1 題題幹
   };
 
   const close = (): void => {

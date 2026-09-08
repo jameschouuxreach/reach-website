@@ -1,13 +1,20 @@
 ---
 /**
- * 常見專案類型：探索型三卡＋優化型三卡，/services/ 與四個服務類別頁重用同一組內容。
+ * 常見專案類型：探索型三卡＋優化型三卡，目前只在 /services/ 使用（四個服務類別頁已改用 ServiceItemProjectTabs）。
  * - 文案一律取自 src/data/services.ts，不接受頁面自行傳入另一份。
  * - 根節點固定 id="project-types"（專案頁「常見專案類型」返回入口），同一頁只能出現一次。
- * - 標題階層：H2（區塊）→ H3（群組名稱）→ H4（專案卡）；showIntro=false 時 H2 仍以 sr-only 保留，避免跳級。
- * - showClosingCta：區塊末尾加「還不確定自己屬於哪一種專案？」收尾（§7.4）。2026-09-07 起收尾改為「專案類型評估」入口
- *   （評估 Modal 規格 §4）：容器、H2 與版面不變，只換副標與 CTA；副標／CTA 文案取自 data/projectAssessment.ts，
- *   CTA 保留 /contact/ 連結作無 JS fallback，有 JS 時由 scripts/project-assessment.ts 攔截並開啟 ProjectAssessmentModal。
- * - 群組標題下為一行副標（2026-08-31 業主指示，取代規格原本的多段群組說明）。
+ * - 標題階層由 headingLevel 決定：'h2'（預設）→ H2（區塊）→ H3（群組、收尾）→ H4（專案卡）；
+ *   'h1'（頁面關閉服務項目區塊、本區塊成為頁首時）→ H1 → H2 → H3，避免頁面沒有 H1 或跳級；此時不畫區塊上緣分隔線。
+ *   showIntro=false 時區塊標題仍以 sr-only 保留。
+ * - 群組標題為第一人稱情境句（2026-09-08 業主指示；同日移除 2026-08-31 加入的群組副標，以及區塊標題下原有的說明段落）。
+ *   標題內的 PROJECT_FAMILIES[].em 片段套首頁「找出關鍵／推動改變」同款藍色螢光筆畫記（.svc-group-em）：
+ *   標題容器加 data-reveal＋data-reveal-mark，由 reveal.ts 進場觸發、捲出重置，但容器本身不淡入不位移（motion.css），
+ *   維持「卡片捲到即完整呈現」的既有決定。
+ * - showAssessment：區塊末尾的「專案類型評估」收尾（§7.4 的收尾區塊改為評估入口，評估 Modal 規格 §4）：
+ *   標題「不確定自己屬於哪一種專案？」＋粗體副標「簡單回答幾個問題，評估你適合哪個專案」＋「開始評估」CTA
+ *   （2026-09-08 業主指示：曾短暫移到區塊標題下方，同日改回收尾位置與原樣式，副標加粗）。
+ *   CTA 保留 /contact/ 連結作無 JS fallback，有 JS 時由 scripts/project-assessment.ts 攔截並開啟 ProjectAssessmentModal；
+ *   文案取自 data/projectAssessment.ts。
  */
 import {
   PROJECT_FAMILIES,
@@ -21,19 +28,34 @@ import { ASSESSMENT_COPY } from '../../data/projectAssessment';
 
 interface Props {
   showIntro?: boolean;
-  showClosingCta?: boolean;
+  showAssessment?: boolean;
+  /** 區塊標題層級；本區塊是頁面第一個區塊、頁面沒有其他 H1 時傳 'h1' */
+  headingLevel?: 'h1' | 'h2';
 }
 
-const { showIntro = true, showClosingCta = true } = Astro.props;
+const { showIntro = true, showAssessment = true, headingLevel = 'h2' } = Astro.props;
 
-const groups = PROJECT_FAMILY_ORDER.map((family) => ({
-  family,
-  ...PROJECT_FAMILIES[family],
-  projects: getProjectTypesByFamily(family),
-}));
+const isLead = headingLevel === 'h1';
+const IntroHeading = headingLevel;
+const GroupHeading = isLead ? 'h2' : 'h3';
+const cardHeadingLevel = isLead ? 'h3' : 'h4';
+
+// 群組標題切出畫記片段（同 AudienceCard 的做法）；找不到片段時整句原樣顯示
+const groups = PROJECT_FAMILY_ORDER.map((family) => {
+  const { label, em } = PROJECT_FAMILIES[family];
+  const emIndex = em ? label.indexOf(em) : -1;
+  return {
+    family,
+    label,
+    em: emIndex >= 0 ? em : undefined,
+    pre: emIndex >= 0 ? label.slice(0, emIndex) : label,
+    post: emIndex >= 0 && em ? label.slice(emIndex + em.length) : '',
+    projects: getProjectTypesByFamily(family),
+  };
+});
 ---
 
-<section id={PROJECT_TYPES_ANCHOR} class="svc-project-types border-t border-line bg-page">
+<section id={PROJECT_TYPES_ANCHOR} class:list={['svc-project-types bg-page', isLead ? '' : 'border-t border-line']}>
   <div class="container-site py-16 md:py-24">
     {
       showIntro ? (
@@ -44,28 +66,35 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => ({
               COMMON ENGAGEMENTS
             </span>
           </p>
-          <h2 class="heading-section mt-4">從你的問題和需求出發，看看哪種專案適合你</h2>
-          <p class="mt-4 text-lg font-bold leading-relaxed text-ink md:mt-5">
-            專案通常組合多種項目來有效達成目標，看看以下哪類專案與你的情況比較相似。
-          </p>
+          <IntroHeading class="heading-section mt-4">從你的問題和需求出發，看看哪種專案適合你</IntroHeading>
         </div>
       ) : (
-        <h2 class="sr-only">常見專案類型</h2>
+        <IntroHeading class="sr-only">常見專案類型</IntroHeading>
       )
     }
 
-    {/* 不做進場淡入，捲到即完整呈現（2026-08-28 業主指示；原兩群組共用一個 data-reveal） */}
+    {/* 卡片不做進場淡入，捲到即完整呈現（2026-08-28 業主指示；原兩群組共用一個 data-reveal）。
+        群組標題容器的 data-reveal 只用來觸發關鍵詞畫記（data-reveal-mark：不淡入、不位移） */}
     <div class:list={[showIntro ? 'mt-12 md:mt-16' : '']}>
       {
         groups.map((group, groupIndex) => (
           <div class:list={['svc-group', groupIndex > 0 ? 'mt-20 md:mt-24' : '']}>
-            <div class="max-w-3xl">
-              <h3 class="heading-sub">{group.label}</h3>
-              <p class="mt-2 text-lg font-medium leading-relaxed text-ink-secondary">{group.subtitle}</p>
+            <div class="max-w-3xl" data-reveal data-reveal-mark>
+              <GroupHeading class="heading-sub">
+                {group.em ? (
+                  <>
+                    {group.pre}
+                    <span class="svc-group-em">{group.em}</span>
+                    {group.post}
+                  </>
+                ) : (
+                  group.label
+                )}
+              </GroupHeading>
             </div>
             <div class="mt-8 grid gap-6 md:mt-10 md:grid-cols-2 lg:grid-cols-3">
               {group.projects.map((project) => (
-                <ProjectTypeCard {...project} headingLevel="h4" />
+                <ProjectTypeCard {...project} headingLevel={cardHeadingLevel} />
               ))}
             </div>
           </div>
@@ -74,15 +103,13 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => ({
     </div>
 
     {
-      showClosingCta && (
+      showAssessment && (
         <div
           class="svc-closing mt-16 rounded-2xl border border-accent-100 bg-accent px-6 py-10 text-center md:mt-24 md:px-12 md:py-14"
           data-reveal
         >
-          <h2 class="heading-sub">還不確定自己屬於哪一種專案？</h2>
-          <p class="mx-auto mt-4 max-w-2xl leading-relaxed text-ink-secondary">
-            {ASSESSMENT_COPY.entry.subtitle}
-          </p>
+          <GroupHeading class="heading-sub">{ASSESSMENT_COPY.entry.title}</GroupHeading>
+          <p class="mx-auto mt-4 max-w-2xl font-bold leading-relaxed text-ink-secondary">{ASSESSMENT_COPY.entry.subtitle}</p>
           <p class="mt-8">
             <a href={ASSESSMENT_COPY.contactHref} class="btn-primary svc-closing-cta rounded-full px-7" data-pa-open>
               {ASSESSMENT_COPY.entry.cta}
@@ -92,7 +119,8 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => ({
         </div>
       )
     }
-    {showClosingCta && <ProjectAssessmentModal />}
+
+    {showAssessment && <ProjectAssessmentModal />}
   </div>
 </section>
 
@@ -100,6 +128,34 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => ({
   /* 由專案頁返回 /services/#project-types 時避開 sticky Header（72px＋緩衝） */
   .svc-project-types {
     scroll-margin-top: 88px;
+  }
+
+  /* 群組標題關鍵詞：藍色螢光筆畫記，進場時由左至右掃過（同首頁 AI 區塊 .ai-em／AudienceCard .aud-em） */
+  .svc-group-em {
+    color: var(--color-text);
+    background-image: linear-gradient(var(--reach-blue-200), var(--reach-blue-200));
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: 0 50%;
+    padding-inline: 0.06em;
+    margin-inline: -0.03em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .svc-group-em {
+      background-size: 0% 100%;
+      transition: background-size 550ms cubic-bezier(0.65, 0, 0.35, 1);
+      transition-delay: 250ms;
+    }
+
+    :global(html.js [data-reveal].is-visible) .svc-group-em {
+      background-size: 100% 100%;
+    }
+
+    /* 離場即瞬間重置，捲回時螢光筆重新掃入 */
+    :global(html.js [data-reveal]:not(.is-visible)) .svc-group-em {
+      transition: none;
+    }
   }
 
   .svc-closing-cta .cta-arrow {

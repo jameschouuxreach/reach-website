@@ -72,9 +72,10 @@ export interface FaqItem {
 }
 
 export interface ProjectFamilyInfo {
+  /** 群組標題（2026-09-08 業主指示：改為第一人稱情境句；原 2026-08-31 加入的群組副標同日移除） */
   label: string;
-  /** 群組副標（2026-08-31 業主指示：取代原多段群組說明） */
-  subtitle: string;
+  /** 標題內要以藍色螢光筆畫記的片段（效果同首頁「找出關鍵／推動改變」的 .ai-em；2026-09-08 業主指示） */
+  em?: string;
 }
 
 /* ---------------------------------------------------------------- 路由 */
@@ -234,12 +235,12 @@ export const PROJECT_FAMILY_ORDER: ProjectFamily[] = ['discovery', 'optimization
 
 export const PROJECT_FAMILIES: Record<ProjectFamily, ProjectFamilyInfo> = {
   discovery: {
-    label: '探索型專案',
-    subtitle: '釐清未知，找到值得投入的方向',
+    label: '我想針對新服務或產品進行探索...',
+    em: '新服務或產品',
   },
   optimization: {
-    label: '優化型專案',
-    subtitle: '找出關鍵阻礙，讓既有體驗發揮更大價值',
+    label: '我想針對既有服務或產品進行優化...',
+    em: '既有服務或產品',
   },
 };
 

@@ -1,0 +1,55 @@
+---
+/**
+ * 「專案類型評估」入口區塊（收尾卡＋ProjectAssessmentModal），/services/ 常見專案類型末尾與六個專案類型頁的常見問題下方共用
+ *（2026-09-08 業主指示加到專案頁，故由 ProjectTypeGroups 抽出）。
+ * - 淡藍底框置中：標題「不確定自己屬於哪一種專案？」＋粗體副標「簡單回答幾個問題，了解你適合哪個專案」＋「開始評估」CTA；
+ *   文案取自 data/projectAssessment.ts。載入即顯示，不做進場淡入（2026-09-08 業主指示）。
+ * - CTA 保留 /contact/ 連結作無 JS fallback，有 JS 時由 scripts/project-assessment.ts（隨 Modal 掛載）攔截並開啟 Modal。
+ * - 每頁最多掛一個（Modal id 固定、腳本以 document.querySelector 找入口與 dialog）。
+ * - 外距由父層決定（本元件不帶 margin）；headingLevel 依頁面標題階層傳入。
+ */
+import { ASSESSMENT_COPY } from '../../data/projectAssessment';
+import ProjectAssessmentModal from './ProjectAssessmentModal.astro';
+
+interface Props {
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { headingLevel = 'h2' } = Astro.props;
+const Heading = headingLevel;
+---
+
+<div class="svc-closing rounded-2xl border border-accent-100 bg-accent px-6 py-10 text-center md:px-12 md:py-14">
+  <Heading class="heading-sub">{ASSESSMENT_COPY.entry.title}</Heading>
+  <p class="mx-auto mt-4 max-w-2xl font-bold leading-relaxed text-ink-secondary">{ASSESSMENT_COPY.entry.subtitle}</p>
+  <p class="mt-8">
+    <a href={ASSESSMENT_COPY.contactHref} class="btn-primary svc-closing-cta rounded-full px-7" data-pa-open>
+      {ASSESSMENT_COPY.entry.cta}
+      <span class="cta-arrow" aria-hidden="true">→</span>
+    </a>
+  </p>
+</div>
+
+<ProjectAssessmentModal />
+
+<style>
+  .svc-closing-cta .cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  .svc-closing-cta:hover .cta-arrow,
+  .svc-closing-cta:focus-visible .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-closing-cta .cta-arrow {
+      transition: none;
+    }
+
+    .svc-closing-cta:hover .cta-arrow,
+    .svc-closing-cta:focus-visible .cta-arrow {
+      transform: none;
+    }
+  }
+</style>

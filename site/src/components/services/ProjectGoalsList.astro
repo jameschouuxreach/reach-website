@@ -1,0 +1,116 @@
+---
+/**
+ * 專案目標（六個專案類型頁）：以列點呈現目標標題，點擊展開看內文（2026-09-08 業主指示，取代原本三張並排的非互動卡片）。
+ * - 原生 <details>／<summary>，不依賴 JavaScript；一次可展開多個，不強制 accordion 單開；預設全部收合。
+ * - 樣式與 FaqList 一致（觸控高度至少 52px、＋圖示展開轉 45°、hover／展開轉品牌藍、明確 focus-visible、
+ *   reduced-motion 取消 transition），差別在標題前有品牌藍圓點作列點、標題為 H3。
+ * - 內文完整存在 HTML，搜尋引擎與無 JavaScript 環境都讀得到。
+ */
+import type { ProjectGoal } from '../../data/services';
+
+interface Props {
+  goals: ProjectGoal[];
+}
+
+const { goals } = Astro.props;
+---
+
+<div class="goal-list border-y border-line">
+  {
+    goals.map((goal) => (
+      <details class="goal-item">
+        <summary class="goal-summary">
+          <span class="goal-bullet" aria-hidden="true" />
+          <h3 class="goal-title">{goal.title}</h3>
+          <svg class="goal-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+        </summary>
+        <div class="goal-body">
+          <p>{goal.body}</p>
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .goal-item + .goal-item {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .goal-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    min-height: 52px;
+    padding-block: 0.875rem;
+    cursor: pointer;
+    list-style: none;
+    color: var(--color-text);
+    transition: color 180ms ease;
+  }
+
+  .goal-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .goal-summary:hover,
+  .goal-item[open] > .goal-summary {
+    color: var(--color-brand);
+  }
+
+  .goal-summary:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* 列點：品牌藍圓點，與 fit 列表的 marker 同色 */
+  .goal-bullet {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background-color: var(--color-brand);
+  }
+
+  .goal-title {
+    flex: 1 1 auto;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.5;
+    color: inherit;
+  }
+
+  @media (min-width: 768px) {
+    .goal-title {
+      font-size: 1.125rem;
+    }
+  }
+
+  .goal-icon {
+    flex: 0 0 auto;
+    color: var(--color-brand);
+    transition: transform 180ms ease;
+  }
+
+  .goal-item[open] .goal-icon {
+    transform: rotate(45deg);
+  }
+
+  /* 內文左緣對齊標題（圓點 8px＋間距 0.875rem） */
+  .goal-body {
+    padding: 0.25rem 2.5rem 1.375rem calc(8px + 0.875rem);
+    max-width: 65ch;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .goal-summary,
+    .goal-icon {
+      transition: none;
+    }
+  }
+</style>

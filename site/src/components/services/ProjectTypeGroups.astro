@@ -9,11 +9,8 @@
  * - 群組標題為第一人稱情境句（2026-09-08 業主指示；同日移除 2026-08-31 加入的群組副標，以及區塊標題下原有的說明段落）。
  *   標題內的 PROJECT_FAMILIES[].em 片段套藍色螢光筆底色（.svc-group-em，Blue 200，同首頁「找出關鍵／推動改變」的色塊），
  *   一開始就完整顯示、不做掃過動畫（2026-09-08 業主指示：先套首頁同款掃過動畫、同日改為靜態底色）。
- * - showAssessment：區塊末尾的「專案類型評估」收尾（§7.4 的收尾區塊改為評估入口，評估 Modal 規格 §4）：
- *   標題「不確定自己屬於哪一種專案？」＋粗體副標「簡單回答幾個問題，評估你適合哪個專案」＋「開始評估」CTA
- *   （2026-09-08 業主指示：曾短暫移到區塊標題下方，同日改回收尾位置與原樣式，副標加粗）。
- *   CTA 保留 /contact/ 連結作無 JS fallback，有 JS 時由 scripts/project-assessment.ts 攔截並開啟 ProjectAssessmentModal；
- *   文案取自 data/projectAssessment.ts。
+ * - showAssessment：區塊末尾掛「專案類型評估」入口（ProjectAssessmentEntry：收尾卡＋Modal；2026-09-08 抽成共用元件，
+ *   專案類型頁的常見問題下方也用同一個）。
  */
 import {
   PROJECT_FAMILIES,
@@ -22,8 +19,7 @@ import {
   getProjectTypesByFamily,
 } from '../../data/services';
 import ProjectTypeCard from './ProjectTypeCard.astro';
-import ProjectAssessmentModal from './ProjectAssessmentModal.astro';
-import { ASSESSMENT_COPY } from '../../data/projectAssessment';
+import ProjectAssessmentEntry from './ProjectAssessmentEntry.astro';
 
 interface Props {
   showIntro?: boolean;
@@ -102,23 +98,11 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => {
 
     {
       showAssessment && (
-        <div
-          class="svc-closing mt-16 rounded-2xl border border-accent-100 bg-accent px-6 py-10 text-center md:mt-24 md:px-12 md:py-14"
-          data-reveal
-        >
-          <GroupHeading class="heading-sub">{ASSESSMENT_COPY.entry.title}</GroupHeading>
-          <p class="mx-auto mt-4 max-w-2xl font-bold leading-relaxed text-ink-secondary">{ASSESSMENT_COPY.entry.subtitle}</p>
-          <p class="mt-8">
-            <a href={ASSESSMENT_COPY.contactHref} class="btn-primary svc-closing-cta rounded-full px-7" data-pa-open>
-              {ASSESSMENT_COPY.entry.cta}
-              <span class="cta-arrow" aria-hidden="true">→</span>
-            </a>
-          </p>
+        <div class="mt-16 md:mt-24">
+          <ProjectAssessmentEntry headingLevel={GroupHeading} />
         </div>
       )
     }
-
-    {showAssessment && <ProjectAssessmentModal />}
   </div>
 </section>
 
@@ -137,25 +121,5 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => {
     background-position: 0 50%;
     padding-inline: 0.06em;
     margin-inline: -0.03em;
-  }
-
-  .svc-closing-cta .cta-arrow {
-    transition: transform 200ms ease;
-  }
-
-  .svc-closing-cta:hover .cta-arrow,
-  .svc-closing-cta:focus-visible .cta-arrow {
-    transform: translateX(3px);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .svc-closing-cta .cta-arrow {
-      transition: none;
-    }
-
-    .svc-closing-cta:hover .cta-arrow,
-    .svc-closing-cta:focus-visible .cta-arrow {
-      transform: none;
-    }
   }
 </style>

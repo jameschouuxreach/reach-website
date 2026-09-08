@@ -1,20 +1,32 @@
 ---
 /**
  * 專案類型頁（第二層，六頁由 getStaticPaths 產出）：
- * Header → ServiceContextNav（返回常見專案類型＋六類切換）→ 專案 Hero
- * → 專案完整內容（適合以下情況｜常見情境舉例 → 專案目標 → 專案流程 → 此專案通常包含哪些執行項目？→ 預期成效；2026-09-01 業主指示調整）
- * → 相關案例 → 常見問題 → 既有 ContactCta → Footer。
+ * Header → ServiceContextNav（返回常見專案類型＋六類切換）
+ * → 專案 Hero（eyebrow、標題、副標、適合以下情況）
+ * → 專案完整內容（你的情況類似這樣嗎？〔情境舉例＋相關案例連結〕→ 專案目標 → 專案流程 → 此專案通常會有哪些執行項目？
+ *   →〔預期成效，旗標關閉中〕；2026-09-01 業主指示調整，2026-09-08 多次調整見下）
+ * → 常見問題 → 專案類型評估入口（ProjectAssessmentEntry）→ 既有 ContactCta → Footer。
+ * 2026-09-08 業主指示：
+ * - 本頁自身區塊全部拿掉 data-reveal 進場淡入，載入即顯示（共用的 ContactCta 仍保留自己的淡入）。
+ * - 執行項目卡改為非互動（ServiceItemLinkCard：無連結、無 hover、無箭頭）。
+ * - 常見問題併入專案完整內容同一 section、移除中間分隔線；其下加「開始評估」入口。
+ * - 「適合以下情況」移入 Hero；Hero 上下內距縮為 48/64px。
+ * - 各子區塊上下間距由 mt-12/md:mt-16（48/64px）加寬為 mt-16/md:mt-24（64/96px）；專案目標改為列點標題＋展開內文（ProjectGoalsList）。
+ * - 原「常見情境舉例」Blue 50 底框改為與其他區塊相同的標題＋內文樣式，標題「你的情況類似這樣嗎？」；
+ *   原獨立的「相關案例」section 併入此區塊內文下方，改為藍色文字連結＋外連 icon（「案例分享：案例名」），
+ *   尚無案例頁者以灰字顯示候選名稱＋「案例內容整理中」，不輸出連結。
+ * - 「預期成效」以 SHOW_EXPECTED_VALUE 旗標隱藏（程式碼與資料保留，改 true 即恢復）。
  */
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ContactCta from '../../../components/ContactCta.astro';
-import CaseCard from '../../../components/CaseCard.astro';
 import ServiceContextNav from '../../../components/services/ServiceContextNav.astro';
 import FaqList from '../../../components/services/FaqList.astro';
-import RelatedCasePlaceholder from '../../../components/services/RelatedCasePlaceholder.astro';
 import ProjectGlyph from '../../../components/services/ProjectGlyph.astro';
 import ServiceItemLinkCard from '../../../components/services/ServiceItemLinkCard.astro';
 import ProjectSteps from '../../../components/services/ProjectSteps.astro';
+import ProjectGoalsList from '../../../components/services/ProjectGoalsList.astro';
+import ProjectAssessmentEntry from '../../../components/services/ProjectAssessmentEntry.astro';
 import {
   PROJECT_TYPES,
   PROJECT_TYPES_HREF,
@@ -37,6 +49,9 @@ interface Props {
 
 const { project } = Astro.props;
 
+/** 「預期成效」區塊開關（2026-09-08 業主指示隱藏；改 true 即恢復） */
+const SHOW_EXPECTED_VALUE = false;
+
 const navItems = PROJECT_TYPES.map((item) => ({
   label: item.title,
   href: getProjectTypePath(item.slug),
@@ -48,10 +63,12 @@ const services = resolveServiceItems(project.serviceItemSlugs);
 // 執行項目卡桌機欄數：5 個以上 3 欄，4 個以下 2 欄（避免 3＋1 孤卡）
 const serviceColumns = services.length >= 5 ? 'lg:grid-cols-3' : 'lg:grid-cols-2';
 
-// 相關案例：published 且能在 CASES 找到者用 CaseCard；其餘一律顯示整理中（不輸出連結）
+// 相關案例：published 且能在 CASES 找到者輸出連結；其餘只顯示候選名稱＋「案例內容整理中」（不輸出連結）
 const relatedCases = project.relatedCases.map((reference) => {
   const published = getPublishedCase(reference);
-  return published ? { kind: 'published' as const, data: published } : { kind: 'preparing' as const, name: reference.name };
+  return published
+    ? { kind: 'published' as const, name: published.name, href: published.href! }
+    : { kind: 'preparing' as const, name: reference.name };
 });
 
 // 專案頁 description：副標＋適合以下情況（§16.1；fit 改列點後以「；」串接）
@@ -68,67 +85,75 @@ const description = `${project.subtitle}。適合以下情況：${project.fit.jo
 
   {/* ---- 專案 Hero（右下以專案類型標誌當背景裝飾，2026-08-31 業主指示）---- */}
   <section class="relative isolate overflow-hidden border-b border-line bg-page">
-    {/* 手機版底部多留 120px：標誌固定住在文字下方的留白帶，不壓到副標 */}
-    <div class="container-site relative pt-16 pb-30 md:py-24">
+    {/* 上下內距 48/64px（2026-09-08 業主指示縮窄，原 64/96px）；手機版底部多留 120px：標誌固定住在文字下方的留白帶，不壓到列表 */}
+    <div class="container-site relative pt-12 pb-30 md:py-16">
       <ProjectGlyph slug={project.slug} class="svc-hero-glyph" />
       <p class="text-sm font-bold uppercase tracking-[0.14em] text-brand">{project.eyebrow}</p>
       <h1 class="heading-section mt-4 max-w-3xl">{project.title}</h1>
       <p class="mt-4 max-w-3xl text-xl font-semibold leading-relaxed text-ink md:text-2xl">{project.subtitle}</p>
+      {/* 適合以下情況：藍色小標＋列點，置於副標下方（2026-09-08 業主指示，由內容區第一塊移入 Hero） */}
+      <h2 class="mt-6 text-sm font-bold tracking-wide text-brand md:mt-8">適合以下情況</h2>
+      <ul class="mt-3 max-w-3xl list-disc space-y-1.5 pl-5 text-[17px] leading-relaxed text-ink-secondary marker:text-brand md:text-lg">
+        {project.fit.map((line) => <li>{line}</li>)}
+      </ul>
     </div>
   </section>
 
   {/* ---- 專案完整內容 ---- */}
   <section class="bg-surface">
     <div class="container-site py-16 md:py-24">
-      {/* 適合以下情況｜常見情境舉例：桌機兩欄、手機單欄。舉例為小型藍色標題＋Blue 50 底框（不用引號造型或假客戶照片） */}
-      <div class="grid gap-10 md:grid-cols-2 md:gap-12" data-reveal>
-        <div>
-          <h2 class="heading-sub">適合以下情況</h2>
-          <ul class="mt-4 list-disc space-y-2 pl-5 text-[17px] leading-relaxed text-ink-secondary marker:text-brand md:text-lg">
-            {project.fit.map((line) => <li>{line}</li>)}
-          </ul>
-        </div>
-        <div class="rounded-2xl border border-accent-100 bg-accent p-6 md:p-7">
-          <h2 class="text-sm font-bold tracking-wide text-brand">常見情境舉例</h2>
-          <p class="mt-3 text-[17px] leading-relaxed text-ink md:text-lg">{project.example}</p>
-        </div>
+      {/* 你的情況類似這樣嗎？：情境舉例（與其他區塊相同的標題＋內文樣式）＋內文下方的相關案例連結（2026-09-08 業主指示） */}
+      <div>
+        <h2 class="heading-sub">你的情況類似這樣嗎？</h2>
+        <p class="mt-4 max-w-3xl text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.example}</p>
+        {
+          relatedCases.length > 0 && (
+            <ul class="mt-5 space-y-2 text-[17px] leading-relaxed md:text-lg">
+              {relatedCases.map((entry) => (
+                <li class="flex flex-wrap items-baseline gap-x-1.5">
+                  <span class="font-semibold text-ink">案例分享：</span>
+                  {entry.kind === 'published' ? (
+                    <a href={entry.href} class="svc-case-link">
+                      {entry.name}
+                      <svg class="svc-case-link-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M5 3.5h7.5V11M12.5 3.5 3.5 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <span class="text-ink-muted">
+                      {entry.name}
+                      <span class="ml-1.5 text-sm font-medium">（案例內容整理中）</span>
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )
+        }
       </div>
 
-      {/* 專案目標：三張有標題的非互動卡片（2026-09-01 業主指示新增，置於「我們會如何協助」之上） */}
-      <div class="mt-12 md:mt-16" data-reveal>
+      {/* 專案目標：列點呈現標題、點擊展開內文（2026-09-08 業主指示，取代 2026-09-01 的三張並排卡片） */}
+      <div class="mt-16 md:mt-24">
         <h2 class="heading-sub">專案目標</h2>
-        <ul class="mt-6 grid gap-5 md:mt-8 md:grid-cols-2 lg:grid-cols-3">
-          {
-            project.goals.map((goal, index) => (
-              <li class="card flex flex-col p-6 md:p-7">
-                <p class="text-sm font-bold tabular-nums text-brand" aria-hidden="true">
-                  {String(index + 1).padStart(2, '0')}
-                </p>
-                <h3 class="mt-3 text-lg font-bold text-ink md:text-xl">{goal.title}</h3>
-                <p class="mt-3 text-[15px] leading-relaxed text-ink-secondary md:text-base">{goal.body}</p>
-              </li>
-            ))
-          }
-        </ul>
+        <div class="mt-6 max-w-3xl md:mt-8">
+          <ProjectGoalsList goals={project.goals} />
+        </div>
       </div>
 
-      {/* 專案流程（2026-09-01 業主指示：取代「我們會如何協助」；副標粗體） */}
-      <div class="mt-12 md:mt-16" data-reveal>
+      {/* 專案流程（2026-09-01 業主指示：取代「我們會如何協助」；2026-09-08 原副標改為時間軸下方的「*」斜體提醒） */}
+      <div class="mt-16 md:mt-24">
         <h2 class="heading-sub">專案流程</h2>
-        <p class="mt-4 max-w-3xl text-[17px] font-bold leading-relaxed text-ink md:text-lg">
-          以下為常見執行流程。實際階段與順序會在釐清需求後，依專案目標、預算與時程彈性調整。
-        </p>
         <div class="mt-8 md:mt-10">
           <ProjectSteps steps={project.steps} />
         </div>
+        <p class="svc-note mt-8 max-w-3xl">
+          <span aria-hidden="true">* </span>實際階段與順序會在釐清需求後，依專案目標、預算與時程彈性調整。
+        </p>
       </div>
 
       {/* 執行項目：卡片（類別標籤＋項目名稱＋與服務類別頁相同的說明），整卡連至服務類別頁對應 anchor */}
-      <div class="mt-12 md:mt-16" data-reveal>
-        <h2 class="heading-sub">此專案通常包含哪些執行項目？</h2>
-        <p class="mt-4 max-w-3xl text-[17px] leading-relaxed text-ink-secondary md:text-lg">
-          以下為常見執行項目，並非每個專案都需全部包含。我們會在釐清需求後，依據專案目標、預算與時程，規劃合適的執行組合。
-        </p>
+      <div class="mt-16 md:mt-24">
+        <h2 class="heading-sub">此專案通常會有哪些執行項目？</h2>
         <ul class:list={['mt-6 grid gap-5 md:mt-8 md:grid-cols-2', serviceColumns]}>
           {
             services.map((service) => (
@@ -138,40 +163,32 @@ const description = `${project.subtitle}。適合以下情況：${project.fit.jo
             ))
           }
         </ul>
+        <p class="svc-note mt-6 max-w-3xl">
+          <span aria-hidden="true">* </span>專案不需要包含全部項目，我們會在釐清需求後，依據專案目標、預算與時程，規劃合適的執行組合。
+        </p>
       </div>
 
-      {/* 預期成效：內文樣式，不寫成保證成效、KPI 或 ROI */}
-      <div class="mt-12 md:mt-16" data-reveal>
-        <h2 class="heading-sub">預期成效</h2>
-        <p class="mt-4 max-w-3xl text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.value}</p>
-      </div>
-    </div>
-  </section>
-
-  {/* ---- 相關案例（relatedCases 為空時整個 section 不渲染）---- */}
-  {
-    relatedCases.length > 0 && (
-      <section class="border-t border-line bg-page">
-        <div class="container-site py-16 md:py-24">
-          <h2 class="heading-sub" data-reveal>相關案例</h2>
-          <div class="mt-8 grid gap-x-8 gap-y-12 md:mt-10 md:grid-cols-2" data-reveal>
-            {relatedCases.map((entry) =>
-              entry.kind === 'published' ? <CaseCard {...entry.data} /> : <RelatedCasePlaceholder name={entry.name} />,
-            )}
+      {/* 預期成效：內文樣式，不寫成保證成效、KPI 或 ROI（2026-09-08 業主指示以旗標隱藏） */}
+      {
+        SHOW_EXPECTED_VALUE && (
+          <div class="mt-16 md:mt-24">
+            <h2 class="heading-sub">預期成效</h2>
+            <p class="mt-4 max-w-3xl text-[17px] leading-relaxed text-ink-secondary md:text-lg">{project.value}</p>
           </div>
-        </div>
-      </section>
-    )
-  }
+        )
+      }
 
-  {/* ---- 常見問題 ---- */}
-  <section class="border-t border-line bg-surface">
-    <div class="container-site py-16 md:py-24">
-      <div class="max-w-3xl" data-reveal>
+      {/* 常見問題：與上方區塊同一 section、無分隔線（2026-09-08 業主指示） */}
+      <div class="mt-16 max-w-3xl md:mt-24">
         <h2 class="heading-sub">常見問題</h2>
         <div class="mt-8">
           <FaqList items={SERVICE_FAQ} />
         </div>
+      </div>
+
+      {/* 專案類型評估入口（2026-09-08 業主指示：與 /services/ 收尾同一元件，放在常見問題下方） */}
+      <div class="mt-16 md:mt-24">
+        <ProjectAssessmentEntry headingLevel="h2" />
       </div>
     </div>
   </section>
@@ -180,13 +197,14 @@ const description = `${project.subtitle}。適合以下情況：${project.fit.jo
 </BaseLayout>
 
 <style>
-  /* Hero 背景標誌：靠右下、被區塊底邊裁切；置於文字之下（section isolate＋z-index:-1） */
+  /* Hero 背景標誌：靠右下、被區塊底邊裁切；置於文字之下（section isolate＋z-index:-1）。
+     2026-09-08 業主指示放大並上移：寬 clamp 上限 420 → 500px、露出比例 62% → 78% */
   .svc-hero-glyph {
     position: absolute;
     z-index: -1;
     right: -4%;
-    bottom: -38%;
-    width: clamp(240px, 30vw, 420px);
+    bottom: -22%;
+    width: clamp(280px, 34vw, 500px);
     height: auto;
     pointer-events: none;
   }
@@ -200,4 +218,55 @@ const description = `${project.subtitle}。適合以下情況：${project.fit.jo
     }
   }
 
+  /* 提醒文字（2026-09-08 業主指示）：置於內容下方，「*」開頭、斜體、次要灰字；懸掛縮排讓換行後文字與首行對齊 */
+  .svc-note {
+    padding-left: 1em;
+    text-indent: -1em;
+    font-size: 0.9375rem;
+    font-style: italic;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+  }
+
+  /* 相關案例連結：#084BD8 藍字＋外連 icon；hover 底線，icon 往右上微移 */
+  .svc-case-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--color-link);
+    font-weight: 600;
+    text-decoration: none;
+    text-underline-offset: 4px;
+  }
+
+  .svc-case-link:hover {
+    text-decoration: underline;
+  }
+
+  .svc-case-link:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .svc-case-link-icon {
+    flex: 0 0 auto;
+    transition: transform 200ms ease;
+  }
+
+  .svc-case-link:hover .svc-case-link-icon,
+  .svc-case-link:focus-visible .svc-case-link-icon {
+    transform: translate(2px, -2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-case-link-icon {
+      transition: none;
+    }
+
+    .svc-case-link:hover .svc-case-link-icon,
+    .svc-case-link:focus-visible .svc-case-link-icon {
+      transform: none;
+    }
+  }
 </style>

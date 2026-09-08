@@ -1,0 +1,520 @@
+---
+/**
+ * 專案類型評估 Modal（《致遠官網-v1-專案類型評估Modal-增量開發規格》§5、§6、§9–§13）。
+ * - 原生 <dialog>＋<form>：一題一頁、上方標籤／進度文字／細進度條／關閉鈕、下方「上一題／下一題／查看結果」。
+ * - 題目全部於 build 期渲染成 <fieldset>＋<legend>（第 2 題三個分支變體各一個 fieldset），由腳本控制顯示哪一個；
+ *   六張結果卡也預先渲染（hidden），腳本依推薦結果顯示一至兩張並排序——文案與規則單一來源皆在 data/。
+ * - build 期驗證：每個可推薦的 slug 都必須存在於 PROJECT_TYPES，找不到即拋錯讓 build 失敗（§14.2）。
+ * - 行為（開關、分支題序、答案狀態、焦點、結果）在 scripts/project-assessment.ts；本元件只負責靜態結構與局部樣式。
+ * - 無 JavaScript：本 Modal 不會被開啟，入口 CTA 維持連往 /contact/。
+ * - 每頁最多掛一個（id 固定）；目前只由 ProjectTypeGroups 的 showClosingCta 掛載於 /services/。
+ */
+import { getProjectType, type ProjectType } from '../../data/services';
+import {
+  ASSESSMENT_COPY,
+  ASSESSMENT_MAX_STEPS,
+  ASSESSMENT_QUESTIONS,
+  PROJECT_ASSESSMENT_SLUGS,
+  RECOMMENDATION_REASONS,
+} from '../../data/projectAssessment';
+import ProjectRecommendationCard from './ProjectRecommendationCard.astro';
+
+const resultProjects: ProjectType[] = PROJECT_ASSESSMENT_SLUGS.map((slug) => {
+  const project = getProjectType(slug);
+  if (!project) {
+    throw new Error(`[ProjectAssessmentModal] 推薦方案「${slug}」不存在於 src/data/services.ts 的 PROJECT_TYPES`);
+  }
+  if (!RECOMMENDATION_REASONS[slug]) {
+    throw new Error(`[ProjectAssessmentModal] 推薦方案「${slug}」缺少推薦理由（projectAssessment.ts）`);
+  }
+  return project;
+});
+
+const { label, intro, buttons, contactHref, result, error } = ASSESSMENT_COPY;
+---
+
+<dialog
+  id="project-assessment"
+  class="pa-dialog"
+  aria-labelledby="pa-title"
+  aria-describedby="pa-desc"
+  data-project-assessment
+>
+  <header class="pa-header">
+    <div class="pa-header-row">
+      <p class="pa-header-label">{label}</p>
+      <p class="pa-progress-text" data-pa-progress-text>{ASSESSMENT_COPY.progress(1, ASSESSMENT_MAX_STEPS)}</p>
+      <button type="button" class="pa-close" aria-label={buttons.closeLabel} data-pa-close>
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="pa-progress" aria-hidden="true">
+      <span class="pa-progress-bar" data-pa-progress-bar style={`width: ${Math.round(100 / ASSESSMENT_MAX_STEPS)}%`}></span>
+    </div>
+  </header>
+
+  <form class="pa-form" data-pa-form novalidate>
+    <div class="pa-body" data-pa-body>
+      <p class="sr-only" role="status" aria-live="polite" data-pa-status></p>
+
+      {/* ---- 題目畫面 ---- */}
+      <div data-pa-view="questions">
+        <div class="pa-intro" data-pa-intro>
+          <h2 id="pa-title" class="heading-sub pa-focus-target" tabindex="-1">{intro.title}</h2>
+          <p id="pa-desc" class="pa-desc">{intro.description}</p>
+        </div>
+        {
+          ASSESSMENT_QUESTIONS.map((question) => (
+            <fieldset class="pa-question" data-pa-question={question.id} data-pa-step={question.step} hidden>
+              <legend class="pa-legend pa-focus-target" tabindex="-1">{question.title}</legend>
+              <div class="pa-options">
+                {question.options.map((option) => (
+                  <label class="pa-option">
+                    <input type="radio" name={`pa-${question.id}`} value={option.value} />
+                    <span class="pa-option-text">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))
+        }
+      </div>
+
+      {/* ---- 結果畫面（六張卡預先渲染，腳本顯示一至兩張並排序）---- */}
+      <div data-pa-view="result" hidden>
+        <p class="pa-header-label">{result.label}</p>
+        <h2 id="pa-result-title" class="heading-sub pa-result-title pa-focus-target" tabindex="-1">{result.title}</h2>
+        <p class="pa-desc">{result.description}</p>
+        <div class="pa-cards" data-pa-cards>
+          {resultProjects.map((project) => (
+            <ProjectRecommendationCard project={project} reason={RECOMMENDATION_REASONS[project.slug as (typeof PROJECT_ASSESSMENT_SLUGS)[number]]} />
+          ))}
+        </div>
+        <p class="pa-note" data-pa-note="advisory" hidden>
+          <span class="pa-badge pa-note-badge" data-pa-note-badge hidden>{result.tentativeLabel}</span>
+          <span>{result.advisoryNote}</span>
+        </p>
+        <p class="pa-note" data-pa-note="scope" hidden>{result.scopeNote}</p>
+      </div>
+
+      {/* ---- 錯誤防護（§15）---- */}
+      <div data-pa-view="error" hidden>
+        <p class="pa-header-label">{label}</p>
+        <p class="pa-error pa-focus-target" tabindex="-1" data-pa-error>{error}</p>
+      </div>
+    </div>
+
+    <div class="pa-footer">
+      <div class="pa-footer-start">
+        <button type="button" class="btn-secondary pa-btn" data-pa-prev hidden>{buttons.prev}</button>
+      </div>
+      <div class="pa-footer-end">
+        <button type="submit" class="btn-primary pa-btn pa-next" data-pa-next disabled>{buttons.next}</button>
+        <button type="button" class="btn-secondary pa-btn" data-pa-restart hidden>{buttons.restart}</button>
+        <a href={contactHref} class="btn-primary pa-btn" data-pa-contact hidden>
+          {buttons.contact}
+          <span class="cta-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<style is:global>
+  /* Modal 開啟時鎖住背景捲動（由腳本切換） */
+  html.pa-lock {
+    overflow: hidden;
+  }
+</style>
+
+<style>
+  /* ---- 面板：桌機／平板置中白色面板（≤760px、≤90dvh），手機近全螢幕（100dvh、無圓角）---- */
+  .pa-dialog {
+    width: min(760px, calc(100vw - 2rem));
+    max-width: 760px;
+    max-height: 90dvh;
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: 0 12px 40px rgb(14 17 22 / 0.14);
+    overflow: hidden;
+  }
+
+  .pa-dialog[open] {
+    display: flex;
+    flex-direction: column;
+    animation: pa-dialog-in 200ms ease both;
+  }
+
+  .pa-dialog::backdrop {
+    background-color: rgb(14 17 22 / 0.62);
+  }
+
+  .pa-dialog[open]::backdrop {
+    animation: pa-fade-in 200ms ease both;
+  }
+
+  @keyframes pa-dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pa-fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* ---- 上方：標籤、進度文字、關閉鈕、細進度條 ---- */
+  .pa-header {
+    flex: none;
+    padding: 1.25rem 1.5rem 0;
+  }
+
+  .pa-header-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .pa-header-label {
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  .pa-progress-text {
+    margin-left: auto;
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .pa-close {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-right: -0.625rem;
+    border: 0;
+    border-radius: 9999px;
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background-color 160ms ease,
+      color 160ms ease;
+  }
+
+  .pa-close:hover {
+    background-color: var(--neutral-100);
+    color: var(--color-text);
+  }
+
+  .pa-close:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+  }
+
+  .pa-progress {
+    height: 4px;
+    margin-top: 1rem;
+    border-radius: 9999px;
+    background-color: var(--neutral-200);
+    overflow: hidden;
+  }
+
+  .pa-progress-bar {
+    display: block;
+    height: 100%;
+    border-radius: 9999px;
+    background-color: var(--color-brand);
+    transition: width 200ms ease;
+  }
+
+  /* ---- 中央內容獨立捲動；下方操作列固定可見 ---- */
+  .pa-form {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .pa-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1.5rem 1.5rem 2rem;
+  }
+
+  .pa-footer {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+  }
+
+  .pa-footer-end {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-left: auto;
+  }
+
+  .pa-btn {
+    border-radius: 9999px;
+    padding-inline: 1.5rem;
+    white-space: nowrap; /* 中文按鈕文字不可被壓成直排 */
+  }
+
+  /* disabled 用原生屬性（不以 pointer-events:none 取代），並有明確視覺差異 */
+  .pa-next:disabled,
+  .pa-next:disabled:hover,
+  .pa-next:disabled:active {
+    background-color: var(--neutral-200);
+    color: var(--neutral-500);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ---- 第一個畫面：標題＋說明（第 2 題起隱藏，讓題目有更多空間）---- */
+  .pa-intro .heading-sub {
+    margin-top: 0.25rem;
+  }
+
+  .pa-desc {
+    margin-top: 0.75rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .pa-focus-target:focus {
+    outline: none;
+  }
+
+  .pa-focus-target:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  /* ---- 題目：fieldset＋legend，選項為完整可點擊 label＋原生 radio ---- */
+  .pa-question {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .pa-intro:not([hidden]) ~ .pa-question {
+    margin-top: 1.75rem;
+  }
+
+  .pa-legend {
+    padding: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.45;
+    color: var(--color-text);
+  }
+
+  .pa-options {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+
+  .pa-option {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    min-height: 52px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background-color: var(--color-surface);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .pa-option:hover {
+    background-color: var(--reach-blue-50);
+    border-color: var(--color-brand);
+  }
+
+  /* selected：Blue 50 背景＋品牌藍 2px 邊框（外 1px border＋內 1px box-shadow，避免版面跳動）＋實心 radio */
+  .pa-option:has(input:checked) {
+    background-color: var(--reach-blue-50);
+    border-color: var(--color-brand);
+    box-shadow: inset 0 0 0 1px var(--color-brand);
+  }
+
+  .pa-option:has(input:focus-visible) {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+  }
+
+  .pa-option input {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    accent-color: var(--color-brand);
+    cursor: pointer;
+  }
+
+  .pa-option-text {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--color-text);
+  }
+
+  /* 題目切換：160–200ms 淡入，不做水平位移 */
+  .pa-enter {
+    animation: pa-fade-in 180ms ease both;
+  }
+
+  /* ---- 結果 ---- */
+  .pa-result-title {
+    margin-top: 0.25rem;
+  }
+
+  .pa-cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    /* 兩欄；只有一張卡時佔一欄，寬度即為兩欄總寬的一半，靠左對齊格線 */
+    .pa-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .pa-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 0.75rem;
+    margin-top: 1.25rem;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--reach-blue-100);
+    border-radius: 12px;
+    background-color: var(--reach-blue-50);
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  .pa-badge {
+    display: inline-block;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    background-color: var(--reach-blue-100);
+    color: var(--reach-blue-700);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    line-height: 1.6;
+  }
+
+  .pa-error {
+    margin-top: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background-color: var(--neutral-50);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  /* ---- 手機：近全螢幕，Header 與操作列固定，中央獨立捲動 ---- */
+  @media (max-width: 767px) {
+    .pa-dialog {
+      width: 100vw;
+      max-width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+      inset: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .pa-header {
+      padding: 1rem 1.25rem 0;
+    }
+
+    .pa-body {
+      padding: 1.25rem 1.25rem 1.5rem;
+    }
+
+    /* 結果頁三顆按鈕塞不進一列時換行：上一題留第一列左側，重新評估＋與我們討論需求整組換到下一列並撐滿 */
+    .pa-footer {
+      flex-wrap: wrap;
+      padding-inline: 1.25rem;
+    }
+
+    .pa-footer-end {
+      flex: 1 1 auto;
+    }
+
+    .pa-footer-end .pa-btn {
+      flex: 1 1 auto;
+    }
+
+    .pa-btn {
+      padding-inline: 1.25rem;
+    }
+
+    .pa-legend {
+      font-size: 1.125rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pa-dialog[open],
+    .pa-dialog[open]::backdrop,
+    .pa-enter {
+      animation: none;
+    }
+
+    .pa-progress-bar,
+    .pa-option,
+    .pa-close {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/project-assessment';
+</script>

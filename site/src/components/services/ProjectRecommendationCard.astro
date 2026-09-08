@@ -1,0 +1,133 @@
+---
+/**
+ * 專案評估結果卡（評估 Modal 規格 §10）：外觀延續 ProjectTypeCard（白底、細灰框、圓角、右下角淡藍標誌、
+ * hover／focus 轉 Blue 50＋品牌藍、箭頭右移 3px），但內容改為「標題 → 副標 → 為什麼推薦 → 推薦理由 → 查看專案說明」。
+ * 獨立成元件，避免推薦理由擠進原本六張總覽卡造成回歸。
+ * - title／subtitle／路由一律取自 services.ts 的 ProjectType；推薦理由來自 projectAssessment.ts（結果卡專用文案）。
+ * - Modal 於 build 期預先渲染六張（hidden），由腳本依結果顯示與排序；data-pa-card=slug 供腳本查找。
+ * - 「可進一步評估」標籤（data-pa-badge）預設 hidden，顧問陪跑只達「可能適合」條件時由腳本顯示。
+ * - 整張卡為單一 <a>，內部 CTA 為 <span>；標題層級固定 H3（結果頁 H2「適合你的專案方向」之下）。
+ */
+import type { ProjectType } from '../../data/services';
+import { getProjectTypePath } from '../../data/services';
+import { ASSESSMENT_COPY } from '../../data/projectAssessment';
+import ProjectGlyph from './ProjectGlyph.astro';
+
+interface Props {
+  project: ProjectType;
+  reason: string;
+}
+
+const { project, reason } = Astro.props;
+const { slug, title, subtitle } = project;
+const href = getProjectTypePath(slug);
+---
+
+<a
+  href={href}
+  class="pa-card card relative isolate flex h-full flex-col overflow-hidden p-6 no-underline md:p-7"
+  data-pa-card={slug}
+  hidden
+>
+  <ProjectGlyph slug={slug} class="pa-card-glyph" />
+  <p class="pa-card-badge-row" data-pa-badge hidden>
+    <span class="pa-badge">{ASSESSMENT_COPY.result.tentativeLabel}</span>
+  </p>
+  <h3 class="pa-card-title text-[1.375rem] font-bold text-ink md:text-2xl">{title}</h3>
+  <p class="mt-3 text-[17px] font-semibold leading-relaxed text-ink md:text-lg">{subtitle}</p>
+  <p class="mt-5 text-sm font-bold text-brand">{ASSESSMENT_COPY.result.reasonHeading}</p>
+  <p class="mt-2 text-[15px] leading-relaxed text-ink-secondary">{reason}</p>
+  <p class="mt-auto pt-7">
+    <span class="pa-card-cta inline-flex items-center gap-1.5 font-semibold text-ink-secondary">
+      {ASSESSMENT_COPY.result.cardCta}
+      <span class="cta-arrow" aria-hidden="true">→</span>
+    </span>
+  </p>
+</a>
+
+<style>
+  /* 右下角裝飾標誌：與 ProjectTypeCard 相同（約六成卡寬、往右下推出、只露左上、透明度 30%） */
+  .pa-card-glyph {
+    position: absolute;
+    z-index: -1;
+    right: -22%;
+    bottom: -26%;
+    width: 64%;
+    height: auto;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .pa-card {
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      transform 120ms ease;
+  }
+
+  .pa-card:hover,
+  .pa-card:focus-visible {
+    background-color: var(--reach-blue-50);
+    border-color: var(--color-brand);
+  }
+
+  .pa-card:active {
+    transform: translateY(1px);
+  }
+
+  .pa-card:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 3px;
+  }
+
+  .pa-card-title,
+  .pa-card-cta {
+    transition: color 200ms ease;
+  }
+
+  .pa-card:hover .pa-card-title,
+  .pa-card:focus-visible .pa-card-title,
+  .pa-card:hover .pa-card-cta,
+  .pa-card:focus-visible .pa-card-cta {
+    color: var(--color-brand);
+  }
+
+  .pa-card-cta .cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  .pa-card:hover .cta-arrow,
+  .pa-card:focus-visible .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  .pa-card-badge-row {
+    margin-bottom: 0.75rem;
+  }
+
+  .pa-badge {
+    display: inline-block;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    background-color: var(--reach-blue-100);
+    color: var(--reach-blue-700);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    line-height: 1.6;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pa-card,
+    .pa-card-title,
+    .pa-card-cta,
+    .pa-card-cta .cta-arrow {
+      transition: none;
+    }
+
+    .pa-card:active,
+    .pa-card:hover .cta-arrow,
+    .pa-card:focus-visible .cta-arrow {
+      transform: none;
+    }
+  }
+</style>

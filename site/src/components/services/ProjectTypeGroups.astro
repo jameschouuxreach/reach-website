@@ -4,7 +4,9 @@
  * - 文案一律取自 src/data/services.ts，不接受頁面自行傳入另一份。
  * - 根節點固定 id="project-types"（專案頁「常見專案類型」返回入口），同一頁只能出現一次。
  * - 標題階層：H2（區塊）→ H3（群組名稱）→ H4（專案卡）；showIntro=false 時 H2 仍以 sr-only 保留，避免跳級。
- * - showClosingCta：區塊末尾加「還不確定自己屬於哪一種專案？」收尾（§7.4）。
+ * - showClosingCta：區塊末尾加「還不確定自己屬於哪一種專案？」收尾（§7.4）。2026-09-07 起收尾改為「專案類型評估」入口
+ *   （評估 Modal 規格 §4）：容器、H2 與版面不變，只換副標與 CTA；副標／CTA 文案取自 data/projectAssessment.ts，
+ *   CTA 保留 /contact/ 連結作無 JS fallback，有 JS 時由 scripts/project-assessment.ts 攔截並開啟 ProjectAssessmentModal。
  * - 群組標題下為一行副標（2026-08-31 業主指示，取代規格原本的多段群組說明）。
  */
 import {
@@ -14,6 +16,8 @@ import {
   getProjectTypesByFamily,
 } from '../../data/services';
 import ProjectTypeCard from './ProjectTypeCard.astro';
+import ProjectAssessmentModal from './ProjectAssessmentModal.astro';
+import { ASSESSMENT_COPY } from '../../data/projectAssessment';
 
 interface Props {
   showIntro?: boolean;
@@ -77,17 +81,18 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => ({
         >
           <h2 class="heading-sub">還不確定自己屬於哪一種專案？</h2>
           <p class="mx-auto mt-4 max-w-2xl leading-relaxed text-ink-secondary">
-            告訴我們目前遇到的問題、希望達成的目標與預計時程。我們會協助判斷適合的專案類型，並組合真正需要的服務項目。
+            {ASSESSMENT_COPY.entry.subtitle}
           </p>
           <p class="mt-8">
-            <a href="/contact/" class="btn-primary svc-closing-cta rounded-full px-7">
-              與我們討論需求
+            <a href={ASSESSMENT_COPY.contactHref} class="btn-primary svc-closing-cta rounded-full px-7" data-pa-open>
+              {ASSESSMENT_COPY.entry.cta}
               <span class="cta-arrow" aria-hidden="true">→</span>
             </a>
           </p>
         </div>
       )
     }
+    {showClosingCta && <ProjectAssessmentModal />}
   </div>
 </section>
 

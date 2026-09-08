@@ -1,8 +1,10 @@
 ---
 /**
- * 專案類型摘要卡（探索型／優化型各三張）：整張卡為單一 <a>，內部 CTA 為 <span>。
- * 內容順序：專案類型標題 → 副標 → 小標「適合以下情況」→ fit 三點列表 → 查看說明。
- * headingLevel 依頁面結構傳入（ProjectTypeGroups 內的群組標題為 H3，卡片標題用 H4，避免跳級）。
+ * 專案類型摘要卡（探索型／優化型各三張）：整張卡為單一 <a>，卡內不另放文字 CTA
+ *（2026-09-08 業主指示移除原本卡底的「查看說明 →」，讓卡片高度隨內容縮短；可點擊由 hover／focus 的
+ * Blue 50 底、品牌藍框與標題轉藍表達）。
+ * 內容順序：專案類型標題 → 副標 → 小標「適合以下情況」→ fit 三點列表。
+ * headingLevel 由父層依標題階層傳入（ProjectTypeGroups：h1 模式用 h3、h2 模式用 h4；ServiceItemProjectTabs 用 h3），避免跳級。
  * 右下角以該專案類型標誌作裝飾（2026-08-31 業主指示）：標誌不完整呈現，被卡片右下邊裁切、只露出左上部分；
  * 純裝飾且置於內容之下（isolate＋z-index:-1），不影響文字可讀性與點擊。
  */
@@ -28,12 +30,6 @@ const href = getProjectTypePath(slug);
   <ul class="mt-2 list-disc space-y-1 pl-3.5 text-[15px] leading-relaxed text-ink-secondary marker:text-brand">
     {fit.map((line) => <li>{line}</li>)}
   </ul>
-  <p class="mt-auto pt-7">
-    <span class="svc-card-cta inline-flex items-center gap-1.5 font-semibold text-ink-secondary">
-      查看說明
-      <span class="cta-arrow" aria-hidden="true">→</span>
-    </span>
-  </p>
 </a>
 
 <style>
@@ -71,38 +67,22 @@ const href = getProjectTypePath(slug);
     outline-offset: 3px;
   }
 
-  .svc-card-title,
-  .svc-card-cta {
+  .svc-card-title {
     transition: color 200ms ease;
   }
 
   .svc-link-card:hover .svc-card-title,
-  .svc-link-card:focus-visible .svc-card-title,
-  .svc-link-card:hover .svc-card-cta,
-  .svc-link-card:focus-visible .svc-card-cta {
+  .svc-link-card:focus-visible .svc-card-title {
     color: var(--color-brand);
-  }
-
-  .svc-card-cta .cta-arrow {
-    transition: transform 200ms ease;
-  }
-
-  .svc-link-card:hover .cta-arrow,
-  .svc-link-card:focus-visible .cta-arrow {
-    transform: translateX(3px);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .svc-link-card,
-    .svc-card-title,
-    .svc-card-cta,
-    .svc-card-cta .cta-arrow {
+    .svc-card-title {
       transition: none;
     }
 
-    .svc-link-card:active,
-    .svc-link-card:hover .cta-arrow,
-    .svc-link-card:focus-visible .cta-arrow {
+    .svc-link-card:active {
       transform: none;
     }
   }

@@ -1,5 +1,7 @@
 ## Development
 
+本專案位於 repo 的 `site/` 子資料夾（repo 根目錄另有只存本機、不進 git 的 `doc/`），以下 npm、astro、deploy 指令一律在 `site/` 內執行。
+
 When starting the dev server, use background mode:
 
 ```

@@ -29,7 +29,8 @@ const pageUrl = new URL(pagePath, SITE_URL).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    {/* TODO: 正式網域確認後（src/config.ts），canonical 自動啟用 */}
+    {/* 正式上線前全站 noindex：由 src/config.ts 的 SITE_URL_CONFIRMED 控制，改為 true 後自動解除並啟用 canonical */}
+    {!SITE_URL_CONFIRMED && <meta name="robots" content="noindex, nofollow" />}
     {SITE_URL_CONFIRMED && <link rel="canonical" href={pageUrl} />}
     <meta property="og:title" content={shareTitle} />
     <meta property="og:description" content={shareDescription} />

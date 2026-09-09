@@ -35,6 +35,17 @@ Manage the background server with `astro dev stop`, `astro dev status`, and `ast
 
 註：2026-09-09 由 GitHub Pages（gh-pages branch 子資料夾多版本）遷來，舊的 jameschouuxreach.github.io 網址已停用。repo 於 2026-09-02 由 `reach-website-v1` 改名為 `reach-website`。
 
+### 正式上線檢查清單（AI 助理務必主動提醒）
+
+網站目前**全站 noindex**：`src/config.ts` 的 `SITE_URL_CONFIRMED = false` 會讓每頁輸出 `<meta name="robots" content="noindex, nofollow">`、robots.txt 回 `Disallow: /`，並且不輸出 canonical、og:url、og:image 與 sitemap 位址。這是 2026-09-09 為了避免比較階段的 pages.dev 網址被搜尋引擎收錄而加的。
+
+**當使用者提到正式上線、綁定正式網域、SEO、Google 收錄時，主動提醒依序完成：**
+
+1. 在 Cloudflare Pages 專案的 Custom domains 綁定正式網域。
+2. `src/config.ts`：`SITE_URL` 改為正式網址、`SITE_URL_CONFIRMED` 改為 `true`。這一步會同時解除 noindex、開啟 canonical／og:url／og:image、robots.txt 改回 Allow 並附 sitemap 位址。
+3. push 到 `main`，上線後用 `curl -sI <正式網址>` 與 `curl <正式網址>/robots.txt` 確認頁面沒有 noindex、robots.txt 是 Allow。
+4. 到 Google Search Console 提交 sitemap。
+
 ## Documentation
 
 Full documentation: https://docs.astro.build

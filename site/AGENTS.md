@@ -12,20 +12,28 @@ Manage the background server with `astro dev stop`, `astro dev status`, and `ast
 
 注意：專案在外接硬碟上，Vite 檔案監聽不可靠——**切換 branch 後一律重啟 dev server**；遇到「檔案存在卻 404」「改了樣式沒生效」也先重啟再查。
 
-## Deploy（GitHub Pages）
+## Deploy（Cloudflare Pages）
 
-網站以「gh-pages branch 放靜態成品」的方式部署，多個版本並存供比較。**網站根是版本入口頁**（正本在 `scripts/entry/index.html`，含根目錄 404.html，只在部署 main 時同步），各版本一律部署在子資料夾。部署方式：checkout 要部署的 branch，跑 `./scripts/deploy.sh`——部署位置由 branch 自動決定，腳本開頭會印出目標網址：
+網站由 Cloudflare Pages 連動 GitHub repo 自動部署（Pages 專案 `reach-website-6cb`；Root directory = `site`、build `npm run build`、output `dist`）。**push 即部署**，repo 裡沒有也不需要部署腳本；沒有 commit 並 push 的變更不會上線。push 後約一到兩分鐘生效，build 狀態看 Cloudflare 專案的 Deployments 頁或 GitHub commit 旁的勾叉。
 
-- 版本入口頁 → https://jameschouuxreach.github.io/reach-website/
-- `main` → https://jameschouuxreach.github.io/reach-website/v1/
-- `reach-web-v2` → https://jameschouuxreach.github.io/reach-website/v2/
-- `reach-web-v2-1` → https://jameschouuxreach.github.io/reach-website/v2-1/ （v2 首頁改版快照：Logo 移至 Hero 下、使命區具體舉例卡、服務對象文案）
-- `reach-web-v2-2` → https://jameschouuxreach.github.io/reach-website/v2-2/ （2026-08-28 快照：案例卡 C 版改小標＋五 tag、使命區 v5 無捲動鎖定只留 tabs、服務區新增四個服務範疇 pill）
-- `service-v1` → https://jameschouuxreach.github.io/reach-website/v2-3/ （2026-09-02 快照：服務內容三層資訊架構——/services/ 總覽＋四類別頁＋六專案頁，含專案標誌、專案目標、專案流程、執行項目 tab 與相關案例）
+- production branch 是 `main` → https://reach-website-6cb.pages.dev
+- 其他任何 branch 第一次 push 後自動得到 `https://<branch>.reach-website-6cb.pages.dev`，之後每次 push 更新。branch 名稱用小寫英數與連字號、保持簡短。
+- 預覽網址由 Cloudflare 自動加 noindex，不會被搜尋引擎收錄。
 
-腳本會自動 build、用 `scripts/prefix-base.mjs` 補上 Pages 子路徑前綴、把成品同步進 gh-pages 對應位置後 push。原始碼一律維持根路徑寫法（`/images/...`），不要把前綴寫進原始碼。要再多掛一個版本時，在 `scripts/deploy.sh` 的 branch 對應表加一行、並在 `scripts/entry/index.html` 的版本清單加一張卡（在 main 上改、部署 main 生效）。
+版本模型：`main` 是正式／基準版；開發中的版本用功能 branch；要凍結給人比較的快照另開 branch，push 一次後不再推（別名網址永遠指向該 branch 最新一次部署）。目前線上版本：
 
-註：repo 於 2026-09-02 由 `reach-website-v1` 改名為 `reach-website`——GitHub Pages 舊網址不轉址，改名前分享出去的連結已失效。
+| branch | 網址 | 說明 |
+|---|---|---|
+| `main` | https://reach-website-6cb.pages.dev | v1 基準版（2026-08-25 併入 main） |
+| `reach-web-v2` | https://reach-web-v2.reach-website-6cb.pages.dev | v2 開發線 |
+| `reach-web-v2-1` | https://reach-web-v2-1.reach-website-6cb.pages.dev | 2026-08-27 快照：Logo 移至 Hero 下、使命區具體舉例卡、服務對象文案 |
+| `reach-web-v2-2` | https://reach-web-v2-2.reach-website-6cb.pages.dev | 2026-08-28 快照：案例卡 C 版改小標＋五 tag、使命區 v5 無捲動鎖定只留 tabs、服務區新增四個服務範疇 pill |
+| `service-v1` | https://service-v1.reach-website-6cb.pages.dev | 2026-09-02 快照：服務內容三層資訊架構（原 GitHub Pages 的 /v2-3/） |
+| `service-v2` | https://service-v2.reach-website-6cb.pages.dev | 服務頁後續調整開發線 |
+
+原始碼一律維持根路徑寫法（`/images/...`）。正式網域確認後，在 Cloudflare 專案的 Custom domains 綁定，並更新 `src/config.ts` 的 `SITE_URL`。
+
+註：2026-09-09 由 GitHub Pages（gh-pages branch 子資料夾多版本）遷來，舊的 jameschouuxreach.github.io 網址已停用。repo 於 2026-09-02 由 `reach-website-v1` 改名為 `reach-website`。
 
 ## Documentation
 

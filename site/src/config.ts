@@ -1,6 +1,8 @@
 // 全站集中設定：所有需要網域的地方（canonical、og:url、sitemap）一律引用這裡，不得散落硬編碼。
 
 // TODO: 正式網域確認後改為真實網址，並將 SITE_URL_CONFIRMED 改為 true。
+// SITE_URL_CONFIRMED = false 期間（2026-09-09 起）：每頁輸出 noindex,nofollow、robots.txt 回 Disallow: /，
+// 且不輸出 canonical／og:url／og:image／sitemap 位址。正式上線時改為 true 一次解除，步驟見 AGENTS.md「正式上線檢查清單」。
 export const SITE_URL = 'https://example.com';
 export const SITE_URL_CONFIRMED = false;
 

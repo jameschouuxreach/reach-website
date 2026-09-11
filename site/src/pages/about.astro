@@ -1,26 +1,28 @@
 ---
+/**
+ * 關於致遠：PageHero → 我們的使命（MissionScrollStory，2026-09-08 業主指示由首頁移入）→ 團隊／合作方式 → ContactCta。
+ * 使命三點內容取自 src/data/mission.ts。原「致／遠的品牌哲學」區塊已於 2026-09-09 業主指示移除。
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
+import MissionScrollStory from '../components/MissionScrollStory.astro';
 import ContactCta from '../components/ContactCta.astro';
+import { MISSION_ITEMS } from '../data/mission';
 ---
 
 <BaseLayout
   title="關於致遠"
-  description="認識致遠體驗設計：我們的品牌哲學「從複雜，致清晰」、團隊組成與合作方式。"
+  description="認識致遠體驗設計：我們的使命、團隊組成與合作方式。"
 >
   <PageHero
     title="關於致遠"
     intro="致遠體驗設計陪伴政府與企業，從複雜的情境中找出清晰可行的方向。"
   />
 
-  <section class="container-site py-16 md:py-24" data-reveal>
-    <h2 class="heading-sub">致／遠的品牌哲學</h2>
-    <p class="mt-4 max-w-2xl text-ink-secondary">
-      「<span class="font-bold text-brand">致</span>」是抵達清晰的過程，「<span class="font-bold text-brand">遠</span>」是走得更深、更廣、更遠的承諾。品牌故事完整內容整理中。
-    </p>
-  </section>
+  {/* ---- 我們的使命（捲動敘事版；桌機三點 tabs＋九宮格動畫，行動版／reduced-motion 為靜態三段）---- */}
+  <MissionScrollStory items={MISSION_ITEMS} />
 
-  <section class="container-site pb-16 md:pb-24" data-reveal>
+  <section class="container-site py-16 md:py-24" data-reveal>
     <div class="grid gap-5 md:grid-cols-2">
       <div class="card p-6">
         <h2 class="text-lg font-bold">團隊</h2>

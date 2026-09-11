@@ -1,0 +1,16 @@
+{
+  // exFAT 外接碟會產生 macOS AppleDouble 附屬檔（._xxx）與 .DS_Store：
+  // 從檔案總管、搜尋與檔案監聽一律排除（git 端已由 .gitignore 排除）
+  "files.exclude": {
+    "**/._*": true,
+    "**/.DS_Store": true
+  },
+  "search.exclude": {
+    "**/._*": true,
+    "**/.DS_Store": true
+  },
+  "files.watcherExclude": {
+    "**/._*": true,
+    "**/.DS_Store": true
+  }
+}

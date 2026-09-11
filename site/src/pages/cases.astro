@@ -3,7 +3,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import ContactCta from '../components/ContactCta.astro';
 import CaseCard from '../components/CaseCard.astro';
-import { CASES } from '../data/cases';
+import CaseCardCaptioned from '../components/CaseCardCaptioned.astro';
+import { CASES, NEXDO_D_CASE } from '../data/cases';
+
+// 好齡居 D 版入口只出現在本頁：插在 C 版之後、合作金庫之前；首頁共用的 CASES 不變
+const cIndex = CASES.findIndex((item) => item.href === '/work/nexdo-c/');
+const casesBeforeD = CASES.slice(0, cIndex + 1);
+const casesAfterD = CASES.slice(cIndex + 1);
 ---
 
 <BaseLayout
@@ -28,7 +34,9 @@ import { CASES } from '../data/cases';
     </div>
 
     <div class="grid gap-x-8 gap-y-14 sm:grid-cols-2" data-reveal>
-      {CASES.map((item) => <CaseCard {...item} />)}
+      {casesBeforeD.map((item) => <CaseCard {...item} />)}
+      <CaseCardCaptioned {...NEXDO_D_CASE} />
+      {casesAfterD.map((item) => <CaseCard {...item} />)}
     </div>
   </section>
 

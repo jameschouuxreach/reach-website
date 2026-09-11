@@ -1,0 +1,83 @@
+---
+/**
+ * 附圖說的案例卡：版式與 CaseCard 相同（圖片 → 品牌色小標 → 標題 → 摘要 → 類型 pills），
+ * 多一段緊貼圖片的可見圖說（figure／figcaption）。
+ * 2026-09-11 為好齡居 D 版列表入口新增；共用 CaseCard 不為此改動所有案例。
+ */
+interface Props {
+  name: string;
+  kicker: string;
+  summary: string;
+  types: string[];
+  image: { src: string; alt: string; width: number; height: number };
+  caption: string;
+  href: string;
+}
+
+const { name, kicker, summary, types, image, caption, href } = Astro.props;
+---
+
+<a href={href} class="case-card ccc group block no-underline">
+  <figure>
+    <div class="overflow-hidden rounded-xl border border-line">
+      <img
+        src={image.src}
+        alt={image.alt}
+        width={image.width}
+        height={image.height}
+        loading="lazy"
+        decoding="async"
+        class="ccc-img aspect-[16/10] w-full object-cover object-top"
+      />
+    </div>
+    <figcaption class="mt-2 text-sm leading-relaxed text-ink-secondary">{caption}</figcaption>
+  </figure>
+  <p class="mt-5 text-sm font-bold tracking-wide text-brand">{kicker}</p>
+  <h3 class="ccc-title mt-2 text-xl font-bold text-ink md:text-2xl">{name}</h3>
+  <p class="mt-3 leading-relaxed text-ink-secondary">{summary}</p>
+  <p class="mt-4 flex flex-wrap gap-2">
+    {
+      types.map((type) => (
+        <span class="rounded-full border border-line bg-surface px-3.5 py-1 text-sm text-ink-secondary">{type}</span>
+      ))
+    }
+  </p>
+</a>
+
+<style>
+  .ccc-img {
+    transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .ccc:hover .ccc-img,
+  .ccc:focus-visible .ccc-img {
+    transform: scale(1.03);
+  }
+
+  .ccc:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 4px;
+    border-radius: 12px;
+  }
+
+  .ccc-title {
+    transition: color 200ms ease;
+  }
+
+  .ccc:hover .ccc-title,
+  .ccc:focus-visible .ccc-title {
+    color: var(--color-brand);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ccc-img,
+    .ccc-title {
+      transition: none;
+    }
+
+    .ccc:hover .ccc-img,
+    .ccc:focus-visible .ccc-img {
+      transform: none;
+    }
+  }
+</style>

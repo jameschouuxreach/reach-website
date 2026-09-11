@@ -1,0 +1,1758 @@
+---
+/**
+ * 好齡居專案實例｜版本 D（第四版，2026-09-11）。
+ * 文案、圖片位置、圖說與版面規則依《好齡居專案實例-版本D-第四版文案與開發規格.md》第 2～4 節；
+ * 素材來源註（結案簡報頁碼）只留在此註解與該文件，不上稿。
+ *
+ * 結構：開場（H1＋背景＋資訊列＋F01）→ 三項挑戰 → 五張跳轉卡（#approach）
+ *       → 閱讀區（桌面左側常駐目錄／窄螢幕頂部折疊目錄＋五段內容）→ 收尾 CTA。
+ * 五段 ID：research／brand／architecture／interface／content；卡片、目錄與段落共用同一組 hash，
+ * 卡片主張與段落 H2 由同一份 PARTS 常數輸出，保證逐字相同。
+ *
+ * 圖片來源（結案簡報 PDF，頁碼從封面算第 1 頁）：
+ *   F01 p.70 左側設計總覽（手機版為同源首屏裁切：Logo＋第一個畫面；OG 圖為 F01 上緣 1200×630 縮圖）
+ *   F02 p.13 右上受眾輪廓　F03 p.17 雙方需求對照　F04 p.28 五大特質　F05 p.50 服務定位圖
+ *   F06 p.37 分類重整　F07a／F07b p.64 左右畫面　F08 p.55 首頁四階段　F09 p.77　F10 p.80　F11 p.81
+ * 簡報中的新版網站為設計提案／原型畫面，一律標「改版設計示意」；圖中灰色佔位為原型證據，不補造內容。
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const IMG = '/images/work/nexdo/v4';
+
+/** 五項成果：卡片、目錄、段落標題共用（順序即閱讀順序） */
+const PARTS = [
+  { id: 'research', num: '01', name: '研究分析', claim: '結合質性與量化，清楚了解受眾全貌' },
+  { id: 'brand', num: '02', name: '品牌定位', claim: '定位品牌特質與服務價值，讓受眾認識好齡居的專業' },
+  { id: 'architecture', num: '03', name: '資訊架構設計', claim: '重整網站內容分類及名稱，讓使用者更容易找到服務' },
+  { id: 'interface', num: '04', name: '介面與原型設計', claim: '重新規劃首頁內容佈局，讓網站更加吸引人' },
+  { id: 'content', num: '05', name: '內容策略', claim: '定義品牌專屬的文案原則，讓品牌能輕鬆維持一致形象' },
+] as const;
+
+const [RESEARCH, BRAND, ARCHITECTURE, INTERFACE, CONTENT] = PARTS;
+
+const CHALLENGES = [
+  {
+    title: '不清楚誰會購買、為什麼購買，品牌難以對準溝通對象',
+    body: '有需要的是長輩，主動尋找服務的卻可能是子女；品牌需要同時理解付款者的考量與使用者的顧慮。',
+  },
+  {
+    title: '服務眾多且抽象，客戶難以判斷自己需要哪一項',
+    body: '當相近服務分散在不同類別，名稱又無法直接說明用途，使用者就得先研究整張清單，才能找到適合的協助。',
+  },
+  {
+    title: '服務重點不明確，難以和一般居家清潔形成區隔',
+    body: '好齡居涵蓋居住安全與健康等多項服務，卻還需要一個清楚的主打方向，讓人理解這些專業如何共同回應家庭需求。',
+  },
+];
+
+/** F02 手機重排 */
+const AUDIENCE_PROFILE = [
+  '25～54 歲',
+  '與家人同住、想買服務給長輩',
+  '重視長輩安全，對評估診斷及空間改善有興趣',
+  '有預算限制',
+];
+
+/** F03 手機重排（研究歸納，不用引號） */
+const FAMILY_NEEDS = [
+  { role: '子女', items: ['希望付出與照顧被看見', '希望長輩平安健康'] },
+  { role: '長輩', items: ['希望被當作有自主權的人', '不想成為家人的負擔'] },
+];
+
+/** F04 手機重排 */
+const BRAND_TRAITS = [
+  { layer: '執行層面', traits: [['專業', '專業有保障'], ['完善', '全面完善']] },
+  { layer: '溝通層面', traits: [['溫暖', '溫暖舒適'], ['彈性', '彈性不強迫'], ['共創', '平等共創']] },
+];
+
+/** F06 手機重排：改版前／後完整細項 */
+const CATEGORIES_BEFORE = [
+  { name: '居家照護', items: ['居家整聊', '安全評估', '衛浴裝修', '安心移居'] },
+  { name: '適老換屋', items: ['適老換屋', '舊屋診斷', '代租代管', '房屋仲介'] },
+  { name: '居家改造', items: ['軟裝設計', '室內清運', '收納規劃'] },
+  { name: '關懷陪伴', items: ['牙科衛教', '營養諮詢', '體適能'] },
+];
+const CATEGORIES_AFTER = [
+  { name: '居家安全', items: ['舊屋診斷', '安全評估', '衛浴裝修'] },
+  { name: '收納清潔', items: ['室內清運', '收納規劃', '居家整聊'] },
+  { name: '租房搬家', items: ['適老換屋', '安心移居', '代租代管', '房屋仲介'] },
+  { name: '樂齡健康', items: ['牙科衛教', '營養諮詢', '體適能'] },
+  { name: '獨立服務 軟裝設計', items: ['軟裝設計'] },
+];
+
+/** 首頁四個溝通階段（F08 旁說明） */
+const STAGES = [
+  { num: '01', name: '建立印象', body: '用品牌主張說明服務對象與核心價值，讓訪客先知道好齡居能幫什麼。', blocks: '首屏主視覺' },
+  { num: '02', name: '了解服務', body: '從居家安全等生活需求帶出服務，再補充細項與其他選擇。', blocks: '服務價值主張、三項主題、熱門服務、延伸服務' },
+  { num: '03', name: '取得信任', body: '安排服務案例與贊助企業資訊，提供判斷品牌可信度的依據。', blocks: '服務案例、贊助企業' },
+  { num: '04', name: '引導行動', body: '先交代合作流程，再提供諮詢入口，讓訪客知道聯絡後會怎麼進行。', blocks: '服務流程、諮詢' },
+];
+
+/** F09 手機重排：品牌特質 → 指南 */
+const PRINCIPLE_MAP = [
+  { trait: '專業有保障／講效益', guides: ['談效益而非服務規格', '專業建議'] },
+  { trait: '溫暖舒適／講暖話', guides: ['日常關心'] },
+  { trait: '平等共創／講我們', guides: ['去失能化', '夥伴關係'] },
+  { trait: '全面完善／講貼心', guides: ['服務完善可自由選擇'] },
+  { trait: '彈性不強迫／講隨緣', guides: ['小投入大改善'] },
+];
+
+const DESCRIPTION =
+  '致遠透過受眾研究，協助好齡居確立品牌定位、重整服務分類與首頁設計，並建立可沿用的文案指南。';
+---
+
+<BaseLayout
+  title="好齡居品牌定位、服務分類與網站設計｜致遠專案實例"
+  description={DESCRIPTION}
+  isHome
+  ogTitle="好齡居｜受眾研究、品牌定位與網站改版"
+  ogDescription={DESCRIPTION}
+  ogImage={`${IMG}/nexdo-v4-og.jpg`}
+>
+  <article class="nd">
+    {/* ---- 開場：藍色小字＋H1＋背景＋資訊列＋F01 ---- */}
+    <section class="bg-page">
+      <div class="container-site pb-14 pt-16 md:pb-20 md:pt-24">
+        <p class="nd-eyebrow">好齡居 NEXDO｜銀髮生活服務</p>
+        <h1 class="nd-h1">好齡居｜以受眾研究重整品牌定位、服務分類與網站設計</h1>
+        <p class="nd-lead">
+          好齡居以提供全面的長照生活服務為目標，為銀髮族及其家庭整合居家安全、整理清潔、健康支持與搬遷等協助。這類服務往往需要子女與長輩共同做決定，既有的服務分類與說明，卻讓人難以判斷自己需要什麼、為何值得投入。致遠透過研究釐清受眾與需求，確立品牌定位，並將成果轉化為服務分類、網站改版設計與文案指南，讓品牌更清楚地說明能提供的協助。
+        </p>
+
+        <dl class="nd-meta">
+          <div class="nd-meta-item">
+            <dt>客戶</dt>
+            <dd>好齡居 NEXDO</dd>
+          </div>
+          <div class="nd-meta-item">
+            <dt>專案範圍</dt>
+            <dd>研究分析／品牌定位／資訊架構設計／介面與原型設計／內容策略</dd>
+          </div>
+          <div class="nd-meta-item">
+            <dt>研究規模</dt>
+            <dd>303 份問卷、5 位深度訪談</dd>
+          </div>
+        </dl>
+
+        <figure class="nd-fig nd-fig-hero">
+          <p class="nd-fig-tag">改版設計示意</p>
+          <div class="nd-fig-media">
+            <picture>
+              {/* 手機：同源首屏裁切，避免長圖推遲挑戰與五卡 */}
+              <source media="(max-width: 767px)" srcset={`${IMG}/f01-design-overview-mobile.webp`} width="923" height="1286" />
+              <img
+                src={`${IMG}/f01-design-overview.webp`}
+                alt="好齡居首頁改版設計示意，呈現生活需求入口、服務介紹與諮詢流程"
+                width="2400"
+                height="1827"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </picture>
+          </div>
+          <figcaption>我們把受眾研究轉成看得見的網站設計：先說明能解決的生活問題，再安排服務介紹與諮詢入口。</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    {/* ---- 本案遇到哪些挑戰？ ---- */}
+    <section class="border-t border-line bg-page">
+      <div class="container-site py-16 md:py-24">
+        <h2 class="nd-h2" data-reveal>本案遇到哪些挑戰？</h2>
+        <ol class="nd-challenges" data-reveal>
+          {
+            CHALLENGES.map((item, i) => (
+              <li class="nd-challenge">
+                <span class="nd-challenge-num" aria-hidden="true">{`0${i + 1}`}</span>
+                <h3 class="nd-challenge-title">{item.title}</h3>
+                <p class="nd-challenge-body">{item.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    {/* ---- 我們做了什麼？五張跳轉卡（無補充文案，CTA 一律「查看更多」） ---- */}
+    <section id="approach" class="border-t border-line bg-page">
+      <div class="container-site py-16 md:py-24">
+        <h2 class="nd-h2" data-reveal>我們做了什麼？</h2>
+        <p class="nd-p" data-reveal>
+          我們把研究結果轉成五項可執行的成果，協助好齡居決定對誰說、主打什麼，以及網站和文案該怎麼呈現。點選卡片，可直接查看對應的做法與設計實例。
+        </p>
+        <ol class="nd-cards" data-reveal>
+          {
+            PARTS.map((part) => (
+              <li>
+                <a href={`#${part.id}`} class="nd-card" data-nd-jump>
+                  <span class="nd-card-num">{`${part.num} ${part.name}`}</span>
+                  <span class="nd-card-claim">{part.claim}</span>
+                  <span class="nd-card-cta">
+                    查看更多
+                    <span aria-hidden="true">→</span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    {/* ---- 閱讀區：目錄（桌面左側常駐／窄螢幕頂部折疊）＋五段內容 ---- */}
+    <div class="nd-read border-t border-line bg-page" data-nd-read>
+      {/* 窄螢幕折疊目錄：原生 details，無 JS 時仍可展開與跳轉；收合文字由 JS 補上目前段落 */}
+      <details class="nd-toc-m" data-nd-toc-mobile>
+        <summary class="nd-toc-m-summary">
+          <span class="container-site nd-toc-m-summary-inner">
+            <span class="nd-toc-m-label">本頁目錄<span data-nd-toc-current hidden></span></span>
+            <svg class="nd-toc-m-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+        </summary>
+        <nav aria-label="本頁目錄" class="nd-toc-m-list">
+          <ol class="container-site" data-nd-toc>
+            {
+              PARTS.map((part) => (
+                <li>
+                  <a href={`#${part.id}`} class="nd-toc-link" data-nd-jump>{part.name}</a>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
+      </details>
+
+      <div class="container-site nd-read-grid">
+        {/* 桌面左側常駐目錄（≥1024px）；與窄螢幕目錄不會同時顯示 */}
+        <nav aria-label="本頁目錄" class="nd-toc-d">
+          <ol data-nd-toc>
+            {
+              PARTS.map((part) => (
+                <li>
+                  <a href={`#${part.id}`} class="nd-toc-link" data-nd-jump>{part.name}</a>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
+
+        <div class="nd-read-body">
+          {/* ---- 01 研究分析 ---- */}
+          <section id={RESEARCH.id} class="nd-part" data-nd-part data-nd-name={RESEARCH.name}>
+            <p class="nd-kicker">{`${RESEARCH.num} ${RESEARCH.name}`}</p>
+            <h2 class="nd-h2" tabindex="-1" data-nd-heading>{RESEARCH.claim}</h2>
+            <p class="nd-p">我們用問卷找出需求較明確的族群，再透過訪談理解他們為何猶豫。兩種研究相互補充，讓品牌定位與網站設計有共同依據。</p>
+
+            <div class="nd-split">
+              <div>
+                <h3 class="nd-h3">透過問卷數據分析，精準描繪受眾樣貌</h3>
+                <p class="nd-p">
+                  我們分析 303 份問卷，比較居住狀況、購買對象與服務需求，將主要溝通對象聚焦在與長輩同住、希望替長輩購買服務的成年子女。這群人重視安全，也有預算考量，因此後續設計優先回應居家風險與可負擔的改善需求。
+                </p>
+              </div>
+              <figure class="nd-fig nd-fig-swap">
+                <p class="nd-fig-tag">研究洞察整理</p>
+                <div class="nd-fig-media">
+                  <img
+                    src={`${IMG}/f02-audience-profile.webp`}
+                    alt="問卷研究收斂的受眾輪廓，包括與長輩同住、為長輩購買服務、重視安全與預算限制"
+                    width="2105"
+                    height="962"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div class="nd-fig-alt">
+                  <div class="nd-alt">
+                    <p class="nd-alt-title">本案研究收斂的受眾輪廓</p>
+                    <ul class="nd-alt-list">
+                      {AUDIENCE_PROFILE.map((item) => <li>{item}</li>)}
+                    </ul>
+                  </div>
+                  <a href={`${IMG}/f02-audience-profile.webp`} class="nd-fig-open" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：問卷分析收斂出的受眾輪廓">
+                    查看原圖
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+                <figcaption>問卷分析讓品牌知道應優先回應哪一群人的需求，並把安全與預算納入服務溝通重點。</figcaption>
+              </figure>
+            </div>
+
+            <h3 class="nd-h3">透過訪談，深入了解受眾需求及痛點</h3>
+            <p class="nd-p">
+              5 位深度訪談讓我們看見：子女擔心安全、希望照顧被理解，長輩則在意自己是否還能決定生活。服務能否被接受，還取決於如何討論改變，因此我們把尊重選擇與平等溝通納入品牌及文案方向。
+            </p>
+            <figure class="nd-fig nd-fig-swap">
+              <p class="nd-fig-tag">研究洞察整理</p>
+              <div class="nd-fig-media">
+                <img
+                  src={`${IMG}/f03-family-needs.webp`}
+                  alt="研究整理的子女與長輩需求對照：子女希望照顧被看見，長輩希望自主受到尊重"
+                  width="2400"
+                  height="939"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="nd-fig-alt">
+                <div class="nd-alt nd-alt-pair">
+                  {
+                    FAMILY_NEEDS.map((side) => (
+                      <div>
+                        <p class="nd-alt-title">
+                          <span class="nd-alt-role">{side.role}</span>研究歸納
+                        </p>
+                        <ul class="nd-alt-list">
+                          {side.items.map((item) => <li>{item}</li>)}
+                        </ul>
+                      </div>
+                    ))
+                  }
+                </div>
+                <a href={`${IMG}/f03-family-needs.webp`} class="nd-fig-open" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：子女與長輩的顧慮對照">
+                  查看原圖
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <figcaption>同一項居家改善，需要回應子女的安心與長輩的自主；這項發現影響了品牌語氣與服務說明。</figcaption>
+            </figure>
+          </section>
+
+          {/* ---- 02 品牌定位 ---- */}
+          <section id={BRAND.id} class="nd-part" data-nd-part data-nd-name={BRAND.name}>
+            <p class="nd-kicker">{`${BRAND.num} ${BRAND.name}`}</p>
+            <h2 class="nd-h2" tabindex="-1" data-nd-heading>{BRAND.claim}</h2>
+            <p class="nd-p">我們協助好齡居確立服務主打方向，並定義品牌與家庭互動的方式，讓後續網站與文案有清楚的判斷標準。</p>
+
+            <h3 class="nd-h3">定位品牌五大特質，建立專業又有溫度的品牌印象</h3>
+            <p class="nd-p">
+              依據受訪者對服務的期待，我們整理出專業、完善、溫暖、彈性與共創五項特質。前兩項回應服務品質與完整性的期待，後三項則要求品牌在溝通時保留選擇、聆聽雙方，避免讓長輩感到被安排。
+            </p>
+            <figure class="nd-fig nd-fig-swap">
+              <p class="nd-fig-tag">品牌定位準則</p>
+              <div class="nd-fig-media">
+                <img
+                  src={`${IMG}/f04-brand-traits.webp`}
+                  alt="好齡居五大品牌特質，分為執行層面的專業、完善，以及溝通層面的溫暖、彈性、共創"
+                  width="2400"
+                  height="838"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="nd-fig-alt">
+                <div class="nd-alt nd-alt-pair">
+                  {
+                    BRAND_TRAITS.map((layer) => (
+                      <div>
+                        <p class="nd-alt-title">{layer.layer}</p>
+                        <ul class="nd-alt-list">
+                          {layer.traits.map(([trait, note]) => (
+                            <li>
+                              <strong>{trait}</strong>—{note}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))
+                  }
+                </div>
+                <a href={`${IMG}/f04-brand-traits.webp`} class="nd-fig-open" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：五大品牌特質">
+                  查看原圖
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <figcaption>品牌定位同時定義服務要做到什麼，以及如何與家庭互動，讓專業與溝通方式都有依據。</figcaption>
+            </figure>
+
+            <h3 class="nd-h3">提煉服務的核心價值，對準受眾最在意的需求</h3>
+            <p class="nd-p">
+              研究顯示，居家安全是受眾重視的需求，因此我們建議以安全評估、舊屋診斷與空間改善作為主打方向。從這個起點介紹整理、清潔與其他服務，品牌便能說清楚各項協助如何共同支持安全生活，建立與一般清潔服務不同的專業定位。
+            </p>
+            <figure class="nd-fig nd-fig-swap">
+              <p class="nd-fig-tag">服務定位策略方向</p>
+              <div class="nd-fig-media">
+                <img
+                  src={`${IMG}/f05-service-focus.webp`}
+                  alt="以居住安全為起點，連結收納清潔、樂齡健康、租房搬家與軟裝設計的服務定位示意"
+                  width="2400"
+                  height="817"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="nd-fig-alt">
+                <div class="nd-alt">
+                  <p class="nd-alt-title">策略方向</p>
+                  <dl class="nd-alt-dl">
+                    <div>
+                      <dt>起點</dt>
+                      <dd>居住安全</dd>
+                    </div>
+                    <div>
+                      <dt>延伸服務</dt>
+                      <dd>收納清潔、樂齡健康、租房搬家、軟裝設計</dd>
+                    </div>
+                    <div>
+                      <dt>定位方向</dt>
+                      <dd>樂齡居住安全專家</dd>
+                    </div>
+                  </dl>
+                </div>
+                <a href={`${IMG}/f05-service-focus.webp`} class="nd-fig-open" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：以居家安全為起點的服務定位">
+                  查看原圖
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <figcaption>我們為多項服務找到共同的主打方向，讓品牌先以居家安全建立專業印象，再介紹延伸協助。</figcaption>
+            </figure>
+          </section>
+
+          {/* ---- 03 資訊架構設計 ---- */}
+          <section id={ARCHITECTURE.id} class="nd-part" data-nd-part data-nd-name={ARCHITECTURE.name}>
+            <p class="nd-kicker">{`${ARCHITECTURE.num} ${ARCHITECTURE.name}`}</p>
+            <h2 class="nd-h2" tabindex="-1" data-nd-heading>{ARCHITECTURE.claim}</h2>
+            <p class="nd-p">我們從「使用者會把哪些協助看成同一件事」重新整理分類，再調整類別名稱，減少搜尋服務時需要自行猜測的地方。</p>
+
+            <h3 class="nd-h3">從受眾的視角重新分類，讓服務更好找</h3>
+            <p class="nd-p">
+              原本分散的居家整聊、室內清運與收納規劃，被整合到同一個「收納清潔」入口。購買動機不同的軟裝設計則獨立呈現，讓整理空間與重新布置的需求更容易區分。
+            </p>
+
+            <h3 class="nd-h3">調整服務類別名稱，讓使用者一看就懂</h3>
+            <p class="nd-p">
+              我們將「適老換屋」「關懷陪伴」等較抽象的類別，重整為居家安全、收納清潔、租房搬家與樂齡健康四個主要入口，另保留軟裝設計。新的分類與名稱直接提示服務用途，讓第一次接觸品牌的人也有明確的尋找方向。
+            </p>
+            {/* F06 同時佐證上述兩個 H3，只放一張 */}
+            <figure class="nd-fig nd-fig-swap">
+              <p class="nd-fig-tag">資訊架構設計示意</p>
+              <div class="nd-fig-media">
+                <img
+                  src={`${IMG}/f06-service-categories.webp`}
+                  alt="好齡居服務分類重整前後，從居家照護、適老換屋、居家改造、關懷陪伴，重整為四個主要類別及獨立的軟裝設計"
+                  width="2400"
+                  height="962"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="nd-fig-alt">
+                <div class="nd-alt nd-alt-stack">
+                  <div>
+                    <p class="nd-alt-title">改版前</p>
+                    <ul class="nd-alt-cats">
+                      {
+                        CATEGORIES_BEFORE.map((cat) => (
+                          <li>
+                            <span class="nd-alt-cat">{cat.name}</span>
+                            <span class="nd-alt-cat-items">{cat.items.join('、')}</span>
+                          </li>
+                        ))
+                      }
+                    </ul>
+                  </div>
+                  <div>
+                    <p class="nd-alt-title nd-alt-title-brand">改版後</p>
+                    <ul class="nd-alt-cats">
+                      {
+                        CATEGORIES_AFTER.map((cat) => (
+                          <li>
+                            <span class="nd-alt-cat nd-alt-cat-brand">{cat.name}</span>
+                            <span class="nd-alt-cat-items">{cat.items.join('、')}</span>
+                          </li>
+                        ))
+                      }
+                    </ul>
+                  </div>
+                </div>
+                <a href={`${IMG}/f06-service-categories.webp`} class="nd-fig-open" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：服務分類與命名重整">
+                  查看原圖
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <figcaption>相近服務被放回同一個入口，類別名稱也直接提示用途；改變的是尋找方式，並未因重新分類刪減服務。</figcaption>
+            </figure>
+          </section>
+
+          {/* ---- 04 介面與原型設計 ---- */}
+          <section id={INTERFACE.id} class="nd-part" data-nd-part data-nd-name={INTERFACE.name}>
+            <p class="nd-kicker">{`${INTERFACE.num} ${INTERFACE.name}`}</p>
+            <h2 class="nd-h2" tabindex="-1" data-nd-heading>{INTERFACE.claim}</h2>
+            <p class="nd-p">我們把品牌定位與服務分類轉成首頁原型，重新安排先說什麼、後說什麼，讓每個區塊都承接使用者下一個想知道的問題。</p>
+
+            <h3 class="nd-h3">重構首頁瀏覽體驗，從資訊堆疊改成有順序的品牌溝通</h3>
+            <p class="nd-p">
+              原首頁同時呈現許多服務與細節，使用者還沒掌握服務範圍，就需要開始比較。新的設計依序回應品牌是誰、能提供什麼協助、為何值得信任，以及如何開始諮詢，讓首頁形成一段循序展開的對話。
+            </p>
+
+            {/* 首頁主對照：以設計說明呈現，不使用引言樣式；桌面左右、手機上下，先 Before 再 After */}
+            <div class="nd-ba">
+              <figure class="nd-fig nd-ba-col">
+                <p class="nd-ba-label">
+                  <span class="nd-ba-pill nd-ba-pill-before">改版前</span>
+                  服務與細節同時出現
+                </p>
+                <p class="nd-ba-desc">使用者尚未掌握服務範圍，就要在多項資訊中自行判斷需求。</p>
+                <div class="nd-fig-media nd-ba-media">
+                  <img
+                    src={`${IMG}/f07-before.webp`}
+                    alt="好齡居改版前首頁，品牌宣傳、分類導覽與多段服務說明集中呈現"
+                    width="1498"
+                    height="1389"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <figcaption>改版前的首頁需要使用者先消化多項資訊，才能判斷品牌能提供哪些協助。</figcaption>
+              </figure>
+              <figure class="nd-fig nd-ba-col">
+                <p class="nd-ba-label">
+                  <span class="nd-ba-pill nd-ba-pill-after">改版後設計</span>
+                  先掌握範圍，再了解細節
+                </p>
+                <p class="nd-ba-desc">先用核心主張與服務入口建立方向，再逐步展開生活情境及服務內容。</p>
+                <div class="nd-fig-media nd-ba-media nd-ba-media-after">
+                  <img
+                    src={`${IMG}/f07-after.webp`}
+                    alt="好齡居新版首頁原型，以核心主張和服務入口呈現第一層資訊，再往下展開生活情境"
+                    width="1798"
+                    height="1389"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <figcaption>新版設計先呈現核心主張與清楚入口，讓服務細節在建立基本認識後再展開。</figcaption>
+              </figure>
+            </div>
+
+            <h4 class="nd-h4">首頁的四個溝通階段</h4>
+            <div class="nd-flow">
+              <figure class="nd-fig nd-flow-fig">
+                <p class="nd-fig-tag">改版設計示意</p>
+                <div class="nd-fig-media">
+                  <img
+                    src={`${IMG}/f08-homepage-flow.webp`}
+                    alt="好齡居首頁設計由上至下對應建立印象、了解服務、取得信任、引導行動四個任務"
+                    width="1268"
+                    height="1889"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <a href={`${IMG}/f08-homepage-flow.webp`} class="nd-fig-open nd-fig-open-m" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：首頁佈局與四階段對應">
+                  查看原圖
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <figcaption>每個首頁區塊都對應一項溝通任務，讓品牌介紹、服務說明與諮詢邀請有明確的銜接順序。</figcaption>
+              </figure>
+              {/* 四階段是「首頁溝通任務」，不是服務流程 */}
+              <ol class="nd-stages">
+                {
+                  STAGES.map((stage) => (
+                    <li class="nd-stage">
+                      <span class="nd-stage-num" aria-hidden="true">{stage.num}</span>
+                      <div>
+                        <p class="nd-stage-name">{stage.name}</p>
+                        <p class="nd-stage-body">{stage.body}</p>
+                        <p class="nd-stage-blocks">對應的原型區塊：{stage.blocks}</p>
+                      </div>
+                    </li>
+                  ))
+                }
+              </ol>
+            </div>
+
+            <h3 class="nd-h3">兩大設計策略，增加使用者的瀏覽意願</h3>
+            <p class="nd-p">
+              首頁的資訊順序確立後，我們再用「吸引注意」與「輕鬆理解」兩項策略處理各區塊的內容，兼顧停下來看的理由與繼續看下去的方向。
+            </p>
+            <div class="nd-strategies">
+              <div class="nd-strategy">
+                <h4 class="nd-h4">策略一｜用生活情境吸引注意</h4>
+                <p class="nd-p">
+                  我們以家中安全、整理空間等具體需求帶出服務，並優先呈現受眾較在意的居家安全。訪客可以先辨認自己正在面對的問題，再決定是否深入了解對應服務。
+                </p>
+              </div>
+              <div class="nd-strategy">
+                <h4 class="nd-h4">策略二｜把資訊分層，讓服務更容易理解</h4>
+                <p class="nd-p">
+                  我們讓首頁先呈現服務主題與重點，詳細項目留到後續頁面展開。這樣的安排避免初次接觸就要求訪客讀完所有規格，也保留進一步了解的路徑。
+                </p>
+              </div>
+            </div>
+
+            <p class="nd-site-link">
+              <a href="https://www.nexdo.tw/" target="_blank" rel="noopener noreferrer" class="nd-ext-link">
+                查看好齡居網站
+                <span aria-hidden="true">↗</span>
+              </a>
+              <span class="nd-site-note">以上圖像為專案改版設計示意，現行網站內容可能持續調整。</span>
+            </p>
+          </section>
+
+          {/* ---- 05 內容策略 ---- */}
+          <section id={CONTENT.id} class="nd-part" data-nd-part data-nd-name={CONTENT.name}>
+            <p class="nd-kicker">{`${CONTENT.num} ${CONTENT.name}`}</p>
+            <h2 class="nd-h2" tabindex="-1" data-nd-heading>{CONTENT.claim}</h2>
+            <p class="nd-p">網站改版後，品牌仍會持續新增服務說明與文章。我們把研究與定位整理成可沿用的撰寫標準，讓不同撰稿者有共同依據。</p>
+
+            <h3 class="nd-h3">提供具體撰寫指南，協助品牌持續產出高品質文案</h3>
+            <p class="nd-p">
+              我們從五大品牌特質延伸出七項文案指南，並為每項原則附上說明與 Do／Don’t 範例。例如要表現專業，就要具體說明如何改善生活，而非只宣稱有更好的方案；團隊後續撰稿與檢查內容時，都能依此判斷。
+            </p>
+
+            {/* 原則（F09）→ 應用（F10）→ 範例（F11）連續內容 */}
+            <figure class="nd-fig nd-fig-swap nd-fig-swap-md">
+              <p class="nd-fig-tag">文案指南總覽</p>
+              <div class="nd-fig-media">
+                <img
+                  src={`${IMG}/f09-writing-principles.webp`}
+                  alt="五大品牌特質對應七項文案指南，包括談效益、專業建議、日常關心、去失能化、夥伴關係、自由選擇與小投入大改善"
+                  width="2400"
+                  height="819"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="nd-fig-alt">
+                <div class="nd-alt">
+                  <p class="nd-alt-title">品牌特質 → 七項指南</p>
+                  <dl class="nd-alt-dl">
+                    {
+                      PRINCIPLE_MAP.map((row) => (
+                        <div>
+                          <dt>{row.trait}</dt>
+                          <dd>{row.guides.join('、')}</dd>
+                        </div>
+                      ))
+                    }
+                  </dl>
+                </div>
+                <a href={`${IMG}/f09-writing-principles.webp`} class="nd-fig-open" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：品牌特質如何對應七項指南">
+                  查看原圖
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <figcaption>每項寫作原則都能回到品牌特質，讓「符合品牌」成為有依據的判斷，而非撰稿者各自的感覺。</figcaption>
+            </figure>
+
+            <figure class="nd-fig nd-fig-swap">
+              <p class="nd-fig-tag">指南應用：專業建議</p>
+              <div class="nd-fig-media">
+                <img
+                  src={`${IMG}/f10-writing-guidance.webp`}
+                  alt="專業建議的文案指南，包含原則、具體撰寫說明及在居住安全服務區的應用"
+                  width="2400"
+                  height="1265"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="nd-fig-alt">
+                <div class="nd-alt">
+                  <p class="nd-alt-title">專業建議</p>
+                  <dl class="nd-alt-dl">
+                    <div>
+                      <dt>原則</dt>
+                      <dd>展現我看得到你沒發現的細節。</dd>
+                    </div>
+                    <div>
+                      <dt>撰寫方式</dt>
+                      <dd>根據專業經驗點出具體的生活困擾，並給予對策。</dd>
+                    </div>
+                  </dl>
+                </div>
+                <a href={`${IMG}/f10-writing-guidance.webp`} class="nd-fig-open" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：專業建議的原則、寫法與頁面應用">
+                  查看原圖
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+              <figcaption>指南除了說明原則，也提供寫作方向與頁面應用，讓內容團隊知道如何把專業寫成讀者能理解的協助。</figcaption>
+            </figure>
+
+            {/* Do／Don’t 是撰寫範例，不是歷史上線文案的前後測；文字版桌面與圖並排、手機取代圖 */}
+            <figure class="nd-fig nd-fig-swap nd-fig-dd">
+              <p class="nd-fig-tag">撰寫範例：Do／Don’t</p>
+              <div class="nd-dd-wrap">
+                <div class="nd-fig-media">
+                  <img
+                    src={`${IMG}/f11-writing-example.webp`}
+                    alt="專業建議的 Do 與 Don’t 範例，對比具體說明降低浴室門檻與防滑緩坡，及籠統宣稱有更輕鬆方案的寫法"
+                    width="2400"
+                    height="1350"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div class="nd-dd">
+                  <div class="nd-dd-item nd-dd-do">
+                    <p class="nd-dd-label">建議寫法 Do</p>
+                    <p class="nd-dd-text">把浴室門檻降低、加上防滑緩坡，進出更加輕鬆。</p>
+                  </div>
+                  <div class="nd-dd-item nd-dd-dont">
+                    <p class="nd-dd-label">避免寫法 Don’t</p>
+                    <p class="nd-dd-text">針對浴室的門檻，我們有更輕鬆的進出方案。</p>
+                  </div>
+                  <a href={`${IMG}/f11-writing-example.webp`} class="nd-fig-open nd-fig-open-m" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：專業建議的 Do 與 Don’t 範例">
+                    查看原圖
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </div>
+              <figcaption>透過同一情境的正反範例，團隊能辨認具體解法與空泛描述的差別，並直接用來修改文案。</figcaption>
+            </figure>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    {/* ---- 收尾 CTA ---- */}
+    <section class="nd-closing">
+      <div class="container-site py-20 md:py-24" data-reveal>
+        <h2 class="nd-closing-title">正在改版網站，卻還說不清楚服務的價值？</h2>
+        <p class="nd-closing-body">
+          如果你的團隊也需要釐清受眾、整理服務，或讓網站與品牌說明更一致，歡迎與致遠聊聊。我們會一起梳理問題，找出適合的研究與設計方向。
+        </p>
+        <div class="nd-closing-actions">
+          <a href="/contact/" class="nd-btn-white">
+            與我們討論需求
+            <span aria-hidden="true">→</span>
+          </a>
+          <a href="/cases/" class="nd-link-white">查看其他專案</a>
+        </div>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  /*
+   * 尺寸變數：Header 高度（SiteHeader：手機 h-16＋1px 底線＝65px／md+ 72px＋1px＝73px）、
+   * 窄螢幕目錄列高度、展開清單上限。
+   * 錨點 scroll-margin：桌面 Header＋24px；窄螢幕再加目錄列；無 JS 下展開目錄時（:has）再加清單高度。
+   */
+  .nd {
+    --nd-header: 65px;
+    --nd-tocbar: 3rem;
+    --nd-toclist: 15rem;
+  }
+
+  @media (min-width: 768px) {
+    .nd {
+      --nd-header: 73px;
+    }
+  }
+
+  .nd [id] {
+    scroll-margin-top: calc(var(--nd-header) + 1.5rem);
+  }
+
+  @media (max-width: 1023.98px) {
+    .nd .nd-part {
+      scroll-margin-top: calc(var(--nd-header) + var(--nd-tocbar) + 1rem);
+    }
+
+    .nd-read:has(.nd-toc-m[open]) .nd-part {
+      scroll-margin-top: calc(var(--nd-header) + var(--nd-tocbar) + var(--nd-toclist) + 1rem);
+    }
+  }
+
+  /* 區塊進場：位移 ≤20px、450ms（覆蓋全站 650ms） */
+  :global(html.js) [data-reveal] {
+    transition-duration: 450ms;
+  }
+
+  /* ---- 文字層級 ---- */
+  .nd-eyebrow {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-brand);
+  }
+
+  .nd-h1 {
+    margin-top: 0.875rem;
+    max-width: 52rem;
+    font-size: clamp(1.875rem, 1.3rem + 2.2vw, 3.25rem);
+    line-height: 1.25;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .nd-lead {
+    margin-top: 1.5rem;
+    max-width: 44rem;
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+    line-height: 1.85;
+    color: var(--neutral-600);
+  }
+
+  .nd-meta {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    border-top: 1px solid var(--neutral-200);
+    border-bottom: 1px solid var(--neutral-200);
+    padding-block: 1.125rem;
+  }
+
+  .nd-meta-item dt {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--neutral-500);
+  }
+
+  .nd-meta-item dd {
+    margin-top: 0.125rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--neutral-900);
+  }
+
+  .nd-h2 {
+    max-width: 52rem; /* 1440 寬時五個成果標題可單行，避免「服務」「專業」孤行 */
+    font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2.125rem);
+    line-height: 1.35;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .nd-h2:focus-visible {
+    outline-offset: 6px;
+  }
+
+  /* 藍色小字：與 H2 同一組，14～16px */
+  .nd-kicker {
+    margin-bottom: 0.625rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--color-brand);
+  }
+
+  .nd-h3 {
+    margin-top: 2.75rem;
+    max-width: 44rem;
+    font-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.375rem);
+    line-height: 1.45;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .nd-h4 {
+    margin-top: 2.25rem;
+    max-width: 44rem;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .nd-p {
+    margin-top: 0.875rem;
+    max-width: 44rem;
+    line-height: 1.85;
+    color: var(--neutral-600);
+  }
+
+  /* ---- 三項挑戰 ---- */
+  .nd-challenges {
+    margin-top: 1.75rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .nd-challenges {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2rem;
+    }
+  }
+
+  .nd-challenge {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: 0.5rem;
+    row-gap: 0.5rem;
+    border-top: 1px solid var(--neutral-200);
+    padding-top: 1.25rem;
+  }
+
+  .nd-challenge-num {
+    grid-row: span 2;
+    padding-top: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  .nd-challenge-title {
+    font-size: 1.125rem;
+    line-height: 1.5;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .nd-challenge-body {
+    line-height: 1.8;
+    color: var(--neutral-600);
+  }
+
+  /* ---- 五張跳轉卡：一律等寬；筆電以上（≥1024px）五張一排、平板兩欄、手機一欄（2026-09-11 業主指示） ---- */
+  .nd-cards {
+    margin-top: 2rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .nd-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .nd-cards {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .nd-card {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 1.5rem;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 200ms ease;
+  }
+
+  /* 五張一排時版心 1160px 下每張約 219px：內距與主張字級略縮，主張仍完整顯示、不截斷 */
+  @media (min-width: 1024px) {
+    .nd-card {
+      padding: 1.25rem;
+    }
+
+    .nd-card-claim {
+      font-size: 1.0625rem;
+    }
+  }
+
+  .nd-card:hover {
+    border-color: var(--reach-blue-300);
+  }
+
+  .nd-card:hover .nd-card-claim {
+    color: var(--color-brand);
+  }
+
+  .nd-card:hover .nd-card-cta {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .nd-card:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 3px;
+    border-radius: 12px;
+  }
+
+  .nd-card-num {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  .nd-card-claim {
+    font-size: 1.125rem;
+    line-height: 1.55;
+    font-weight: 700;
+    color: var(--neutral-900);
+    transition: color 200ms ease;
+  }
+
+  .nd-card-cta {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding-top: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-link);
+  }
+
+  /* ---- 閱讀區版面 ---- */
+  .nd-read-grid {
+    padding-block: 3rem 4rem;
+  }
+
+  @media (min-width: 1024px) {
+    .nd-read-grid {
+      display: grid;
+      grid-template-columns: 11rem minmax(0, 1fr);
+      column-gap: 3rem;
+      align-items: start;
+      padding-block: 4rem 5rem;
+    }
+  }
+
+  .nd-read-body {
+    min-width: 0;
+  }
+
+  .nd-part + .nd-part {
+    margin-top: 3.5rem;
+    border-top: 1px solid var(--neutral-200);
+    padding-top: 3.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .nd-part + .nd-part {
+      margin-top: 4.5rem;
+      padding-top: 4.5rem;
+    }
+  }
+
+  /* 桌面左側常駐目錄：sticky，頂端 Header＋24px；短視窗內可捲動 */
+  .nd-toc-d {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .nd-toc-d {
+      display: block;
+      position: sticky;
+      top: calc(var(--nd-header) + 1.5rem);
+      max-height: calc(100vh - var(--nd-header) - 3rem);
+      overflow-y: auto;
+      padding-top: 0.25rem;
+    }
+  }
+
+  .nd-toc-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding-block: 0.25rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--neutral-700);
+    text-decoration: none;
+    transition: color 180ms ease;
+  }
+
+  .nd-toc-link:hover {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .nd-toc-link:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* 目前段落：粗體＋品牌藍＋右側短橫線＋aria-current，不只靠顏色 */
+  .nd-toc-link[aria-current='location'] {
+    color: var(--color-brand);
+    font-weight: 700;
+  }
+
+  .nd-toc-link[aria-current='location']::after {
+    content: '';
+    flex: 0 0 auto;
+    width: 1.5rem;
+    height: 2px;
+    background: var(--color-brand);
+  }
+
+  /* 窄螢幕折疊目錄：閱讀區頂部 sticky，位於全域 Header 下方 */
+  .nd-toc-m {
+    position: sticky;
+    top: var(--nd-header);
+    z-index: 30; /* 低於 Header（z-40）、高於內容 */
+    background: rgba(255, 255, 255, 0.97);
+    border-bottom: 1px solid var(--neutral-200);
+  }
+
+  @media (min-width: 1024px) {
+    .nd-toc-m {
+      display: none;
+    }
+  }
+
+  .nd-toc-m-summary {
+    list-style: none;
+    cursor: pointer;
+    color: var(--neutral-900);
+  }
+
+  .nd-toc-m-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .nd-toc-m-summary:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: -2px;
+    border-radius: 6px;
+  }
+
+  .nd-toc-m-summary-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: var(--nd-tocbar);
+  }
+
+  .nd-toc-m-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .nd-toc-m-icon {
+    flex: 0 0 auto;
+    color: var(--color-brand);
+    transition: transform 180ms ease;
+  }
+
+  .nd-toc-m[open] .nd-toc-m-icon {
+    transform: rotate(180deg);
+  }
+
+  .nd-toc-m-list {
+    max-height: var(--nd-toclist);
+    overflow-y: auto;
+    border-top: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding-block: 0.25rem;
+  }
+
+  /* ---- 圖片與圖說 ---- */
+  .nd-fig {
+    margin-top: 1.5rem;
+  }
+
+  .nd-fig-hero {
+    margin-top: 2.5rem;
+  }
+
+  .nd-fig-tag {
+    display: inline-block;
+    margin-bottom: 0.625rem;
+    border-radius: 9999px;
+    border: 1px solid var(--reach-blue-200);
+    background: var(--reach-blue-50);
+    padding: 0.2rem 0.7rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--color-brand);
+  }
+
+  .nd-fig-media {
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+  }
+
+  .nd-fig-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .nd-fig figcaption {
+    margin-top: 0.75rem;
+    max-width: 44rem;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--neutral-600);
+  }
+
+  /* 「查看原圖」：手機取代圖片的重排區塊內，或（F08／F11）只在手機顯示 */
+  .nd-fig-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.5rem;
+    min-height: 2.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-link);
+    text-decoration: none;
+  }
+
+  .nd-fig-open:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .nd-fig-open-m {
+    display: none;
+  }
+
+  .nd-fig-alt {
+    display: none;
+  }
+
+  /* 手機：內容圖改為 HTML 重排，圖片退為連結 */
+  @media (max-width: 767.98px) {
+    .nd-fig-swap .nd-fig-media {
+      display: none;
+    }
+
+    .nd-fig-swap .nd-fig-alt {
+      display: block;
+    }
+
+    .nd-fig-open-m {
+      display: inline-flex;
+    }
+  }
+
+  /* F09 小字較多：平板以下也用重排 */
+  @media (max-width: 1023.98px) {
+    .nd-fig-swap-md .nd-fig-media {
+      display: none;
+    }
+
+    .nd-fig-swap-md .nd-fig-alt {
+      display: block;
+    }
+  }
+
+  .nd-alt {
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 1.25rem;
+  }
+
+  .nd-alt-pair,
+  .nd-alt-stack {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 480px) {
+    .nd-alt-pair {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .nd-alt-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--neutral-500);
+  }
+
+  .nd-alt-title-brand {
+    color: var(--color-brand);
+  }
+
+  .nd-alt-role {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+    color: var(--neutral-900);
+  }
+
+  .nd-alt-list {
+    margin-top: 0.5rem;
+    padding-left: 1.125rem;
+    list-style: disc;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    line-height: 1.7;
+    color: var(--neutral-700);
+  }
+
+  .nd-alt-list strong {
+    color: var(--neutral-900);
+  }
+
+  .nd-alt-dl {
+    margin-top: 0.5rem;
+    display: grid;
+    gap: 0.625rem;
+  }
+
+  .nd-alt-dl dt {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  .nd-alt-dl dd {
+    line-height: 1.7;
+    color: var(--neutral-700);
+  }
+
+  .nd-alt-cats {
+    margin-top: 0.5rem;
+    display: grid;
+    gap: 0.625rem;
+  }
+
+  .nd-alt-cats li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .nd-alt-cat {
+    align-self: flex-start;
+    border-radius: 9999px;
+    background: var(--neutral-100);
+    padding: 0.2rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--neutral-700);
+  }
+
+  .nd-alt-cat-brand {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  .nd-alt-cat-items {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--neutral-700);
+  }
+
+  /* 研究段：桌面短文與 F02 左右編排 */
+  @media (min-width: 1024px) {
+    .nd-split {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      column-gap: 2.5rem;
+      align-items: start;
+    }
+
+    .nd-split .nd-h3 {
+      margin-top: 2.75rem;
+    }
+
+    .nd-split .nd-fig {
+      margin-top: 2.75rem;
+    }
+  }
+
+  /* 首頁主對照：桌面左右、手機上下；等寬欄，各自原比例（object-contain） */
+  .nd-ba {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .nd-ba {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+  }
+
+  .nd-ba-col {
+    margin-top: 0;
+  }
+
+  .nd-ba-label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.625rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--neutral-700);
+  }
+
+  .nd-ba-pill {
+    border-radius: 9999px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  .nd-ba-pill-before {
+    background: var(--neutral-100);
+    color: var(--neutral-600);
+  }
+
+  .nd-ba-pill-after {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  .nd-ba-desc {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--neutral-600);
+  }
+
+  .nd-ba-media {
+    margin-top: 0.75rem;
+  }
+
+  .nd-ba-media img {
+    object-fit: contain;
+  }
+
+  .nd-ba-media-after {
+    border-color: var(--reach-blue-300);
+  }
+
+  /* 首頁四階段：桌面長圖與說明並排；手機清單在圖下方 */
+  .nd-flow {
+    margin-top: 1rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .nd-flow {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      column-gap: 2.5rem;
+      align-items: start;
+    }
+  }
+
+  .nd-flow-fig {
+    margin-top: 0;
+  }
+
+  .nd-stages {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .nd-stages {
+      padding-top: 2.25rem; /* 對齊左側圖片上緣（略過標籤高度） */
+    }
+  }
+
+  .nd-stage {
+    display: flex;
+    gap: 0.75rem;
+    border-top: 1px solid var(--neutral-200);
+    padding-top: 1rem;
+  }
+
+  .nd-stage-num {
+    flex: 0 0 2.25rem;
+    padding-top: 0.2rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  .nd-stage-name {
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .nd-stage-body {
+    margin-top: 0.25rem;
+    line-height: 1.75;
+    color: var(--neutral-600);
+  }
+
+  .nd-stage-blocks {
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--neutral-500);
+  }
+
+  .nd-strategies {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .nd-strategies {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 2.5rem;
+    }
+  }
+
+  .nd-site-link {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+  }
+
+  .nd-ext-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    font-weight: 700;
+    color: var(--color-link);
+    text-decoration: none;
+  }
+
+  .nd-ext-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .nd-site-note {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--neutral-500);
+  }
+
+  /* Do／Don’t：桌面圖與文字並排，手機只留文字＋原圖連結 */
+  .nd-dd-wrap {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    .nd-dd-wrap {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      column-gap: 1.5rem;
+      align-items: start;
+    }
+  }
+
+  .nd-dd {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .nd-dd-item {
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 1.125rem 1.25rem;
+  }
+
+  .nd-dd-do {
+    border-color: var(--reach-blue-300);
+    background: var(--reach-blue-50);
+  }
+
+  .nd-dd-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-brand);
+  }
+
+  .nd-dd-dont .nd-dd-label {
+    color: var(--neutral-500);
+  }
+
+  .nd-dd-text {
+    margin-top: 0.375rem;
+    line-height: 1.7;
+    font-weight: 600;
+    color: var(--neutral-900);
+  }
+
+  /* ---- 收尾 CTA ---- */
+  .nd-closing {
+    background-color: var(--reach-blue-500);
+  }
+
+  .nd-closing-title {
+    max-width: 40rem;
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+    line-height: 1.35;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .nd-closing-body {
+    margin-top: 1rem;
+    max-width: 40rem;
+    line-height: 1.85;
+    color: rgb(255 255 255 / 0.92);
+  }
+
+  .nd-closing-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.75rem;
+  }
+
+  .nd-btn-white {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 10px;
+    background-color: var(--neutral-0);
+    color: var(--color-brand);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 200ms ease;
+  }
+
+  .nd-btn-white:hover {
+    background-color: var(--reach-blue-50);
+  }
+
+  .nd-btn-white:focus-visible,
+  .nd-link-white:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+
+  .nd-link-white {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nd-card,
+    .nd-card-claim,
+    .nd-toc-link,
+    .nd-toc-m-icon,
+    .nd-btn-white {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  /**
+   * 目錄增強（無 JS 時目錄仍可原生展開與跳轉）：
+   * - 隨捲動標示目前段落：以 Header（＋窄螢幕目錄列）遮擋後的閱讀區頂緣為判定線，
+   *   取最近一個已越過判定線的段落；未越過第一段標研究分析、到達閱讀區底部標內容策略。
+   *   一次只標一項（aria-current="location"）；被動捲動不改 URL、不動焦點。
+   * - 點卡片／目錄：沿用原生 hash 跳轉（保留瀏覽歷史），窄螢幕先收合目錄再讓瀏覽器算位置，
+   *   下一幀把焦點移到目標 H2（tabindex=-1、preventScroll）。
+   * - 窄螢幕目錄：Escape 收合並把焦點還給 summary；收合文字更新為「本頁目錄：目前段落」。
+   * - 平滑捲動由全站 CSS scroll-behavior 控制，reduced-motion 時已改為直接定位。
+   */
+  const root = document.querySelector<HTMLElement>('[data-nd-read]');
+
+  if (root) {
+    const parts = Array.from(root.querySelectorAll<HTMLElement>('[data-nd-part]'));
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-nd-toc] a[href^="#"]'));
+    const details = root.querySelector<HTMLDetailsElement>('[data-nd-toc-mobile]');
+    const summary = details?.querySelector<HTMLElement>('summary') ?? null;
+    const currentLabel = details?.querySelector<HTMLElement>('[data-nd-toc-current]') ?? null;
+    const header = document.querySelector<HTMLElement>('body > header');
+    const names = new Map(parts.map((part) => [part.id, part.dataset.ndName ?? '']));
+
+    let activeId = '';
+
+    function setActive(id: string): void {
+      if (id === activeId) return;
+      activeId = id;
+      for (const link of links) {
+        if (link.getAttribute('href') === `#${id}`) {
+          link.setAttribute('aria-current', 'location');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      }
+      if (currentLabel) {
+        currentLabel.textContent = `：${names.get(id) ?? ''}`;
+        currentLabel.hidden = false;
+      }
+    }
+
+    /**
+     * 判定線：扣除 Header（＋窄螢幕目錄列）遮擋後的閱讀區頂緣。
+     * 段落的 scroll-margin-top 正是「Header＋目錄列＋餘裕」，跳轉後段落頂緣剛好落在此線，
+     * 因此直接讀它（含無 JS／展開狀態的 :has 變化）再加幾 px 容差，確保跳轉後的目標段落被標示。
+     */
+    function judgeLine(): number {
+      const headerBottom = header ? Math.max(0, header.getBoundingClientRect().bottom) : 0;
+      const barVisible = details && summary && getComputedStyle(details).display !== 'none';
+      const barHeight = barVisible ? summary.getBoundingClientRect().height : 0;
+      const margin = parseFloat(getComputedStyle(parts[0]).scrollMarginTop) || 0;
+      return Math.max(headerBottom + barHeight, margin) + 4;
+    }
+
+    function update(): void {
+      if (parts.length === 0) return;
+      const last = parts[parts.length - 1];
+      const doc = document.documentElement;
+      const atPageBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
+      const readEndVisible = root!.getBoundingClientRect().bottom <= window.innerHeight;
+      if (atPageBottom || readEndVisible) {
+        setActive(last.id);
+        return;
+      }
+      const line = judgeLine();
+      let current = parts[0];
+      for (const part of parts) {
+        if (part.getBoundingClientRect().top <= line) current = part;
+      }
+      setActive(current.id);
+    }
+
+    let ticking = false;
+    function request(): void {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        update();
+      });
+    }
+
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+    window.addEventListener('hashchange', request);
+    window.addEventListener('load', request);
+    update();
+
+    // 卡片與目錄的跳轉：先收合窄螢幕目錄，讓原生 hash 跳轉執行後再把焦點移到目標標題
+    document.querySelectorAll<HTMLAnchorElement>('[data-nd-jump]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const id = (link.getAttribute('href') ?? '').slice(1);
+        const target = id ? document.getElementById(id) : null;
+        if (!target) return;
+        if (details?.open && details.contains(link)) details.open = false;
+        const heading = target.querySelector<HTMLElement>('[data-nd-heading]') ?? target;
+        requestAnimationFrame(() => {
+          heading.focus({ preventScroll: true });
+          request();
+        });
+      });
+    });
+
+    details?.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && details.open) {
+        event.preventDefault();
+        details.open = false;
+        summary?.focus();
+      }
+    });
+  }
+</script>

@@ -6,6 +6,7 @@
  *
  * 好齡居目前以三種敘事風格並列測試（A 悠識務實版／B AJA 品牌敘事版／C 小瑜觀點版），
  * 內容依據《好齡居專案實例-版本A/B/C》指示文件；擇定後保留一版並改用 /work/nexdo。
+ * 2026-09-11 另有 D 版（NEXDO_D_CASE）：只在 /cases/ 列表顯示，不加入下方首頁共用的 CASES。
  */
 export interface CaseItem {
   name: string;
@@ -71,3 +72,23 @@ export const CASES: CaseItem[] = [
     mediaNote: '需要素材：網銀流程改造專案代表圖',
   },
 ];
+
+/**
+ * 好齡居 D 版（第四版，2026-09-11）列表入口：依《好齡居專案實例-版本D》第 4.5 節。
+ * 只在 /cases/ 顯示（C 版之後、合作金庫之前），由 CaseCardCaptioned 呈現（多一段 F01 圖說）；
+ * 不得加入首頁共用的 CASES 陣列。
+ */
+export const NEXDO_D_CASE = {
+  kicker: '第四版｜好齡居 NEXDO',
+  name: '好齡居｜受眾研究、品牌定位與網站改版',
+  summary: '從購買者與使用者的需求出發，重整服務分類、首頁內容與文案指南。',
+  types: ['品牌定位', '網站改版', '內容策略'],
+  image: {
+    src: '/images/work/nexdo/v4/f01-design-overview.webp',
+    alt: '好齡居首頁改版設計示意，呈現生活需求入口、服務介紹與諮詢流程',
+    width: 2400,
+    height: 1827,
+  },
+  caption: '我們把受眾研究轉成看得見的網站設計：先說明能解決的生活問題，再安排服務介紹與諮詢入口。',
+  href: '/work/nexdo-d/',
+};

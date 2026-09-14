@@ -10,7 +10,7 @@
  * 卡片主張與段落 H2 由同一份 PARTS 常數輸出，保證逐字相同。
  *
  * 圖片來源（結案簡報 PDF，頁碼從封面算第 1 頁；2026-09-14 業主指示一律用完整來源頁，不裁局部）：
- *   開場 p.70（OG 圖為其 1200×630 置中裁切）　受眾輪廓 p.13　雙方需求 p.17　五大特質 p.28　服務定位 p.50
+ *   開場：p.56 筆電畫面去掉左側文字、置入 p.70 的白色 Logo（去背 374×112）合成為 nexdo-v4-hero.webp（OG 圖為其 1200×630 置中裁切）　受眾輪廓 p.13　雙方需求 p.17　五大特質 p.28　服務定位 p.50
  *   分類重整 p.37　首頁主對照：改版前 p.54／改版後 p.55（標籤切換）　兩大設計策略 p.56
  *   指南總覽 p.77　指南應用 p.80　Do／Don’t p.81
  * 簡報中的新版網站為設計提案／原型畫面，一律標「改版設計示意」；圖中灰色佔位為原型證據，不補造內容。
@@ -90,14 +90,6 @@ const CATEGORIES_AFTER = [
   { name: '租房搬家', items: ['適老換屋', '安心移居', '代租代管', '房屋仲介'] },
   { name: '樂齡健康', items: ['牙科衛教', '營養諮詢', '體適能'] },
   { name: '獨立服務 軟裝設計', items: ['軟裝設計'] },
-];
-
-/** 首頁四個溝通階段（F08 旁說明） */
-const STAGES = [
-  { num: '01', name: '建立印象', body: '用品牌主張說明服務對象與核心價值，讓訪客先知道好齡居能幫什麼。', blocks: '首屏主視覺' },
-  { num: '02', name: '了解服務', body: '從居家安全等生活需求帶出服務，再補充細項與其他選擇。', blocks: '服務價值主張、三項主題、熱門服務、延伸服務' },
-  { num: '03', name: '取得信任', body: '安排服務案例與贊助企業資訊，提供判斷品牌可信度的依據。', blocks: '服務案例、贊助企業' },
-  { num: '04', name: '引導行動', body: '先交代合作流程，再提供諮詢入口，讓訪客知道聯絡後會怎麼進行。', blocks: '服務流程、諮詢' },
 ];
 
 /** F09 手機重排：品牌特質 → 指南 */
@@ -186,19 +178,19 @@ const DESCRIPTION =
               </div>
             </dl>
 
-            {/* 開場圖不放標籤與說明（2026-09-14 業主指示） */}
+            {/* 開場圖：簡報第 56 頁的筆電畫面＋好齡居白色 Logo 合成（2026-09-14 業主指示；不放標籤與說明） */}
             <figure class="nd-fig nd-fig-hero">
               <div class="nd-fig-media">
                 <img
-                  src={`${IMG}/pdf-p070.webp`}
-                  alt="好齡居首頁改版設計總覽整頁：三個畫面呈現生活需求入口、服務介紹與諮詢流程，右側為配色說明"
+                  src={`${IMG}/nexdo-v4-hero.webp`}
+                  alt="好齡居白色 Logo 與筆電中的新版首頁設計：陪伴您把居家環境變安全，擁有安心自在的樂齡日常"
                   width="1920"
                   height="1080"
                   fetchpriority="high"
                   decoding="async"
                 />
               </div>
-              <a href={`${IMG}/pdf-p070.webp`} class="nd-fig-open nd-fig-open-m" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：改版設計總覽">
+              <a href={`${IMG}/nexdo-v4-hero.webp`} class="nd-fig-open nd-fig-open-m" target="_blank" rel="noopener noreferrer" aria-label="查看原圖：好齡居新版首頁設計">
                 查看原圖
                 <span aria-hidden="true">↗</span>
               </a>
@@ -540,23 +532,6 @@ const DESCRIPTION =
               </figure>
             </div>
 
-            <h4 class="nd-h4">首頁的四個溝通階段</h4>
-            {/* 四階段是「首頁溝通任務」，不是服務流程；對應上方「改版後」整頁圖的區塊標示，不重複放同一頁 */}
-            <ol class="nd-stages">
-                {
-                  STAGES.map((stage) => (
-                    <li class="nd-stage">
-                      <span class="nd-stage-num" aria-hidden="true">{stage.num}</span>
-                      <div>
-                        <p class="nd-stage-name">{stage.name}</p>
-                        <p class="nd-stage-body">{stage.body}</p>
-                        <p class="nd-stage-blocks">對應的原型區塊：{stage.blocks}</p>
-                      </div>
-                    </li>
-                  ))
-                }
-              </ol>
-
             <h3 class="nd-h3">兩大設計策略，增加使用者的瀏覽意願</h3>
             <p class="nd-p">
               首頁的資訊順序確立後，我們再用「吸引注意」與「輕鬆理解」兩項策略處理各區塊的內容，兼顧停下來看的理由與繼續看下去的方向。
@@ -705,14 +680,15 @@ const DESCRIPTION =
 
     {/* ---- 收尾 CTA ---- */}
     <section class="nd-closing">
-      <div class="container-site py-20 md:py-24">
-        <h2 class="nd-closing-title">正在改版網站，卻還說不清楚服務的價值？</h2>
-        <p class="nd-closing-body">
-          如果你的團隊也需要釐清受眾、整理服務，或讓網站與品牌說明更一致，歡迎與致遠聊聊。我們會一起梳理問題，找出適合的研究與設計方向。
-        </p>
+      <div class="container-site nd-closing-inner py-20 md:py-24">
+        {/* 大標＋副標（比照 ContactCta 兩行標題版式）、置中、無內文：2026-09-14 業主指示 */}
+        <h2 class="nd-closing-title">
+          你也遇到類似的問題？
+          <span class="nd-closing-sub">歡迎與我們聊聊，共同找到改變的起點</span>
+        </h2>
         <div class="nd-closing-actions">
           <a href="/contact/" class="nd-btn-white">
-            與我們討論需求
+            與我們聊聊
             <span aria-hidden="true">→</span>
           </a>
           <a href="/cases/" class="nd-link-white">查看其他專案</a>
@@ -1401,47 +1377,6 @@ const DESCRIPTION =
     display: none;
   }
 
-  /* 首頁四階段清單：接在上方「改版後」整頁圖之後，單欄 */
-  .nd-stages {
-    margin-top: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .nd-stage {
-    display: flex;
-    gap: 0.75rem;
-    border-top: 1px solid var(--neutral-200);
-    padding-top: 1rem;
-  }
-
-  .nd-stage-num {
-    flex: 0 0 2.25rem;
-    padding-top: 0.2rem;
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--color-brand);
-  }
-
-  .nd-stage-name {
-    font-weight: 700;
-    color: var(--neutral-900);
-  }
-
-  .nd-stage-body {
-    margin-top: 0.25rem;
-    line-height: 1.75;
-    color: var(--neutral-600);
-  }
-
-  .nd-stage-blocks {
-    margin-top: 0.375rem;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: var(--neutral-500);
-  }
-
   .nd-site-link {
     margin-top: 3.5rem;
     display: flex;
@@ -1476,19 +1411,28 @@ const DESCRIPTION =
     background-color: var(--reach-blue-500);
   }
 
+  /* 收尾內容水平置中（2026-09-14 業主指示） */
+  .nd-closing-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
   .nd-closing-title {
-    max-width: 40rem;
+    max-width: 44rem;
     font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
     line-height: 1.35;
     font-weight: 700;
     color: #fff;
   }
 
-  .nd-closing-body {
-    margin-top: 1rem;
-    max-width: 40rem;
-    line-height: 1.85;
-    color: rgb(255 255 255 / 0.92);
+  /* 副標：同標題級距下縮小、降字重（同 ContactCta .cta-sub） */
+  .nd-closing-sub {
+    display: block;
+    margin-top: 0.35em;
+    font-size: 0.7em;
+    font-weight: 500;
   }
 
   .nd-closing-actions {
@@ -1496,6 +1440,7 @@ const DESCRIPTION =
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     gap: 1rem 1.75rem;
   }
 

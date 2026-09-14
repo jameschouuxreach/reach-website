@@ -84,8 +84,8 @@ export const NEXDO_D_CASE = {
   summary: '從購買者與使用者的需求出發，重整服務分類、首頁內容與文案指南。',
   types: ['品牌定位', '網站改版', '內容策略'],
   image: {
-    src: '/images/work/nexdo/v4/pdf-p070.webp',
-    alt: '好齡居首頁改版設計示意，呈現生活需求入口、服務介紹與諮詢流程',
+    src: '/images/work/nexdo/v4/nexdo-v4-hero.webp',
+    alt: '好齡居白色 Logo 與筆電中的新版首頁設計',
     width: 1920,
     height: 1080,
   },

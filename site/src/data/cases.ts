@@ -84,10 +84,10 @@ export const NEXDO_D_CASE = {
   summary: '從購買者與使用者的需求出發，重整服務分類、首頁內容與文案指南。',
   types: ['品牌定位', '網站改版', '內容策略'],
   image: {
-    src: '/images/work/nexdo/v4/f01-design-overview.webp',
+    src: '/images/work/nexdo/v4/pdf-p070.webp',
     alt: '好齡居首頁改版設計示意，呈現生活需求入口、服務介紹與諮詢流程',
-    width: 2400,
-    height: 1827,
+    width: 1920,
+    height: 1080,
   },
   caption: '我們把受眾研究轉成看得見的網站設計：先說明能解決的生活問題，再安排服務介紹與諮詢入口。',
   href: '/work/nexdo-d/',

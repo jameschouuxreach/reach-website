@@ -4,7 +4,7 @@
  * 文案、圖片位置、圖說與版面規則依《好齡居專案實例-版本D-第四版文案與開發規格.md》第 2～4 節；
  * 素材來源註（結案簡報頁碼）只留在此註解與該文件，不上稿。
  *
- * 結構：開場（H1＋背景＋資訊列＋F01）→ 三項挑戰 → 五張跳轉卡（#approach）
+ * 結構：開場（H1＋背景＋資訊列＋F01）→ 三項挑戰 → 五項成果列點（#approach，2026-09-14 由卡片改為列點連結）
  *       → 閱讀區（桌面左側常駐目錄／窄螢幕頂部折疊目錄＋五段內容）→ 收尾 CTA。
  * 五段 ID：research／brand／architecture／interface／content；卡片、目錄與段落共用同一組 hash，
  * 卡片主張與段落 H2 由同一份 PARTS 常數輸出，保證逐字相同。
@@ -29,6 +29,18 @@ const PARTS = [
 ] as const;
 
 const [RESEARCH, BRAND, ARCHITECTURE, INTERFACE, CONTENT] = PARTS;
+
+/**
+ * 目錄（2026-09-11 業主指示）：從開場起全程常駐，收錄案例簡介、挑戰、我們做了什麼與五段；
+ * 五段目錄文字帶編號（與段落藍色小字相同）。
+ */
+const TOC_HEAD = [
+  { id: 'intro', label: '案例簡介' },
+  { id: 'challenges', label: '遇到哪些挑戰？' },
+  { id: 'approach', label: '我們做了什麼？' },
+] as const;
+const [INTRO_TOC, CHALLENGES_TOC, APPROACH_TOC] = TOC_HEAD;
+const TOC = [...TOC_HEAD, ...PARTS.map((part) => ({ id: part.id, label: `${part.num} ${part.name}` }))];
 
 const CHALLENGES = [
   {
@@ -110,97 +122,8 @@ const DESCRIPTION =
   ogImage={`${IMG}/nexdo-v4-og.jpg`}
 >
   <article class="nd">
-    {/* ---- 開場：藍色小字＋H1＋背景＋資訊列＋F01 ---- */}
-    <section class="bg-page">
-      <div class="container-site pb-14 pt-16 md:pb-20 md:pt-24">
-        <p class="nd-eyebrow">好齡居 NEXDO｜銀髮生活服務</p>
-        <h1 class="nd-h1">好齡居｜以受眾研究重整品牌定位、服務分類與網站設計</h1>
-        <p class="nd-lead">
-          好齡居以提供全面的長照生活服務為目標，為銀髮族及其家庭整合居家安全、整理清潔、健康支持與搬遷等協助。這類服務往往需要子女與長輩共同做決定，既有的服務分類與說明，卻讓人難以判斷自己需要什麼、為何值得投入。致遠透過研究釐清受眾與需求，確立品牌定位，並將成果轉化為服務分類、網站改版設計與文案指南，讓品牌更清楚地說明能提供的協助。
-        </p>
-
-        <dl class="nd-meta">
-          <div class="nd-meta-item">
-            <dt>客戶</dt>
-            <dd>好齡居 NEXDO</dd>
-          </div>
-          <div class="nd-meta-item">
-            <dt>專案範圍</dt>
-            <dd>研究分析／品牌定位／資訊架構設計／介面與原型設計／內容策略</dd>
-          </div>
-          <div class="nd-meta-item">
-            <dt>研究規模</dt>
-            <dd>303 份問卷、5 位深度訪談</dd>
-          </div>
-        </dl>
-
-        <figure class="nd-fig nd-fig-hero">
-          <p class="nd-fig-tag">改版設計示意</p>
-          <div class="nd-fig-media">
-            <picture>
-              {/* 手機：同源首屏裁切，避免長圖推遲挑戰與五卡 */}
-              <source media="(max-width: 767px)" srcset={`${IMG}/f01-design-overview-mobile.webp`} width="923" height="1286" />
-              <img
-                src={`${IMG}/f01-design-overview.webp`}
-                alt="好齡居首頁改版設計示意，呈現生活需求入口、服務介紹與諮詢流程"
-                width="2400"
-                height="1827"
-                fetchpriority="high"
-                decoding="async"
-              />
-            </picture>
-          </div>
-          <figcaption>我們把受眾研究轉成看得見的網站設計：先說明能解決的生活問題，再安排服務介紹與諮詢入口。</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    {/* ---- 本案遇到哪些挑戰？ ---- */}
-    <section class="border-t border-line bg-page">
-      <div class="container-site py-16 md:py-24">
-        <h2 class="nd-h2" data-reveal>本案遇到哪些挑戰？</h2>
-        <ol class="nd-challenges" data-reveal>
-          {
-            CHALLENGES.map((item, i) => (
-              <li class="nd-challenge">
-                <span class="nd-challenge-num" aria-hidden="true">{`0${i + 1}`}</span>
-                <h3 class="nd-challenge-title">{item.title}</h3>
-                <p class="nd-challenge-body">{item.body}</p>
-              </li>
-            ))
-          }
-        </ol>
-      </div>
-    </section>
-
-    {/* ---- 我們做了什麼？五張跳轉卡（無補充文案，CTA 一律「查看更多」） ---- */}
-    <section id="approach" class="border-t border-line bg-page">
-      <div class="container-site py-16 md:py-24">
-        <h2 class="nd-h2" data-reveal>我們做了什麼？</h2>
-        <p class="nd-p" data-reveal>
-          我們把研究結果轉成五項可執行的成果，協助好齡居決定對誰說、主打什麼，以及網站和文案該怎麼呈現。點選卡片，可直接查看對應的做法與設計實例。
-        </p>
-        <ol class="nd-cards" data-reveal>
-          {
-            PARTS.map((part) => (
-              <li>
-                <a href={`#${part.id}`} class="nd-card" data-nd-jump>
-                  <span class="nd-card-num">{`${part.num} ${part.name}`}</span>
-                  <span class="nd-card-claim">{part.claim}</span>
-                  <span class="nd-card-cta">
-                    查看更多
-                    <span aria-hidden="true">→</span>
-                  </span>
-                </a>
-              </li>
-            ))
-          }
-        </ol>
-      </div>
-    </section>
-
-    {/* ---- 閱讀區：目錄（桌面左側常駐／窄螢幕頂部折疊）＋五段內容 ---- */}
-    <div class="nd-read border-t border-line bg-page" data-nd-read>
+    {/* ---- 目錄＋全文：目錄從開場起全程可用（桌面左側常駐／窄螢幕頂部折疊），2026-09-11 業主指示 ---- */}
+    <div class="nd-read bg-page" data-nd-read>
       {/* 窄螢幕折疊目錄：原生 details，無 JS 時仍可展開與跳轉；收合文字由 JS 補上目前段落 */}
       <details class="nd-toc-m" data-nd-toc-mobile>
         <summary class="nd-toc-m-summary">
@@ -214,9 +137,9 @@ const DESCRIPTION =
         <nav aria-label="本頁目錄" class="nd-toc-m-list">
           <ol class="container-site" data-nd-toc>
             {
-              PARTS.map((part) => (
+              TOC.map((item) => (
                 <li>
-                  <a href={`#${part.id}`} class="nd-toc-link" data-nd-jump>{part.name}</a>
+                  <a href={`#${item.id}`} class="nd-toc-link" data-nd-jump>{item.label}</a>
                 </li>
               ))
             }
@@ -229,9 +152,9 @@ const DESCRIPTION =
         <nav aria-label="本頁目錄" class="nd-toc-d">
           <ol data-nd-toc>
             {
-              PARTS.map((part) => (
+              TOC.map((item) => (
                 <li>
-                  <a href={`#${part.id}`} class="nd-toc-link" data-nd-jump>{part.name}</a>
+                  <a href={`#${item.id}`} class="nd-toc-link" data-nd-jump>{item.label}</a>
                 </li>
               ))
             }
@@ -239,6 +162,87 @@ const DESCRIPTION =
         </nav>
 
         <div class="nd-read-body">
+          {/* ---- 案例簡介：藍色小字＋H1＋背景＋資訊列＋F01 ---- */}
+          <section id={INTRO_TOC.id} class="nd-part" data-nd-part data-nd-name={INTRO_TOC.label}>
+            <p class="nd-eyebrow">好齡居 NEXDO｜銀髮生活服務</p>
+            <h1 class="nd-h1" tabindex="-1" data-nd-heading>好齡居｜以受眾研究重整品牌定位、服務分類與網站設計</h1>
+            {/* 客戶簡介：2026-09-11 業主指示改為兩句版，取代規格 2.1 的三句版 */}
+            <p class="nd-lead">
+              好齡居整合居家安全、清潔整理與健康支持等銀髮生活服務，但服務多元、購買門檻高，讓受眾難以理解與選擇。致遠透過研究釐清需求、確立品牌定位，並重整網站與文案，讓服務價值更清楚易懂。
+            </p>
+
+            <dl class="nd-meta">
+              <div class="nd-meta-item">
+                <dt>客戶</dt>
+                <dd>好齡居 NEXDO</dd>
+              </div>
+              <div class="nd-meta-item">
+                <dt>專案範圍</dt>
+                <dd>研究分析／品牌定位／資訊架構設計／介面與原型設計／內容策略</dd>
+              </div>
+              <div class="nd-meta-item">
+                <dt>研究規模</dt>
+                <dd>303 份問卷、5 位深度訪談</dd>
+              </div>
+            </dl>
+
+            <figure class="nd-fig nd-fig-hero">
+              <p class="nd-fig-tag">改版設計示意</p>
+              <div class="nd-fig-media">
+                <picture>
+                  {/* 手機：同源首屏裁切，避免長圖推遲挑戰與五卡 */}
+                  <source media="(max-width: 767px)" srcset={`${IMG}/f01-design-overview-mobile.webp`} width="923" height="1286" />
+                  <img
+                    src={`${IMG}/f01-design-overview.webp`}
+                    alt="好齡居首頁改版設計示意，呈現生活需求入口、服務介紹與諮詢流程"
+                    width="2400"
+                    height="1827"
+                    fetchpriority="high"
+                    decoding="async"
+                  />
+                </picture>
+              </div>
+              <figcaption>我們把受眾研究轉成看得見的網站設計：先說明能解決的生活問題，再安排服務介紹與諮詢入口。</figcaption>
+            </figure>
+          </section>
+
+          {/* ---- 本案遇到哪些挑戰？ ---- */}
+          <section id={CHALLENGES_TOC.id} class="nd-part" data-nd-part data-nd-name={CHALLENGES_TOC.label}>
+            <h2 class="nd-h2" tabindex="-1" data-nd-heading>本案遇到哪些挑戰？</h2>
+            <ol class="nd-challenges" data-reveal>
+              {
+                CHALLENGES.map((item, i) => (
+                  <li class="nd-challenge">
+                    <span class="nd-challenge-num" aria-hidden="true">{`0${i + 1}`}</span>
+                    <h3 class="nd-challenge-title">{item.title}</h3>
+                    <p class="nd-challenge-body">{item.body}</p>
+                  </li>
+                ))
+              }
+            </ol>
+          </section>
+
+          {/* ---- 我們做了什麼？五項成果列點，每點整列為連結（2026-09-14 業主指示，由五張卡片改為列點） ---- */}
+          <section id={APPROACH_TOC.id} class="nd-part" data-nd-part data-nd-name={APPROACH_TOC.label}>
+            <h2 class="nd-h2" tabindex="-1" data-nd-heading>我們做了什麼？</h2>
+            <p class="nd-p">
+              我們把研究結果轉成五項可執行的成果，協助好齡居決定對誰說、主打什麼，以及網站和文案該怎麼呈現。點選任一項，可直接查看對應的做法與設計實例。
+            </p>
+            <ol class="nd-list" data-reveal>
+              {
+                PARTS.map((part) => (
+                  <li class="nd-list-item">
+                    <a href={`#${part.id}`} class="nd-list-link" data-nd-jump>
+                      <span class="nd-list-num">{`${part.num} ${part.name}`}</span>
+                      <span class="nd-list-claim">{part.claim}</span>
+                      <span class="nd-list-arrow" aria-hidden="true">→</span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ol>
+          </section>
+
           {/* ---- 01 研究分析 ---- */}
           <section id={RESEARCH.id} class="nd-part" data-nd-part data-nd-name={RESEARCH.name}>
             <p class="nd-kicker">{`${RESEARCH.num} ${RESEARCH.name}`}</p>
@@ -736,7 +740,7 @@ const DESCRIPTION =
   .nd {
     --nd-header: 65px;
     --nd-tocbar: 3rem;
-    --nd-toclist: 15rem;
+    --nd-toclist: 23rem; /* 八項 × 44px＋內距，不需清單內捲動 */
   }
 
   @media (min-width: 768px) {
@@ -772,20 +776,20 @@ const DESCRIPTION =
     color: var(--color-brand);
   }
 
+  /* 開場：大標、導言、資訊列、F01 共用版心同一欄寬，右緣對齊（2026-09-11 業主指示，參考悠識案例頁）；
+     大標上限 42px，1440 寬時單行 */
   .nd-h1 {
     margin-top: 0.875rem;
-    max-width: 52rem;
-    font-size: clamp(1.875rem, 1.3rem + 2.2vw, 3.25rem);
-    line-height: 1.25;
+    font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.625rem);
+    line-height: 1.3;
     font-weight: 700;
     color: var(--neutral-900);
   }
 
   .nd-lead {
     margin-top: 1.5rem;
-    max-width: 44rem;
     font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
-    line-height: 1.85;
+    line-height: 1.9;
     color: var(--neutral-600);
   }
 
@@ -813,14 +817,15 @@ const DESCRIPTION =
     color: var(--neutral-900);
   }
 
+  /* 標題、副標、內文、圖說一律與圖片同寬（正文欄寬），不另設 max-width（2026-09-14 業主指示） */
   .nd-h2 {
-    max-width: 52rem; /* 1440 寬時五個成果標題可單行，避免「服務」「專業」孤行 */
     font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2.125rem);
     line-height: 1.35;
     font-weight: 700;
     color: var(--neutral-900);
   }
 
+  .nd-h1:focus-visible,
   .nd-h2:focus-visible {
     outline-offset: 6px;
   }
@@ -836,7 +841,6 @@ const DESCRIPTION =
 
   .nd-h3 {
     margin-top: 2.75rem;
-    max-width: 44rem;
     font-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.375rem);
     line-height: 1.45;
     font-weight: 700;
@@ -845,7 +849,6 @@ const DESCRIPTION =
 
   .nd-h4 {
     margin-top: 2.25rem;
-    max-width: 44rem;
     font-size: 1.0625rem;
     line-height: 1.5;
     font-weight: 700;
@@ -854,7 +857,6 @@ const DESCRIPTION =
 
   .nd-p {
     margin-top: 0.875rem;
-    max-width: 44rem;
     line-height: 1.85;
     color: var(--neutral-600);
   }
@@ -902,92 +904,79 @@ const DESCRIPTION =
     color: var(--neutral-600);
   }
 
-  /* ---- 五張跳轉卡：一律等寬；筆電以上（≥1024px）五張一排、平板兩欄、手機一欄（2026-09-11 業主指示） ---- */
-  .nd-cards {
-    margin-top: 2rem;
+  /* ---- 我們做了什麼：五項成果列點，整列為連結；桌面「編號名稱｜主張｜箭頭」三欄、手機編號在上主張在下（2026-09-14 業主指示） ---- */
+  .nd-list {
+    margin-top: 1.75rem;
+    border-top: 1px solid var(--neutral-200);
+  }
+
+  .nd-list-item {
+    border-bottom: 1px solid var(--neutral-200);
+  }
+
+  .nd-list-link {
     display: grid;
-    gap: 1rem;
-  }
-
-  @media (min-width: 640px) {
-    .nd-cards {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .nd-cards {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-    }
-  }
-
-  .nd-card {
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-    gap: 0.75rem;
-    border-radius: 12px;
-    border: 1px solid var(--neutral-200);
-    background: var(--neutral-0);
-    padding: 1.5rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'num arrow'
+      'claim arrow';
+    column-gap: 1rem;
+    row-gap: 0.25rem;
+    align-items: center;
+    min-height: 3.5rem;
+    padding-block: 1rem;
     color: inherit;
     text-decoration: none;
-    transition: border-color 200ms ease;
   }
 
-  /* 五張一排時版心 1160px 下每張約 219px：內距與主張字級略縮，主張仍完整顯示、不截斷 */
-  @media (min-width: 1024px) {
-    .nd-card {
-      padding: 1.25rem;
-    }
-
-    .nd-card-claim {
-      font-size: 1.0625rem;
+  @media (min-width: 768px) {
+    .nd-list-link {
+      grid-template-columns: 10rem minmax(0, 1fr) auto;
+      grid-template-areas: 'num claim arrow';
+      column-gap: 1.5rem;
     }
   }
 
-  .nd-card:hover {
-    border-color: var(--reach-blue-300);
+  .nd-list-link:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: -2px;
+    border-radius: 6px;
   }
 
-  .nd-card:hover .nd-card-claim {
+  .nd-list-num {
+    grid-area: num;
+    font-size: 0.9375rem;
+    font-weight: 700;
     color: var(--color-brand);
   }
 
-  .nd-card:hover .nd-card-cta {
+  .nd-list-claim {
+    grid-area: claim;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    font-weight: 600;
+    color: var(--neutral-900);
+    transition: color 180ms ease;
+  }
+
+  .nd-list-arrow {
+    grid-area: arrow;
+    align-self: center;
+    font-size: 1.125rem;
+    color: var(--color-link);
+    transition: transform 200ms ease;
+  }
+
+  .nd-list-link:hover .nd-list-claim,
+  .nd-list-link:focus-visible .nd-list-claim {
+    color: var(--color-brand);
     text-decoration: underline;
     text-underline-offset: 4px;
   }
 
-  .nd-card:focus-visible {
-    outline: 2px solid var(--reach-blue-300);
-    outline-offset: 3px;
-    border-radius: 12px;
-  }
-
-  .nd-card-num {
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--color-brand);
-  }
-
-  .nd-card-claim {
-    font-size: 1.125rem;
-    line-height: 1.55;
-    font-weight: 700;
-    color: var(--neutral-900);
-    transition: color 200ms ease;
-  }
-
-  .nd-card-cta {
-    margin-top: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding-top: 0.5rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--color-link);
+  .nd-list-link:hover .nd-list-arrow,
+  .nd-list-link:focus-visible .nd-list-arrow {
+    transform: translateX(3px);
   }
 
   /* ---- 閱讀區版面 ---- */
@@ -998,8 +987,8 @@ const DESCRIPTION =
   @media (min-width: 1024px) {
     .nd-read-grid {
       display: grid;
-      grid-template-columns: 11rem minmax(0, 1fr);
-      column-gap: 3rem;
+      grid-template-columns: 10.5rem minmax(0, 1fr);
+      column-gap: 2.5rem;
       align-items: start;
       padding-block: 4rem 5rem;
     }
@@ -1135,6 +1124,7 @@ const DESCRIPTION =
 
   .nd-toc-m-list {
     max-height: var(--nd-toclist);
+    max-height: min(var(--nd-toclist), calc(100dvh - var(--nd-header) - var(--nd-tocbar) - 1rem));
     overflow-y: auto;
     border-top: 1px solid var(--neutral-200);
     background: var(--neutral-0);
@@ -1178,7 +1168,6 @@ const DESCRIPTION =
 
   .nd-fig figcaption {
     margin-top: 0.75rem;
-    max-width: 44rem;
     font-size: 0.9375rem;
     line-height: 1.7;
     color: var(--neutral-600);
@@ -1635,12 +1624,17 @@ const DESCRIPTION =
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .nd-card,
-    .nd-card-claim,
+    .nd-list-claim,
+    .nd-list-arrow,
     .nd-toc-link,
     .nd-toc-m-icon,
     .nd-btn-white {
       transition: none;
+    }
+
+    .nd-list-link:hover .nd-list-arrow,
+    .nd-list-link:focus-visible .nd-list-arrow {
+      transform: none;
     }
   }
 </style>
@@ -1648,11 +1642,12 @@ const DESCRIPTION =
 <script>
   /**
    * 目錄增強（無 JS 時目錄仍可原生展開與跳轉）：
-   * - 隨捲動標示目前段落：以 Header（＋窄螢幕目錄列）遮擋後的閱讀區頂緣為判定線，
-   *   取最近一個已越過判定線的段落；未越過第一段標研究分析、到達閱讀區底部標內容策略。
+   * - 隨捲動標示目前段落：以段落 scroll-margin-top（＝Header＋目錄列＋餘裕）為判定線，
+   *   取最近一個頂緣已越過判定線的段落；未越過第一段標案例簡介、到達閱讀區底部標內容策略。
    *   一次只標一項（aria-current="location"）；被動捲動不改 URL、不動焦點。
-   * - 點卡片／目錄：沿用原生 hash 跳轉（保留瀏覽歷史），窄螢幕先收合目錄再讓瀏覽器算位置，
-   *   下一幀把焦點移到目標 H2（tabindex=-1、preventScroll）。
+   * - 點卡片／目錄：目標立即標為 active 並「鎖定」，平滑捲動途中經過的段落不會閃過 active；
+   *   目標抵達判定線（或頁面到底）才解除鎖定、恢復隨捲動追蹤。使用者中途以滾輪／觸控／鍵盤捲動則立即解除。
+   *   沿用原生 hash 跳轉（保留瀏覽歷史），窄螢幕先收合目錄再讓瀏覽器算位置，下一幀把焦點移到目標標題。
    * - 窄螢幕目錄：Escape 收合並把焦點還給 summary；收合文字更新為「本頁目錄：目前段落」。
    * - 平滑捲動由全站 CSS scroll-behavior 控制，reduced-motion 時已改為直接定位。
    */
@@ -1665,9 +1660,18 @@ const DESCRIPTION =
     const summary = details?.querySelector<HTMLElement>('summary') ?? null;
     const currentLabel = details?.querySelector<HTMLElement>('[data-nd-toc-current]') ?? null;
     const header = document.querySelector<HTMLElement>('body > header');
+    // 收合文字用的段落名稱：直接取目錄連結文字（含編號），確保與目錄一致；沒有連結時退回 data-nd-name
     const names = new Map(parts.map((part) => [part.id, part.dataset.ndName ?? '']));
+    for (const link of links) {
+      const id = (link.getAttribute('href') ?? '').slice(1);
+      const text = (link.textContent ?? '').trim();
+      if (id && text) names.set(id, text);
+    }
 
     let activeId = '';
+    /** 點選後鎖定的目標；抵達或使用者自行捲動時解除 */
+    let pendingId: string | null = null;
+    let pendingUntil = 0;
 
     function setActive(id: string): void {
       if (id === activeId) return;
@@ -1685,11 +1689,11 @@ const DESCRIPTION =
       }
     }
 
-    /**
-     * 判定線：扣除 Header（＋窄螢幕目錄列）遮擋後的閱讀區頂緣。
-     * 段落的 scroll-margin-top 正是「Header＋目錄列＋餘裕」，跳轉後段落頂緣剛好落在此線，
-     * 因此直接讀它（含無 JS／展開狀態的 :has 變化）再加幾 px 容差，確保跳轉後的目標段落被標示。
-     */
+    function atPageBottom(): boolean {
+      return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    }
+
+    /** 判定線：段落 scroll-margin-top（跳轉後段落頂緣剛好落在此）＋幾 px 容差 */
     function judgeLine(): number {
       const headerBottom = header ? Math.max(0, header.getBoundingClientRect().bottom) : 0;
       const barVisible = details && summary && getComputedStyle(details).display !== 'none';
@@ -1698,13 +1702,22 @@ const DESCRIPTION =
       return Math.max(headerBottom + barHeight, margin) + 4;
     }
 
+    /** 鎖定中的目標是否已抵達（頂緣落在 scroll-margin 附近，或頁面已到底無法再捲） */
+    function arrived(target: HTMLElement): boolean {
+      const margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+      return Math.abs(target.getBoundingClientRect().top - margin) <= 3 || atPageBottom();
+    }
+
     function update(): void {
       if (parts.length === 0) return;
+      if (pendingId) {
+        const target = document.getElementById(pendingId);
+        if (target && !arrived(target) && performance.now() < pendingUntil) return; // 鎖定中：不隨途經段落改變
+        pendingId = null;
+      }
       const last = parts[parts.length - 1];
-      const doc = document.documentElement;
-      const atPageBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
       const readEndVisible = root!.getBoundingClientRect().bottom <= window.innerHeight;
-      if (atPageBottom || readEndVisible) {
+      if (atPageBottom() || readEndVisible) {
         setActive(last.id);
         return;
       }
@@ -1726,18 +1739,33 @@ const DESCRIPTION =
       });
     }
 
+    /** 使用者自行捲動：解除鎖定，恢復隨捲動追蹤 */
+    function release(): void {
+      if (!pendingId) return;
+      pendingId = null;
+      request();
+    }
+
     window.addEventListener('scroll', request, { passive: true });
     window.addEventListener('resize', request);
     window.addEventListener('hashchange', request);
     window.addEventListener('load', request);
+    window.addEventListener('wheel', release, { passive: true });
+    window.addEventListener('touchmove', release, { passive: true });
+    window.addEventListener('keydown', (event) => {
+      if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(event.key)) release();
+    });
     update();
 
-    // 卡片與目錄的跳轉：先收合窄螢幕目錄，讓原生 hash 跳轉執行後再把焦點移到目標標題
+    // 卡片與目錄的跳轉：目標立即 active 並鎖定；先收合窄螢幕目錄，原生 hash 跳轉後把焦點移到目標標題
     document.querySelectorAll<HTMLAnchorElement>('[data-nd-jump]').forEach((link) => {
       link.addEventListener('click', () => {
         const id = (link.getAttribute('href') ?? '').slice(1);
         const target = id ? document.getElementById(id) : null;
         if (!target) return;
+        pendingId = id;
+        pendingUntil = performance.now() + 3000; // 保險：平滑捲動異常中斷時最多鎖 3 秒
+        setActive(id);
         if (details?.open && details.contains(link)) details.open = false;
         const heading = target.querySelector<HTMLElement>('[data-nd-heading]') ?? target;
         requestAnimationFrame(() => {

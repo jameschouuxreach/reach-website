@@ -216,9 +216,7 @@ const DESCRIPTION =
           {/* ---- 我們做了什麼？五項成果列點，每點整列為連結（2026-09-14 業主指示，由五張卡片改為列點） ---- */}
           <section id={APPROACH_TOC.id} class="nd-part" data-nd-part data-nd-name={APPROACH_TOC.label}>
             <h2 class="nd-h2" tabindex="-1" data-nd-heading>我們做了什麼？</h2>
-            <p class="nd-p">
-              我們把研究結果轉成五項可執行的成果，協助好齡居決定對誰說、主打什麼，以及網站和文案該怎麼呈現。點選任一項，可直接查看對應的做法與設計實例。
-            </p>
+            <p class="nd-sub">從受眾研究到網站與文案，將品牌溝通落實為五項具體成果。</p>
             <ol class="nd-list">
               {
                 PARTS.map((part) => (
@@ -238,7 +236,7 @@ const DESCRIPTION =
           <section id={RESEARCH.id} class="nd-part" data-nd-part data-nd-name={RESEARCH.name}>
             <p class="nd-kicker">{`${RESEARCH.num} ${RESEARCH.name}`}</p>
             <h2 class="nd-h2" tabindex="-1" data-nd-heading>{RESEARCH.claim}</h2>
-            <p class="nd-p">我們用問卷找出需求較明確的族群，再透過訪談理解他們為何猶豫。兩種研究相互補充，讓品牌定位與網站設計有共同依據。</p>
+            <p class="nd-sub">用問卷找出潛在購買者，透過訪談理解需求與猶豫。</p>
 
             <h3 class="nd-h3">透過問卷數據分析，精準描繪受眾樣貌</h3>
             <p class="nd-p">
@@ -319,7 +317,7 @@ const DESCRIPTION =
           <section id={BRAND.id} class="nd-part" data-nd-part data-nd-name={BRAND.name}>
             <p class="nd-kicker">{`${BRAND.num} ${BRAND.name}`}</p>
             <h2 class="nd-h2" tabindex="-1" data-nd-heading>{BRAND.claim}</h2>
-            <p class="nd-p">我們協助好齡居確立服務主打方向，並定義品牌與家庭互動的方式，讓後續網站與文案有清楚的判斷標準。</p>
+            <p class="nd-sub">確立服務主打方向與溝通方式，為網站和文案建立共同準則。</p>
 
             <h3 class="nd-h3">定位品牌五大特質，建立專業又有溫度的品牌印象</h3>
             <p class="nd-p">
@@ -413,7 +411,7 @@ const DESCRIPTION =
           <section id={ARCHITECTURE.id} class="nd-part" data-nd-part data-nd-name={ARCHITECTURE.name}>
             <p class="nd-kicker">{`${ARCHITECTURE.num} ${ARCHITECTURE.name}`}</p>
             <h2 class="nd-h2" tabindex="-1" data-nd-heading>{ARCHITECTURE.claim}</h2>
-            <p class="nd-p">我們從「使用者會把哪些協助看成同一件事」重新整理分類，再調整類別名稱，減少搜尋服務時需要自行猜測的地方。</p>
+            <p class="nd-sub">依照使用者理解服務的方式，整合分類並調整名稱。</p>
 
             <h3 class="nd-h3">從受眾的視角重新分類，讓服務更好找</h3>
             <p class="nd-p">
@@ -481,7 +479,7 @@ const DESCRIPTION =
           <section id={INTERFACE.id} class="nd-part" data-nd-part data-nd-name={INTERFACE.name}>
             <p class="nd-kicker">{`${INTERFACE.num} ${INTERFACE.name}`}</p>
             <h2 class="nd-h2" tabindex="-1" data-nd-heading>{INTERFACE.claim}</h2>
-            <p class="nd-p">我們把品牌定位與服務分類轉成首頁原型，重新安排先說什麼、後說什麼，讓每個區塊都承接使用者下一個想知道的問題。</p>
+            <p class="nd-sub">依序回應使用者的疑問，引導讀者從認識品牌走向諮詢。</p>
 
             <h3 class="nd-h3">重構首頁瀏覽體驗，從資訊堆疊改成有順序的品牌溝通</h3>
             <p class="nd-p">
@@ -563,7 +561,7 @@ const DESCRIPTION =
           <section id={CONTENT.id} class="nd-part" data-nd-part data-nd-name={CONTENT.name}>
             <p class="nd-kicker">{`${CONTENT.num} ${CONTENT.name}`}</p>
             <h2 class="nd-h2" tabindex="-1" data-nd-heading>{CONTENT.claim}</h2>
-            <p class="nd-p">網站改版後，品牌仍會持續新增服務說明與文章。我們把研究與定位整理成可沿用的撰寫標準，讓不同撰稿者有共同依據。</p>
+            <p class="nd-sub">將研究與品牌定位轉成撰寫標準，讓不同撰稿者都有依據。</p>
 
             <h3 class="nd-h3">提供具體撰寫指南，協助品牌持續產出高品質文案</h3>
             <p class="nd-p">
@@ -823,6 +821,15 @@ const DESCRIPTION =
   .nd-p {
     margin-top: 0.875rem;
     line-height: 1.85;
+    color: var(--neutral-600);
+  }
+
+  /* 大段落副標：H2 下一行、比內文大一級、中字重（2026-09-15 業主指示，取代原導言段落） */
+  .nd-sub {
+    margin-top: 0.75rem;
+    font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+    line-height: 1.6;
+    font-weight: 500;
     color: var(--neutral-600);
   }
 

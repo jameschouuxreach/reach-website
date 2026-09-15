@@ -61,7 +61,11 @@ const groups = PROJECT_FAMILY_ORDER.map((family) => {
               COMMON ENGAGEMENTS
             </span>
           </p>
-          <IntroHeading class="heading-section mt-4">從你的問題和需求出發，看看哪種專案適合你</IntroHeading>
+          {/* 兩行為設計：逗號後換行（2026-09-14 業主指示，作法同首頁 Hero） */}
+          <IntroHeading class="heading-section mt-4">
+            <span class="block">從你的問題和需求出發，</span>
+            <span class="block">看看哪種專案適合你</span>
+          </IntroHeading>
         </div>
       ) : (
         <IntroHeading class="sr-only">常見專案類型</IntroHeading>

@@ -74,21 +74,21 @@ export const CASES: CaseItem[] = [
 ];
 
 /**
- * 好齡居 D 版（第四版，2026-09-11）列表入口：依《好齡居專案實例-版本D》第 4.5 節。
- * 只在 /cases/ 顯示（C 版之後、合作金庫之前），由 CaseCardCaptioned 呈現（多一段 F01 圖說）；
- * 不得加入首頁共用的 CASES 陣列。
+ * 好齡居 D 版（第四版，2026-09-11）列表入口：依《好齡居專案實例-版本D》第 4.5 節新增，
+ * 只在 /cases/ 顯示（C 版之後、合作金庫之前）；不得加入首頁共用的 CASES 陣列。
+ * 2026-09-15 業主指示：小標改「重新定義長照服務的角色與價值」、摘要與圖說皆拿掉、標籤加「資訊架構」「研究分析」，
+ * 版式因此與共用 CaseCard 相同，改直接以 CaseCard 呈現（原 CaseCardCaptioned 已移除）。
  */
-export const NEXDO_D_CASE = {
-  kicker: '第四版｜好齡居 NEXDO',
+export const NEXDO_D_CASE: CaseItem = {
   name: '好齡居｜受眾研究、品牌定位與網站改版',
-  summary: '從購買者與使用者的需求出發，重整服務分類、首頁內容與文案指南。',
-  types: ['品牌定位', '網站改版', '內容策略'],
+  tag: '生活服務',
+  types: ['品牌定位', '網站改版', '內容策略', '資訊架構', '研究分析'],
+  eyebrow: '好齡居 NEXDO',
+  kicker: '重新定義長照服務的角色與價值',
   image: {
     src: '/images/work/nexdo/v4/nexdo-v4-hero.webp',
     alt: '好齡居白色 Logo 與筆電中的新版首頁設計',
-    width: 1920,
-    height: 1080,
   },
-  caption: '我們把受眾研究轉成看得見的網站設計：先說明能解決的生活問題，再安排服務介紹與諮詢入口。',
   href: '/work/nexdo-d/',
+  cta: '查看專案',
 };

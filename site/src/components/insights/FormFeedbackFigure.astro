@@ -1,0 +1,72 @@
+---
+/**
+ * 圖 2「從卡關的現象，找到可改善的地方」（開發執行規格 §4）：桌機三格 1→2→3 依序，手機垂直堆疊。
+ * 表單為靜態示意（div/span 組成，不用可聚焦 input/button，也不真的提交）。
+ * 格1 看到錯誤；格2 不知道怎麼改；格3 提供具體指引。
+ * 只有純裝飾圖形（欄位空框、來回檢查的虛線、連接箭頭、格號）標 aria-hidden；
+ * 欄位名稱、送出、錯誤訊息與提示文字皆為可讀 HTML，不重複朗讀。
+ */
+---
+
+<div class="ff-figure">
+  <div class="ff-panel">
+    <p class="ff-panel-eyebrow" aria-hidden="true">1</p>
+    <div class="ff-form">
+      <div class="ff-field">
+        <span class="ff-field-label">姓名</span>
+        <span class="ff-field-box" aria-hidden="true"></span>
+      </div>
+      <div class="ff-field">
+        <span class="ff-field-label">出生年份</span>
+        <span class="ff-field-box" aria-hidden="true"></span>
+      </div>
+      <span class="ff-fake-btn">送出</span>
+      <p class="ff-error">資料有誤</p>
+    </div>
+    <p class="insight-panel-label">看到錯誤</p>
+  </div>
+
+  <div class="ff-arrow" aria-hidden="true">
+    <svg viewBox="0 0 32 32" focusable="false"><path d="M4 16h22M18 8l8 8-8 8" fill="none" stroke="var(--reach-blue-300)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  </div>
+
+  <div class="ff-panel">
+    <p class="ff-panel-eyebrow" aria-hidden="true">2</p>
+    <div class="ff-form">
+      <div class="ff-field ff-field--checking">
+        <span class="ff-field-label">姓名</span>
+        <span class="ff-field-box" aria-hidden="true"></span>
+      </div>
+      <svg class="ff-recheck" viewBox="0 0 40 24" aria-hidden="true" focusable="false">
+        <path d="M6 6c10 4 18 4 28 0M34 18c-10-4-18-4-28 0" fill="none" stroke="var(--reach-blue-300)" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 6"></path>
+      </svg>
+      <div class="ff-field ff-field--checking">
+        <span class="ff-field-label">出生年份</span>
+        <span class="ff-field-box" aria-hidden="true"></span>
+      </div>
+      <p class="ff-error">資料有誤</p>
+    </div>
+    <p class="ff-bubble">「是哪裡填錯了？」</p>
+    <p class="insight-panel-label">不知道怎麼改</p>
+  </div>
+
+  <div class="ff-arrow" aria-hidden="true">
+    <svg viewBox="0 0 32 32" focusable="false"><path d="M4 16h22M18 8l8 8-8 8" fill="none" stroke="var(--reach-blue-300)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  </div>
+
+  <div class="ff-panel">
+    <p class="ff-panel-eyebrow" aria-hidden="true">3</p>
+    <div class="ff-form">
+      <div class="ff-field">
+        <span class="ff-field-label">姓名</span>
+        <span class="ff-field-box" aria-hidden="true"></span>
+      </div>
+      <div class="ff-field ff-field--resolved">
+        <span class="ff-field-label">出生年份</span>
+        <span class="ff-field-box" aria-hidden="true"></span>
+        <span class="ff-hint">請輸入西元年份，例如 1990</span>
+      </div>
+    </div>
+    <p class="insight-panel-label">提供具體指引</p>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+---
+/**
+ * 觀點文章圖稿共用外框（依開發執行規格 §4「圖的可存取結構」）。
+ * - 輸出 <figure>＋<figcaption>；summary 為螢幕閱讀器專用的可存取摘要，放在圖稿內容之前，
+ *   讓輔助科技使用者先掌握整體情境，再逐一讀到圖稿內真正的 HTML 文字（不重複朗讀同一句話）。
+ * - 圖稿本體（slot）內的裝飾用 SVG／圖形一律由各圖稿元件自行標記 aria-hidden；
+ *   圖稿內具意義的中文文字必須是真實 HTML，此外框不強制、也不重複渲染那些文字。
+ * - figcaption 為對外可見圖說（鎖定文案附錄B），置於圖稿下方，一般圖說樣式（非裝飾）。
+ */
+interface Props {
+  /** 對外可見圖說（鎖定文案附錄B），不可省略 */
+  figcaption: string;
+  /** 螢幕閱讀器專用摘要，先於圖稿內容朗讀 */
+  summary: string;
+}
+
+const { figcaption, summary } = Astro.props;
+---
+
+<figure class="insight-figure">
+  <p class="sr-only">{summary}</p>
+  <div class="insight-figure-art">
+    <slot />
+  </div>
+  <figcaption class="insight-figure-caption">{figcaption}</figcaption>
+</figure>

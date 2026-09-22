@@ -14,9 +14,11 @@ interface Props {
   ogDescription?: string;
   /** 分享圖片（站內路徑，如 /images/...；未提供時用公司 Logo）。正式網域確認後才輸出 */
   ogImage?: string;
+  /** og:type（首篇觀點文章新增；預設 website，向後相容，其餘頁面不受影響） */
+  ogType?: 'website' | 'article';
 }
 
-const { title, description, isHome = false, ogTitle, ogDescription, ogImage } = Astro.props;
+const { title, description, isHome = false, ogTitle, ogDescription, ogImage, ogType = 'website' } = Astro.props;
 const fullTitle = isHome ? title : `${title}｜${SITE_NAME} ${SITE_NAME_EN}`;
 const shareTitle = ogTitle ?? fullTitle;
 const shareDescription = ogDescription ?? description;
@@ -37,7 +39,7 @@ const shareImage = new URL(ogImage ?? '/images/reach-logo.png', SITE_URL).href;
     {SITE_URL_CONFIRMED && <link rel="canonical" href={pageUrl} />}
     <meta property="og:title" content={shareTitle} />
     <meta property="og:description" content={shareDescription} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={`${SITE_NAME} ${SITE_NAME_EN}`} />
     <meta property="og:locale" content="zh_TW" />
     {SITE_URL_CONFIRMED && <meta property="og:url" content={pageUrl} />}

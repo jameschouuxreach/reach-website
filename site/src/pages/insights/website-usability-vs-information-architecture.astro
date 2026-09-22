@@ -1,0 +1,153 @@
+---
+/**
+ * 首篇觀點文章（依開發執行規格 §3、§9 工作1–2）：
+ * Header → 返回入口 → 類別文字＋H1＋導言 → 五節正文（各節固定 H2＋anchor，§3.1）
+ * → 三張解說圖（§4）→ 專案比較（§5）→ 結尾單一聯絡 CTA → Footer。
+ * 正文逐字依 doc/開發規格/致遠官網-首篇觀點文章-鎖定文案.md；圖稿與比較資料位置依該檔標記。
+ * 不加 data-reveal（§7：避免全站 reveal 使內容初始不可見）；全文於關閉 JavaScript 時仍可讀取與導覽。
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleFigure from '../../components/insights/ArticleFigure.astro';
+import SupermarketFigure from '../../components/insights/SupermarketFigure.astro';
+import FormFeedbackFigure from '../../components/insights/FormFeedbackFigure.astro';
+import DehumidifierFigure from '../../components/insights/DehumidifierFigure.astro';
+import ProjectComparison from '../../components/insights/ProjectComparison.astro';
+import { FIRST_INSIGHT_ARTICLE, CONTACT_CTA } from '../../data/insights';
+import '../../styles/insight-article.css';
+---
+
+<BaseLayout title={FIRST_INSIGHT_ARTICLE.title} description={FIRST_INSIGHT_ARTICLE.description} ogType="article">
+  <section class="insight-article-section bg-page">
+    <div class="insight-article">
+      <a href="/insights/" class="insight-back">← 返回致遠觀點</a>
+      <p class="insight-eyebrow">{FIRST_INSIGHT_ARTICLE.category}</p>
+      <h1>{FIRST_INSIGHT_ARTICLE.title}</h1>
+
+      <p>「資料明明都放在網站上，為什麼客戶還是一直打電話來問？」</p>
+      <p>「流程已經改好幾遍，怎麼還是有很多人卡關？」</p>
+      <p>
+        你是不是也遇過類似的情況？知道網站需要改善，但一開會，有人想重整選單，有人建議放大按鈕，也有人主張乾脆全面改版。每個建議都有道理，你卻不確定：<strong
+          >哪一個，才能解決客戶的問題？</strong
+        >
+      </p>
+      <p>先別急著決定要改什麼。我們可以從一次逛超市的經驗，看看「不好用」背後可能發生了什麼。</p>
+
+      <h2 id="supermarket">同樣是買不到東西，原因可能很不同</h2>
+      <p>想像你走進超市，準備買一瓶燕麥奶。</p>
+      <p>你找過鮮奶區、飲料區，都沒看到。問了店員，才知道它被放在「健康食品區」。商品一直都在，只是它的位置不符合你的預期。</p>
+      <p>好不容易找到商品，到了自助結帳機前，你又停了下來：折價券不知道在哪裡輸入，付款後畫面也沒說清楚是否成功。最後，你還是需要店員協助。</p>
+      <p>這趟購物遇到了兩種困難：<strong>一種是找不到，一種是操作卡住。</strong></p>
+      <p>網站也一樣。使用者可能不知道該點哪個分類，也可能已經進入正確功能，卻無法完成想做的事。理解這個差別，就能開始找到改善方向。</p>
+
+      <ArticleFigure
+        figcaption="同一趟購物，可能同時遇到資訊難找與操作卡住。"
+        summary="顧客先在超市尋找燕麥奶，接著在自助結帳機前遇到操作困難，分別呈現資訊安排與操作過程兩個面向。"
+      >
+        <SupermarketFigure />
+      </ArticleFigure>
+
+      <h2 id="usability-testing">易用性測試：看見使用者是怎麼卡住的</h2>
+      <p>如果你是店長，想改善結帳體驗，最直接的方式，就是看看顧客實際怎麼操作。</p>
+      <p>他是不是沒看到掃描成功的提示，所以又掃了一次？是不是找不到折價券入口，才停下來求助？</p>
+      <p>這也是「易用性測試」的做法：請目標使用者完成具體任務，觀察他在哪裡猶豫、誤解或無法繼續，再找出改善線索。</p>
+      <p>例如，請使用者在網站上完成一筆報名。你可能發現，他不是不願意填資料，而是不懂欄位的意思；也可能不是填錯太多次，而是錯誤訊息從未告訴他該怎麼改。</p>
+      <p>有了這些觀察，團隊就更能判斷，應該修改欄位說明、調整步驟，還是補上清楚的完成提示。</p>
+      <p>
+        <strong>測試的價值，是讓「我們猜他會卡住」變成「我們看見他為什麼卡住」。</strong>
+        觀察範圍也包含找資料的過程，因此測試同樣可能發現分類與命名的問題。
+        <a href="https://www.nngroup.com/articles/usability-testing-101/" class="insight-source-link">
+          易用性測試的專業說明
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path
+              d="M5 3.5h7.5V11M12.5 3.5 3.5 12.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+        </a>
+      </p>
+
+      <ArticleFigure
+        figcaption="看見操作過程，才能針對原因改善。示意情境。"
+        summary="籠統的資料錯誤提示讓使用者不知道如何修正；改在出錯欄位旁提供具體格式說明，幫助他繼續操作。"
+      >
+        <FormFeedbackFigure />
+      </ArticleFigure>
+
+      <h2 id="information-architecture">資訊架構重整：讓內容的安排，更符合使用者的理解</h2>
+      <p>但如果顧客的困難發生在貨架之間，改善結帳機就幫不上忙。我們需要重新檢查：商品怎麼分區？區名是否容易理解？顧客會預期在哪裡找到它？</p>
+      <p>
+        網站上的「資訊架構重整」，處理的就是內容與功能如何分類、命名，以及建立關係。
+        <a href="https://www.nngroup.com/articles/ia-vs-navigation/" class="insight-source-link">
+          資訊架構的專業說明
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path
+              d="M5 3.5h7.5V11M12.5 3.5 3.5 12.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+        </a>
+      </p>
+      <p>以家電網站為例，你想買一台除濕機，打開網站卻只看到一排型號與規格。每個字都看得懂，放在一起卻不知道哪台適合自己，只好一頁一頁打開比較。</p>
+      <p>如果網站提供「適用坪數」與「節能等級」等選擇條件，你就能先對照家中空間，再依節能需求縮小範圍，接著比較產品細節。型號與規格仍然有用，但你不必先成為家電專家，才能開始挑選。</p>
+      <p>這就是資訊架構重整會思考的事：使用者帶著什麼需求而來？哪些資訊能幫助他判斷？內容應該如何安排，才能支持他的選擇？</p>
+      <p>
+        我們會先盤點內容、了解使用者怎麼找，再調整分類、名稱與資訊關聯。提出新安排後，也能先請使用者試著找資料，確認方向是否有效，不必等整個網站做好才知道。
+        <a href="https://www.nngroup.com/articles/tree-testing/" class="insight-source-link">
+          資訊分類的驗證方式
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path
+              d="M5 3.5h7.5V11M12.5 3.5 3.5 12.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+        </a>
+      </p>
+
+      <ArticleFigure
+        figcaption="用使用者熟悉的需求，幫助他找到適合的產品。示意情境。"
+        summary="左邊只有除濕機型號與規格，右邊提供適用坪數及節能等級篩選，讓使用者依家庭需求縮小選擇。"
+      >
+        <DehumidifierFigure />
+      </ArticleFigure>
+
+      <h2 id="choose-project">那麼，我的網站應該從哪一邊開始？</h2>
+      <p>看到這裡，你可能已經想到幾個客戶的抱怨，卻發現兩邊都對得上：有人找不到入口，也有人進去之後做不完。</p>
+      <p>這很常見。一個網站可能同時存在兩種困難，專案中也經常需要一起處理。真正要判斷的是：<strong>目前最需要投入力氣的地方在哪裡？</strong></p>
+      <p>因此，致遠會依主要問題與工作重點，規劃「流程優化型」與「架構重整型」兩種專案類型。</p>
+
+      <ProjectComparison />
+
+      <p>
+        <strong>百分比只是幫助理解工作重心的示意，不是固定的工時、費用或服務配比。</strong>
+        實際安排會依問題調整，資訊架構重整過程中也可能運用易用性測試驗證成果。
+      </p>
+      <p>
+        以致遠參與的<strong>報稅系統優化專案</strong>為例，主要重點是改善民眾操作報稅系統的流程。但我們也同時調整首頁上不同報稅方式的資訊架構，讓各個入口的區分與選擇更直覺。
+      </p>
+      <p>因為對民眾而言，順利完成報稅，從選對入口就已經開始。即使專案以流程優化為主，仍需要照顧資訊的安排，才能讓整段使用體驗銜接起來。</p>
+
+      <h2 id="next-step">決定改版方向前，你可以先做這件事……</h2>
+      <p>找出客服最常收到的三個網站問題，記下使用者當時想做什麼、在哪裡停下來，以及最後需要什麼協助。</p>
+      <p>例如，把「報名流程不好用」說得更具體：</p>
+      <blockquote>「客戶送出表單後，不知道有沒有報名成功，所以打電話來確認。」</blockquote>
+      <p>這樣的描述，已經能幫助團隊縮小問題範圍，也更容易討論該如何驗證與改善。</p>
+      <p>如果你已經累積了一些客戶反映，卻還不確定應該優先改善流程，還是重新整理資訊，歡迎帶著這些問題與致遠聊聊。我們可以一起釐清使用者的困難，討論適合的專案方向與工作範圍。</p>
+
+      <p class="insight-cta-row">
+        <a href={CONTACT_CTA.href} class="btn-primary insight-cta rounded-full px-7">
+          {CONTACT_CTA.label}
+          <span class="cta-arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>

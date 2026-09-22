@@ -1,15 +1,13 @@
 ---
 /**
- * 致遠觀點列表（依開發執行規格 §6）：PageHero → 一張真實文章卡 → 既有 ContactCta。
- * 移除原本的預留分類 pills 與三張「文章整理中」假卡；封面沿用圖 1（超市插畫）簡化版，
+ * 致遠觀點列表：PageHero → 一張真實文章卡 → 既有 ContactCta。
+ * 移除原本的預留分類 pills 與三張「文章整理中」假卡；封面沿用文章圖 1（真實配圖），
  * 標題／摘要取自 src/data/insights.ts，與文章頁、sitemap 共用同一份 metadata。
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import ContactCta from '../components/ContactCta.astro';
-import SupermarketFigure from '../components/insights/SupermarketFigure.astro';
 import { FIRST_INSIGHT_ARTICLE } from '../data/insights';
-import '../styles/insight-article.css';
 ---
 
 <BaseLayout
@@ -23,10 +21,16 @@ import '../styles/insight-article.css';
 
   <section class="container-site py-16 md:py-24" data-reveal>
     <a href={FIRST_INSIGHT_ARTICLE.path} class="insight-card group block max-w-[680px] no-underline">
-      <div class="insight-card-cover overflow-hidden rounded-xl border border-line" aria-hidden="true">
-        <div class="insight-card-cover-art">
-          <SupermarketFigure />
-        </div>
+      <div class="insight-card-cover overflow-hidden rounded-xl border border-line">
+        <img
+          src="/images/insights/figure-supermarket.webp"
+          alt=""
+          width="1600"
+          height="800"
+          loading="lazy"
+          decoding="async"
+          class="insight-card-cover-img"
+        />
       </div>
       <p class="mt-6 text-sm font-bold tracking-wide text-brand">{FIRST_INSIGHT_ARTICLE.category}</p>
       <h2 class="insight-card-title mt-2 text-xl font-bold text-ink md:text-2xl">{FIRST_INSIGHT_ARTICLE.title}</h2>
@@ -42,34 +46,23 @@ import '../styles/insight-article.css';
 </BaseLayout>
 
 <style>
-  /* 封面：簡化版圖 1，縮小文字、關閉互動細節，只保留故事輪廓當裝飾封面 */
+  /* 封面：文章圖 1（真實配圖），hover 時比照 CaseCard 的輕微放大 */
   .insight-card-cover {
     background-color: var(--color-surface-accent);
   }
 
-  .insight-card-cover-art {
-    padding: 20px 16px 4px;
-    transform: scale(0.92);
-    transform-origin: top center;
-    pointer-events: none;
+  .insight-card-cover-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1600 / 800;
+    object-fit: cover;
+    transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .insight-card-cover-art :global(.sm-figure) {
-    gap: 12px;
-  }
-
-  .insight-card-cover-art :global(.sm-panel) {
-    padding: 12px 10px;
-  }
-
-  .insight-card-cover-art :global(.insight-panel-label),
-  .insight-card-cover-art :global(.sm-bubble) {
-    font-size: 0.75rem;
-  }
-
-  .insight-card-cover-art :global(.sm-chip) {
-    font-size: 0.75rem;
-    padding: 4px 8px;
+  .insight-card:hover .insight-card-cover-img,
+  .insight-card:focus-visible .insight-card-cover-img {
+    transform: scale(1.03);
   }
 
   .insight-card-title,
@@ -102,11 +95,14 @@ import '../styles/insight-article.css';
   @media (prefers-reduced-motion: reduce) {
     .insight-card-title,
     .insight-card-cta,
-    .insight-card-cta .cta-arrow {
+    .insight-card-cta .cta-arrow,
+    .insight-card-cover-img {
       transition: none;
     }
     .insight-card:hover .cta-arrow,
-    .insight-card:focus-visible .cta-arrow {
+    .insight-card:focus-visible .cta-arrow,
+    .insight-card:hover .insight-card-cover-img,
+    .insight-card:focus-visible .insight-card-cover-img {
       transform: none;
     }
   }

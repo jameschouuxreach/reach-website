@@ -1,99 +1,87 @@
 ---
 /**
- * 流程優化型／架構重整型專案比較（開發執行規格 §5.1–§5.3）。
- * - ≥1024px：真實 <table>（caption 視覺隱藏、th scope 完整）；<1024px：兩張垂直卡片，同樣五欄資料。
- *   兩種版式共用同一份 PROJECT_COMPARISON_ROWS，並以 CSS display:none 保證同一時刻只有一個
- *   版式進入存取樹與鍵盤順序（見 insight-article.css 的 .ic-table-wrap／.ic-cards 媒體查詢）。
- * - 第四欄「工作重心示意」為易用性測試／資訊架構重整的靜態堆疊條＋文字圖例：色彩＋紋理雙重區分，
- *   兩個類別的完整名稱與數字永遠以真實文字顯示在條狀圖旁，不藏在顏色或 hover tooltip；
- *   條狀圖本身是重複同一組圖例文字的裝飾圖，故整個條狀圖標 aria-hidden，圖例文字才是可讀內容。
- * - 第五欄「了解專案」CTA 為文字連結（描邊／文字樣式，非大型主視覺），沿用全站 .text-cta 語彙。
+ * 架構重整型／流程優化型專案比較（2026-09-22 改版）。
+ * - 欄序固定：架構重整型在左、流程優化型在右（與鎖定文案表格一致）。
+ * - 列序固定：適用情境／專案重點／執行方式／了解專案。
+ * - ≥1024px 用真實 <table>（caption 視覺隱藏、th scope 完整）；<1024px 改兩張垂直卡片，
+ *   同一份 PROJECT_COMPARISON_ROWS 供兩種版式共用，CSS 以 display:none 保證同一時刻只有一版進入
+ *   存取樹與鍵盤順序（見 insight-article.css 的 .ic-table-wrap／.ic-cards）。
+ * - 「了解專案」為文字連結（沿用全站 .text-cta），非大型主視覺按鈕。
+ * - 「執行方式」欄內文分兩行（如「資訊架構重整為主」／「易用性測試為輔」），以 <br> 呈現。
  */
-import { PROJECT_COMPARISON_ROWS } from '../../data/insights';
+import { PROJECT_COMPARISON_ROWS, PROJECT_TYPE_LABELS } from '../../data/insights';
+
+const fields = [
+  { key: 'situation', label: '適用情境' },
+  { key: 'focus', label: '專案重點' },
+  { key: 'approach', label: '執行方式' },
+] as const;
 ---
 
 <div class="ic-table-wrap">
   <table class="ic-table">
-    <caption class="sr-only">流程優化型與架構重整型專案比較</caption>
+    <caption class="sr-only">架構重整型與流程優化型專案比較</caption>
     <thead>
       <tr>
-        <th scope="col">專案類型</th>
-        <th scope="col">比較接近你的情況</th>
-        <th scope="col">主要工作重點</th>
-        <th scope="col">工作重心示意</th>
-        <th scope="col">了解專案</th>
+        <th scope="col">
+          <span class="sr-only">項目</span>
+        </th>
+        {PROJECT_TYPE_LABELS.map((type) => <th scope="col">{type.title}</th>)}
       </tr>
     </thead>
     <tbody>
       {
-        PROJECT_COMPARISON_ROWS.map((row) => (
+        fields.map((field) => (
           <tr>
-            <th scope="row">{row.projectType}</th>
-            <td>{row.situation}</td>
-            <td>{row.focus}</td>
-            <td>
-              <div class="ic-ratio">
-                <div class="ic-ratio-bar" aria-hidden="true">
-                  <span class="ic-ratio-seg ic-ratio-seg--usability" style={`width:${row.usabilityPercent}%`} />
-                  <span class="ic-ratio-seg ic-ratio-seg--ia" style={`width:${row.informationArchitecturePercent}%`} />
-                </div>
-                <ul class="ic-ratio-legend">
-                  <li>
-                    <span class="ic-ratio-swatch ic-ratio-swatch--usability" aria-hidden="true" />
-                    易用性測試 {row.usabilityPercent}%
-                  </li>
-                  <li>
-                    <span class="ic-ratio-swatch ic-ratio-swatch--ia" aria-hidden="true" />
-                    資訊架構重整 {row.informationArchitecturePercent}%
-                  </li>
-                </ul>
-              </div>
-            </td>
+            <th scope="row">{field.label}</th>
+            {PROJECT_COMPARISON_ROWS.map((row) => (
+              <td>
+                {row[field.key].map((line, i) => (
+                  <>
+                    {i > 0 && <br />}
+                    {line}
+                  </>
+                ))}
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+      <tr>
+        <th scope="row">了解專案</th>
+        {
+          PROJECT_COMPARISON_ROWS.map((row) => (
             <td>
               <a href={row.ctaHref} class="text-cta">
                 {row.ctaLabel}
                 <span class="cta-arrow" aria-hidden="true">→</span>
               </a>
             </td>
-          </tr>
-        ))
-      }
+          ))
+        }
+      </tr>
     </tbody>
   </table>
 </div>
 
 <ul class="ic-cards">
   {
-    PROJECT_COMPARISON_ROWS.map((row) => (
+    PROJECT_COMPARISON_ROWS.map((row, index) => (
       <li class="ic-card">
-        <h3 class="ic-card-title">{row.projectType}</h3>
-        <div class="ic-card-field">
-          <p class="ic-card-label">比較接近你的情況</p>
-          <p class="ic-card-value">{row.situation}</p>
-        </div>
-        <div class="ic-card-field">
-          <p class="ic-card-label">主要工作重點</p>
-          <p class="ic-card-value">{row.focus}</p>
-        </div>
-        <div class="ic-card-field">
-          <p class="ic-card-label">工作重心示意</p>
-          <div class="ic-ratio">
-            <div class="ic-ratio-bar" aria-hidden="true">
-              <span class="ic-ratio-seg ic-ratio-seg--usability" style={`width:${row.usabilityPercent}%`} />
-              <span class="ic-ratio-seg ic-ratio-seg--ia" style={`width:${row.informationArchitecturePercent}%`} />
-            </div>
-            <ul class="ic-ratio-legend">
-              <li>
-                <span class="ic-ratio-swatch ic-ratio-swatch--usability" aria-hidden="true" />
-                易用性測試 {row.usabilityPercent}%
-              </li>
-              <li>
-                <span class="ic-ratio-swatch ic-ratio-swatch--ia" aria-hidden="true" />
-                資訊架構重整 {row.informationArchitecturePercent}%
-              </li>
-            </ul>
+        <h3 class="ic-card-title">{PROJECT_TYPE_LABELS[index].title}</h3>
+        {fields.map((field) => (
+          <div class="ic-card-field">
+            <p class="ic-card-label">{field.label}</p>
+            <p class="ic-card-value">
+              {row[field.key].map((line, i) => (
+                <>
+                  {i > 0 && <br />}
+                  {line}
+                </>
+              ))}
+            </p>
           </div>
-        </div>
+        ))}
         <div class="ic-card-field">
           <p class="ic-card-label">了解專案</p>
           <a href={row.ctaHref} class="text-cta">

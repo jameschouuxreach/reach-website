@@ -1,26 +1,23 @@
 ---
 /**
- * 觀點文章圖稿共用外框（依開發執行規格 §4「圖的可存取結構」）。
- * - 輸出 <figure>＋<figcaption>；summary 為螢幕閱讀器專用的可存取摘要，放在圖稿內容之前，
- *   讓輔助科技使用者先掌握整體情境，再逐一讀到圖稿內真正的 HTML 文字（不重複朗讀同一句話）。
- * - 圖稿本體（slot）內的裝飾用 SVG／圖形一律由各圖稿元件自行標記 aria-hidden；
- *   圖稿內具意義的中文文字必須是真實 HTML，此外框不強制、也不重複渲染那些文字。
- * - figcaption 為對外可見圖說（鎖定文案附錄B），置於圖稿下方，一般圖說樣式（非裝飾）。
+ * 觀點文章圖稿統一元件（2026-09-22 改版：全部改用真實配圖，取代先前的自製 HTML/SVG 插畫）。
+ * - 單張 <img>＋<figcaption>；alt 為圖片內容的文字描述，figcaption 為對外可見的編輯圖說，
+ *   兩者分工不同不重複朗讀。
+ * - 寬度與內文同寬（不再另外放大到比正文更寬的「圖稿／比較區」框），由 .insight-article 統一控制。
+ * - 圖檔一律放 public/images/insights/，已於本機轉檔為 WebP 並縮到 1520–1600px 寬（2x 視覺寬度已足夠）。
  */
 interface Props {
-  /** 對外可見圖說（鎖定文案附錄B），不可省略 */
-  figcaption: string;
-  /** 螢幕閱讀器專用摘要，先於圖稿內容朗讀 */
-  summary: string;
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption: string;
 }
 
-const { figcaption, summary } = Astro.props;
+const { src, alt, width, height, caption } = Astro.props;
 ---
 
 <figure class="insight-figure">
-  <p class="sr-only">{summary}</p>
-  <div class="insight-figure-art">
-    <slot />
-  </div>
-  <figcaption class="insight-figure-caption">{figcaption}</figcaption>
+  <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" class="insight-figure-img" />
+  <figcaption class="insight-figure-caption">{caption}</figcaption>
 </figure>

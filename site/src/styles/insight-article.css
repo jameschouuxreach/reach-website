@@ -4,9 +4,18 @@
  *（此檔為未加 @layer 的一般樣式，CSS Cascade Layers 規則下優先權本就高於 global.css 內
  * @layer base/components 的同名選擇器，故只需在此新增規則）。
  *
- * 2026-09-22 改版：圖片與比較表改為與內文同寬（業主指示）——.insight-article 本身即正文寬度框
- * （760px），不再另外設一層更寬的「圖稿／比較區」外框；OS（開頭兩句）改用獨立字體樣式區隔內文
+ * 2026-09-22 改版：圖片與比較表改為與內文同寬（業主指示）——.insight-article 本身即正文寬度框，
+ * 不再另外設一層更寬的「圖稿／比較區」外框；OS（開頭兩句）改用獨立字體樣式區隔內文
  * （Noto Serif TC，僅載入這兩句實際用到的字，減少字型檔重量）。
+ *
+ * 2026-09-23 再改版（業主參考悠識研究 blog.userxper.com 文章頁）：
+ * - 內文寬度改 768px（實測悠識 .entry-content 寬度）。
+ * - H1 縮小為桌機 42px／手機 28px（實測悠識 h1：42px、weight 700、line-height 48.3px）。
+ * - H1 下新增副標（.insight-subtitle，比照悠識 18px／400／灰階）與目錄（.insight-toc，比照悠識
+ *   toc-wrapper 的編號清單樣式，改用品牌藍）。
+ * - 類別文字（.insight-eyebrow）改 pill 樣式。
+ * - OS 移除左側藍色邊框，僅保留字體樣式本身作區隔。
+ * - 比較表左側標題欄縮寬、中右兩欄字級放大。
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500&text=%E3%80%8C%E8%B3%87%E6%96%99%E6%98%8E%E6%98%8E%E9%83%BD%E6%94%BE%E5%9C%A8%E7%B6%B2%E7%AB%99%E4%B8%8A%EF%BC%8C%E7%82%BA%E4%BB%80%E9%BA%BC%E5%AE%A2%E6%88%B6%E9%82%84%E6%98%AF%E4%B8%80%E7%9B%B4%E6%89%93%E9%9B%BB%E8%A9%B1%E4%BE%86%E5%95%8F%EF%BC%9F%E3%80%8D%E3%80%8C%E6%B5%81%E7%A8%8B%E5%B7%B2%E7%B6%93%E6%94%B9%E5%A5%BD%E5%B9%BE%E9%81%8D%EF%BC%8C%E6%80%8E%E9%BA%BC%E9%82%84%E6%98%AF%E6%9C%89%E5%BE%88%E5%A4%9A%E4%BA%BA%E5%8D%A1%E9%97%9C%EF%BC%9F%E3%80%8D&display=swap');
@@ -23,10 +32,13 @@
   }
 }
 
-/* 正文寬度＝全篇唯一寬度：段落、標題、圖片、表格一律同寬（業主 2026-09-22 指示） */
+/* 正文寬度＝全篇唯一寬度：段落、標題、圖片、表格一律同寬。
+   悠識實測固定 768px＋內文 16px（每行約 48 字）；本站內文為 18px，若同樣用 768px，每行只剩約
+   42 字，讀起來才會偏窄。故容器放寬到 920px（桌機扣掉左右內距後約 840px，每行約 47 字），
+   在維持本站 18px 字級的前提下貼近悠識的每行字數與閱讀節奏。 */
 .insight-article {
   width: 100%;
-  max-width: 760px;
+  max-width: 920px;
   margin-inline: auto;
   padding-inline: 20px;
 }
@@ -43,57 +55,161 @@
   }
 }
 
-/* ---------------------------------------------------------------- 返回入口／類別文字／標題 */
+/* ---------------------------------------------------------------- 麵包屑／類別 pill／標題 */
 
-.insight-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
+/* 麵包屑：網站路徑（首頁 › 致遠觀點），比照悠識文章頁 14px 灰階；類別 pill 另起一行放在其下 */
+.insight-breadcrumb {
   margin-top: 24px;
-  font-size: 0.9375rem;
-  font-weight: 600;
+}
+
+.insight-breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insight-breadcrumb-item {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.insight-breadcrumb-item a {
   color: var(--color-text-secondary);
   text-decoration: none;
 }
 
-.insight-back:hover {
+.insight-breadcrumb-item a:hover {
   color: var(--color-brand);
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 
-.insight-eyebrow {
-  margin-top: 20px;
+.insight-breadcrumb-sep {
+  color: var(--color-line-strong);
+}
+
+/* 類別文字：pill 樣式（品牌淡藍底、深藍字）。用 .insight-article .insight-eyebrow 兩層 class
+   提高優先權，避免被後面「.insight-article p」的通用內文樣式覆蓋（兩者都是 <p>） */
+.insight-article .insight-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 20px; /* 與上方麵包屑的間距（本站 4px 級距：20px） */
   margin-bottom: 0;
-  font-size: 0.9375rem;
+  padding: 0.25rem 0.875rem;
+  border: 1px solid var(--reach-blue-200);
+  border-radius: 9999px;
+  /* blue-50 對頁面底色（neutral-50）對比太弱，改 blue-100 並加邊框確保可辨識 */
+  background-color: var(--reach-blue-100);
+  font-size: 0.8125rem;
   font-weight: 700;
-  color: var(--color-brand);
+  color: var(--reach-blue-700);
 }
 
 .insight-article h1 {
-  margin-top: 12px;
+  margin-top: 16px; /* pill → H1 */
   margin-bottom: 0;
-  font-size: 1.875rem; /* 30px：手機 */
-  line-height: 1.35;
-}
-
-@media (min-width: 400px) {
-  .insight-article h1 {
-    font-size: 2.125rem; /* 34px 手機上緣 */
-  }
+  font-size: 1.75rem; /* 28px：手機 */
+  line-height: 1.25;
 }
 
 @media (min-width: 768px) {
   .insight-article h1 {
-    font-size: 2.5rem; /* 40px 桌機下緣 */
-    line-height: 1.3;
+    font-size: 2.625rem; /* 42px：比照悠識文章 h1 實測字級 */
+    line-height: 1.15;
   }
 }
 
-@media (min-width: 1280px) {
-  .insight-article h1 {
-    font-size: 3rem; /* 48px 桌機上緣 */
+/* 副標（比照悠識文章 excerpt：18px／400／灰階）。同上，兩層 class 避免被通用內文樣式覆蓋 */
+.insight-article .insight-subtitle {
+  margin-top: 10px;
+  margin-bottom: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--neutral-400);
+}
+
+@media (min-width: 768px) {
+  .insight-article .insight-subtitle {
+    margin-top: 16px; /* 比照悠識 H1 → 副標約 17px */
+    font-size: 1.125rem; /* 18px */
   }
+}
+
+/* 目錄（比照悠識 toc-wrapper：淡底框＋編號清單，改用品牌藍） */
+.insight-toc {
+  margin-top: 32px;
+  padding: 20px 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background-color: var(--color-surface-accent);
+}
+
+@media (min-width: 768px) {
+  .insight-toc {
+    margin-top: 40px;
+    padding: 24px 28px;
+  }
+}
+
+/* 內文：與上方文章頁首明確分段，避免第一段緊貼目錄（業主指示） */
+.insight-body {
+  margin-top: 36px;
+}
+
+@media (min-width: 768px) {
+  .insight-body {
+    margin-top: 48px;
+  }
+}
+
+/* 內文第一個元素不再自帶上距，間距一律由 .insight-body 控制 */
+.insight-body > :first-child {
+  margin-top: 0;
+}
+
+.insight-toc-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.insight-toc-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insight-toc-item + .insight-toc-item {
+  margin-top: 4px;
+}
+
+.insight-toc-link {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.375rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.insight-toc-link:hover {
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.insight-toc-number {
+  flex: none;
+  color: var(--color-brand);
+  font-weight: 700;
 }
 
 /* ---------------------------------------------------------------- OS（開頭兩句）：獨立字體樣式區隔內文 */
@@ -101,8 +217,6 @@
 .insight-os {
   margin-top: 16px;
   margin-bottom: 0;
-  padding-left: 14px;
-  border-left: 3px solid var(--reach-blue-200);
   font-family: 'Noto Serif TC', var(--font-sans), serif;
   font-weight: 500;
   font-size: 1.0625rem;
@@ -111,11 +225,11 @@
 }
 
 .insight-os + .insight-os {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .insight-os + p {
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 @media (min-width: 768px) {
@@ -270,17 +384,19 @@
 .ic-table td {
   border-bottom: 1px solid var(--color-border);
   border-right: 1px solid var(--color-border);
-  padding: 14px 16px;
+  padding: 16px 18px;
   text-align: left;
   vertical-align: top;
-  font-size: 0.875rem;
+  font-size: 1rem; /* 16px：業主指示放大中右兩欄內文 */
   line-height: 1.65;
   color: var(--color-text-secondary);
 }
 
+/* 左側標題欄縮寬，讓中右兩欄有更多空間（業主指示） */
 .ic-table th:first-child,
 .ic-table td:first-child {
-  width: 27%;
+  width: 18%;
+  padding-right: 10px;
 }
 
 .ic-table th:last-child,
@@ -297,14 +413,14 @@
   background-color: var(--color-surface-accent);
   color: var(--color-text);
   font-weight: 700;
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
 }
 
 .ic-table tbody th[scope='row'] {
   background-color: var(--color-surface-accent);
   color: var(--color-text);
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
 }
 
 .ic-card {

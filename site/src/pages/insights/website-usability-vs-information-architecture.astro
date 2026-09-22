@@ -1,10 +1,10 @@
 ---
 /**
- * 首篇觀點文章（2026-09-22 改版）：
- * Header → 返回入口 → 類別文字＋H1＋OS（開頭兩句，獨立字體樣式）＋導言
- * → 五節正文（各節固定 H2＋anchor）→ 結尾單一聯絡 CTA → 既有 Footer。
- * 章節順序：同樣是購物不順利 → 資訊架構重整 → 易用性測試 → 那麼我的網站應該從哪個問題下手
- *（含專案比較表、報稅／交通部兩個案例小圖）→ 決定改版方向前。
+ * 首篇觀點文章（2026-09-22 改版；2026-09-23 再改版，參考悠識研究 blog.userxper.com 文章頁調整版面）：
+ * Header → 麵包屑 → 類別 pill ＋H1＋副標＋目錄 → 內文（首節「前言」含 OS 兩句，獨立字體樣式、無邊框）
+ * → 六節正文（前言＋五節，各節固定 H2＋anchor）→ 結尾單一聯絡 CTA → 既有 Footer。
+ * 章節順序：前言 → 同樣是購物不順利 → 資訊架構重整 → 易用性測試 → 那麼我的網站應該從哪個問題下手
+ *（含專案比較表、報稅／交通部兩個案例小圖）→ 決定改版方向前；目錄的六個項目與此順序一致。
  * 六張配圖皆為真實圖檔（public/images/insights/，本機已轉 WebP 並縮圖），不再是自製 HTML/SVG 插畫；
  * 圖片與比較表寬度與內文同寬（見 insight-article.css，.insight-article 本身即為正文寬度框）。
  * 不加 data-reveal（避免全站 reveal 使內容初始不可見）；全文於關閉 JavaScript 時仍可閱讀與導覽。
@@ -14,15 +14,52 @@ import ArticleFigure from '../../components/insights/ArticleFigure.astro';
 import ProjectComparison from '../../components/insights/ProjectComparison.astro';
 import { FIRST_INSIGHT_ARTICLE, CONTACT_CTA } from '../../data/insights';
 import '../../styles/insight-article.css';
+
+/** 目錄：與下方六個 H2 的 id／文字一致，供 .insight-toc 產生錨點連結 */
+const TOC_ITEMS = [
+  { id: 'intro', label: '前言' },
+  { id: 'supermarket', label: '同樣是購物不順利，原因可能很不同' },
+  { id: 'information-architecture', label: '資訊架構重整：讓使用者輕鬆找到內容' },
+  { id: 'usability-testing', label: '易用性測試：讓使用者能夠順利操作' },
+  { id: 'choose-project', label: '那麼，我的網站應該從哪個問題下手？' },
+  { id: 'next-step', label: '決定改版方向前，你可以先做這件事……' },
+];
 ---
 
 <BaseLayout title={FIRST_INSIGHT_ARTICLE.title} description={FIRST_INSIGHT_ARTICLE.description} ogType="article">
   <section class="insight-article-section bg-page">
     <div class="insight-article">
-      <a href="/insights/" class="insight-back">← 返回致遠觀點</a>
+      <nav class="insight-breadcrumb" aria-label="麵包屑">
+        <ol class="insight-breadcrumb-list">
+          <li class="insight-breadcrumb-item"><a href="/">首頁</a></li>
+          <li class="insight-breadcrumb-item" aria-hidden="true"><span class="insight-breadcrumb-sep">›</span></li>
+          <li class="insight-breadcrumb-item"><a href="/insights/">致遠觀點</a></li>
+        </ol>
+      </nav>
+
       <p class="insight-eyebrow">{FIRST_INSIGHT_ARTICLE.category}</p>
       <h1>{FIRST_INSIGHT_ARTICLE.title}</h1>
+      <p class="insight-subtitle">先搞懂網站問題，才知道要用哪種方式改善</p>
 
+      <nav class="insight-toc" aria-label="文章目錄">
+        <p class="insight-toc-title">目錄</p>
+        <ol class="insight-toc-list">
+          {
+            TOC_ITEMS.map((item, index) => (
+              <li class="insight-toc-item">
+                <a href={`#${item.id}`} class="insight-toc-link">
+                  <span class="insight-toc-number" aria-hidden="true">{index + 1}.</span>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      {/* 內文：與上方文章頁首（麵包屑／類別／標題／副標／目錄）明確分段，首節為「前言」 */}
+      <div class="insight-body">
+      <h2 id="intro">前言</h2>
       <p class="insight-os">「資料明明都放在網站上，為什麼客戶還是一直打電話來問？」</p>
       <p class="insight-os">「流程已經改好幾遍，怎麼還是有很多人卡關？」</p>
 
@@ -145,6 +182,7 @@ import '../../styles/insight-article.css';
           <span class="cta-arrow" aria-hidden="true">→</span>
         </a>
       </p>
+      </div>
     </div>
   </section>
 </BaseLayout>

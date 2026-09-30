@@ -30,6 +30,7 @@ Manage the background server with `astro dev stop`, `astro dev status`, and `ast
 | `reach-web-v2-2` | https://reach-web-v2-2.reach-website-6cb.pages.dev | 2026-08-28 快照：案例卡 C 版改小標＋五 tag、使命區 v5 無捲動鎖定只留 tabs、服務區新增四個服務範疇 pill |
 | `service-v1` | https://service-v1.reach-website-6cb.pages.dev | 2026-09-02 快照：服務內容三層資訊架構（原 GitHub Pages 的 /v2-3/） |
 | `service-v2` | https://service-v2.reach-website-6cb.pages.dev | 服務頁後續調整開發線 |
+| `case-v5` | https://case-v5.reach-website-6cb.pages.dev | 好齡居案例第五版（E）：`/work/nexdo-e/`，單欄限寬、無目錄、前後直接對照 |
 
 原始碼一律維持根路徑寫法（`/images/...`）。正式網域確認後，在 Cloudflare 專案的 Custom domains 綁定，並更新 `src/config.ts` 的 `SITE_URL`。
 

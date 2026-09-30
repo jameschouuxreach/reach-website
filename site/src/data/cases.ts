@@ -92,3 +92,21 @@ export const NEXDO_D_CASE: CaseItem = {
   href: '/work/nexdo-d/',
   cta: '查看專案',
 };
+
+/**
+ * 好齡居 E 版（第五版，2026-09-30）列表入口：依《好齡居專案實例-版本E》第 6 節新增，
+ * 只在 /cases/ 顯示（D 版之後、合作金庫之前）；不得加入首頁共用的 CASES 陣列。
+ */
+export const NEXDO_E_CASE: CaseItem = {
+  name: '好齡居｜從受眾研究到品牌與網站改版',
+  tag: '生活服務',
+  types: ['研究分析', '品牌定位', '資訊架構', '網站改版', '內容策略'],
+  eyebrow: '好齡居 NEXDO',
+  kicker: '第五版｜好齡居 NEXDO',
+  image: {
+    src: '/images/work/nexdo/v4/nexdo-v4-hero.webp',
+    alt: '好齡居 Logo 與筆電中的首頁改版設計',
+  },
+  href: '/work/nexdo-e/',
+  cta: '查看專案',
+};

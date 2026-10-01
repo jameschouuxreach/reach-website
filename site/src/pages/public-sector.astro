@@ -1,27 +1,19 @@
 ---
+/**
+ * 政府與公共服務內頁（2026-10-01 規格 doc/開發規格/public-sector-v1）：
+ * Hero → 角色 Tab（資訊廠商／政府單位承辦）→ 角色痛點與解法圖文 → 共同相關案例 → 角色 CTA。
+ * 角色內容全部由 Astro 靜態輸出；Tab 為漸進增強，無 JS 時兩角色內容與兩組 CTA 皆可讀。
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
-import ContactCta from '../components/ContactCta.astro';
 import CaseCard from '../components/CaseCard.astro';
+import IllustratedPoint from '../components/public-sector/IllustratedPoint.astro';
+import RoleCta from '../components/public-sector/RoleCta.astro';
 import { CASES } from '../data/cases';
+import { ROLES } from '../data/public-sector';
 
-// 相關案例：桃園卡、綜合所得稅報稅系統
+// 相關案例：桃園卡、綜合所得稅報稅系統（兩者目前未列在 CASES，篩選結果為空時整區不輸出，避免只剩空標題）
 const relatedCases = CASES.filter((c) => ['桃園卡', '綜合所得稅報稅系統'].includes(c.name));
-
-const painPoints = [
-  {
-    title: '標案流程的限制',
-    body: '需求在招標前就已定案，執行中卻發現與民眾實際情境有落差，調整空間有限。',
-  },
-  {
-    title: '跨單位協作的成本',
-    body: '一項服務往往橫跨多個機關與承辦單位，權責與資訊分散，整合困難。',
-  },
-  {
-    title: '既有系統的包袱',
-    body: '新服務必須與既有系統銜接，理想的體驗設計常在技術與制度限制中被迫妥協。',
-  },
-];
 ---
 
 <BaseLayout
@@ -33,44 +25,192 @@ const painPoints = [
     intro="我們熟悉政府標案、跨單位協作與既有系統限制，在民眾需要、政策目標與執行現實之間，找到真正可行的改善方向。"
   />
 
-  <section class="container-site py-16 md:py-24" data-reveal>
-    <h2 class="heading-sub">政府數位服務常見的落地難題</h2>
-    <div class="mt-6 grid gap-5 md:grid-cols-3">
+  <div data-ps-roles>
+    {/* 圖文區白底：插圖為不透明白底 PNG，避免在灰底上出現硬矩形 */}
+    <div class="bg-surface">
+      {/* Tab 列預設 hidden，public-sector-tabs 初始化成功才顯示；不 sticky */}
+      <div class="container-site pt-10 md:pt-14">
+        <div class="ps-tablist" role="tablist" aria-label="選擇您的角色" hidden>
+          {
+            ROLES.map((role, index) => (
+              <button
+                type="button"
+                id={`ps-tab-${role.id}`}
+                class="ps-tab"
+                role="tab"
+                data-role-tab={role.id}
+                aria-selected={index === 0 ? 'true' : 'false'}
+                aria-controls={`ps-panel-${role.id}`}
+                tabindex={index === 0 ? undefined : -1}
+              >
+                {role.label}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
       {
-        painPoints.map((point) => (
-          <div class="card p-6">
-            <h3 class="text-lg font-bold">{point.title}</h3>
-            <p class="mt-3 text-sm leading-relaxed text-ink-secondary">{point.body}</p>
+        ROLES.map((role, roleIndex) => (
+          <div id={`ps-panel-${role.id}`} class="ps-panel">
+            <section class="container-site pb-12 pt-10 md:pb-20 md:pt-14" aria-labelledby={`ps-pain-${role.id}`}>
+              <p class="ps-role-label">{role.label}</p>
+              <h2 id={`ps-pain-${role.id}`} class="ps-section-title">
+                {role.painHeading}
+              </h2>
+              <div class="ps-points">
+                {role.pains.map((point, index) => (
+                  <IllustratedPoint {...point} eager={roleIndex === 0 && index === 0} />
+                ))}
+              </div>
+            </section>
+            <div class="border-t border-line">
+              <section class="container-site py-12 md:py-20" aria-labelledby={`ps-solution-${role.id}`}>
+                <h2 id={`ps-solution-${role.id}`} class="ps-section-title">
+                  {role.solutionHeading}
+                </h2>
+                <div class="ps-points">
+                  {role.solutions.map((point) => (
+                    <IllustratedPoint {...point} />
+                  ))}
+                </div>
+              </section>
+            </div>
           </div>
         ))
       }
     </div>
-  </section>
 
-  <section class="border-y border-line bg-page" data-reveal>
-    <div class="container-site py-16 md:py-24">
-      <h2 class="heading-sub">我們如何理解民眾與機關的運作</h2>
-      <p class="mt-4 max-w-2xl text-ink-secondary">
-        我們同時走進民眾的使用情境與機關的作業現場：理解民眾在服務中真正卡住的地方，也理解承辦人員面對的制度、系統與人力現實，讓改善方向在兩端都站得住。
-      </p>
-    </div>
-  </section>
+    {
+      relatedCases.length > 0 && (
+        <section class="border-t border-line bg-page" data-reveal>
+          <div class="container-site py-16 md:py-24">
+            <h2 class="heading-sub">相關案例</h2>
+            <div class="mt-6 grid gap-x-8 gap-y-14 sm:grid-cols-2">
+              {relatedCases.map((item) => <CaseCard {...item} />)}
+            </div>
+          </div>
+        </section>
+      )
+    }
 
-  <section class="container-site py-16 md:py-24" data-reveal>
-    <h2 class="heading-sub">對應的服務方式</h2>
-    <p class="mt-4 max-w-2xl text-ink-secondary">
-      正式服務分類與說明規劃中。服務方式將對應上述難題，涵蓋研究、全局梳理與跨單位協作。
-    </p>
-  </section>
-
-  <section class="border-t border-line bg-page" data-reveal>
-    <div class="container-site py-16 md:py-24">
-      <h2 class="heading-sub">相關案例</h2>
-      <div class="mt-6 grid gap-x-8 gap-y-14 sm:grid-cols-2">
-        {relatedCases.map((item) => <CaseCard {...item} />)}
-      </div>
-    </div>
-  </section>
-
-  <ContactCta />
+    <RoleCta />
+  </div>
 </BaseLayout>
+
+<style>
+  /* ---- 角色 Tab：手機兩鈕等寬（文字可換行），md+ 自然寬並排 ---- */
+  .ps-tablist:not([hidden]) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .ps-tablist:not([hidden]) {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+
+  .ps-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 9999px;
+    border: 1px solid var(--neutral-300);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    cursor: pointer;
+    transition:
+      border-color 180ms ease,
+      color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  @media (min-width: 768px) {
+    .ps-tab {
+      padding-inline: 1.75rem;
+      font-size: 1.0625rem;
+    }
+  }
+
+  .ps-tab:hover {
+    border-color: var(--color-brand);
+    background-color: var(--reach-blue-50);
+    color: var(--color-brand);
+  }
+
+  .ps-tab[aria-selected='true'] {
+    border-color: var(--color-brand);
+    background-color: var(--color-brand);
+    color: var(--neutral-0);
+  }
+
+  .ps-tab:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ps-tab {
+      transition: none;
+    }
+  }
+
+  /* panel 取得焦點（鍵盤閱讀入口）時的外框 */
+  .ps-panel:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: -2px;
+  }
+
+  /* ---- 無 JS 時兩角色上下並陳：角色小標＋分隔線；Tab 初始化後改由 Tab 表示角色 ---- */
+  .ps-role-label {
+    margin-bottom: 0.75rem;
+    color: var(--color-brand);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .ps-panel + .ps-panel {
+    border-top: 1px solid var(--color-border);
+  }
+
+  [data-ps-roles][data-ready] .ps-role-label {
+    display: none;
+  }
+
+  [data-ps-roles][data-ready] .ps-panel + .ps-panel {
+    border-top: 0;
+  }
+
+  /* ---- 區塊標題與逐列圖文 ---- */
+  .ps-section-title {
+    font-size: clamp(1.625rem, 1.3rem + 1.4vw, 2.25rem); /* 手機 26px → 桌機 36px */
+    line-height: 1.4;
+  }
+
+  .ps-points {
+    display: grid;
+    gap: 3rem;
+    margin-top: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .ps-points {
+      gap: 4rem;
+      margin-top: 3.5rem;
+    }
+  }
+</style>
+
+<script>
+  import '../scripts/public-sector-tabs';
+</script>

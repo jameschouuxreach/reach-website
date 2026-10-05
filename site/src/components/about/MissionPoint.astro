@@ -17,16 +17,19 @@ interface Props {
 
 const { item, eager = false, reverse = false } = Astro.props;
 const src = `/images/about/mission-${item.index}`;
-// 案例連結文字一律在第一個逗號後換行，排成兩行（業主指示）
-const commaAt = item.caseLink.text.indexOf('，');
-const linkHead = commaAt === -1 ? item.caseLink.text : item.caseLink.text.slice(0, commaAt + 1);
-const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
+/** 在第一個逗號後斷成兩行：案例連結文字（業主指示）；標題同理（欄寬 340px 放不下一行，避免自然折行斷在詞中） */
+function splitAtComma(text: string): [string, string] {
+  const at = text.indexOf('，');
+  return at === -1 ? [text, ''] : [text.slice(0, at + 1), text.slice(at + 1)];
+}
+const [linkHead, linkTail] = splitAtComma(item.caseLink.text);
+const [titleHead, titleTail] = splitAtComma(item.title);
 ---
 
 <article class:list={['mp', reverse && 'mp-reverse']}>
   <div class="mp-text">
     <h3 class="mp-title">
-      {item.word}<span class="mp-sep" aria-hidden="true">｜</span>{item.title}
+      {item.word}<span class="mp-sep" aria-hidden="true">｜</span>{titleHead}{titleTail && <br />}{titleTail}
     </h3>
     <p class="mp-body">{item.body}</p>
     <a href={item.caseLink.href} class="mp-link">
@@ -68,9 +71,12 @@ const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
     }
   }
 
+  /* 桌機：兩欄固定為 GIF 原尺寸（340px），左右貼齊內容區兩側，剩餘空間全給中間欄距（文字與 GIF 拉開） */
   @media (min-width: 1024px) {
     .mp {
-      gap: 6rem;
+      grid-template-columns: repeat(2, minmax(0, 340px));
+      justify-content: space-between;
+      gap: 4rem;
     }
   }
 

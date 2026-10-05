@@ -62,9 +62,11 @@ const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
     }
   }
 
+  /* 圖左文右的列：圖片靠右（貼中間欄距），與其他列「圖片貼中間欄距」對稱 */
   @media (min-width: 768px) {
     .mp-reverse .mp-media {
       order: -1;
+      justify-self: end;
     }
   }
 
@@ -126,8 +128,8 @@ const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
     }
   }
 
-  /* GIF 點陣幾乎貼齊圖片邊緣，圖片靠欄位左緣：
-     交錯排列時，點陣左緣與上下列文字左緣對齊（不置中，置中會偏移約 90px） */
+  /* GIF 點陣幾乎貼齊圖片邊緣，圖片一律貼中間欄距（文右列靠左、圖左列靠右）：
+     交錯排列時，點陣在中間欄距兩側的邊緣與上下列文字切齊 */
   .mp-media {
     width: 100%;
     max-width: 340px;

@@ -7,7 +7,7 @@ export interface MissionItem {
   title: string;
   body: string;
   /** 具體舉例：這一點如何落實在專案中 */
-  example: { project: string; body: string; /** 有公開案例頁時才提供 */ href?: string };
+  example: { project: string; body: string };
 }
 
 export const MISSION_ITEMS: MissionItem[] = [
@@ -27,7 +27,6 @@ export const MISSION_ITEMS: MissionItem[] = [
     example: {
       project: '長照官網重塑｜從多方角色中，找出品牌切入點',
       body: '同時理解父母與子女對照顧的不同期待，從多方需求中找到兼顧各個角色的品牌定位與官網優化方向。',
-      href: '/work/nexdo-e/',
     },
   },
   {

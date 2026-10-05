@@ -6,7 +6,7 @@
  */
 export interface MissionItem {
   index: string;
-  /** 品牌對應詞：更深／更廣／更遠，標題前以品牌色呈現 */
+  /** 品牌對應詞：更深／更廣／更遠，接在標題前（以「｜」分隔） */
   word: string;
   title: string;
   body: string;

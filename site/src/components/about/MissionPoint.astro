@@ -126,16 +126,16 @@ const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
     }
   }
 
+  /* GIF 點陣幾乎貼齊圖片邊緣，圖片靠欄位左緣：
+     交錯排列時，點陣左緣與上下列文字左緣對齊（不置中，置中會偏移約 90px） */
   .mp-media {
     width: 100%;
-    max-width: 440px;
-    margin-inline: auto;
+    max-width: 340px;
   }
 
   .mp-media img {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: 20px;
   }
 </style>

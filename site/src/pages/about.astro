@@ -1,39 +1,115 @@
 ---
 /**
- * 關於致遠：PageHero → 我們的使命（MissionScrollStory，2026-09-08 業主指示由首頁移入）→ 團隊／合作方式 → ContactCta。
- * 使命三點內容取自 src/data/mission.ts。原「致／遠的品牌哲學」區塊已於 2026-09-09 業主指示移除。
+ * 關於致遠 v2（2026-10-05，branch about-v2 試做）：
+ * 主張式 PageHero → 為什麼客戶找我們（三點）→ 我們的使命（三欄靜態，MissionColumns）→ 合作客戶 Logo → ContactCta。
+ * 團隊與合作方式依業主指示拿掉；滿版藍底的 MissionScrollStory 改為白／灰底三欄，藍色只留給最後的 CTA。
+ * 文案見 src/data/about.ts，使命三點見 src/data/mission.ts。
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
-import MissionScrollStory from '../components/MissionScrollStory.astro';
+import SectionLabel from '../components/SectionLabel.astro';
+import MissionColumns from '../components/about/MissionColumns.astro';
+import PartnerLogos from '../components/PartnerLogos.astro';
 import ContactCta from '../components/ContactCta.astro';
+import { ABOUT_HERO, ABOUT_REASONS } from '../data/about';
 import { MISSION_ITEMS } from '../data/mission';
 ---
 
 <BaseLayout
   title="關於致遠"
-  description="認識致遠體驗設計：我們的使命、團隊組成與合作方式。"
+  description="認識致遠體驗設計：為什麼政府與企業找我們、我們的使命，以及合作過的客戶。"
 >
-  <PageHero
-    title="關於致遠"
-    intro="致遠體驗設計陪伴政府與企業，從複雜的情境中找出清晰可行的方向。"
-  />
+  <PageHero title={ABOUT_HERO.title} intro={ABOUT_HERO.intro} />
 
-  {/* ---- 我們的使命（捲動敘事版；桌機三點 tabs＋九宮格動畫，行動版／reduced-motion 為靜態三段）---- */}
-  <MissionScrollStory items={MISSION_ITEMS} />
+  {/* ---- 為什麼客戶找我們：三點，左欄編號＋標題、右欄內文（手機單欄） ---- */}
+  <section class="bg-surface">
+    <div class="container-site py-16 md:py-24">
+      <div data-reveal>
+        <SectionLabel zh="為什麼客戶找我們" en="Why Reach" />
+      </div>
+      <ol class="ab-reasons">
+        {
+          ABOUT_REASONS.map((reason) => (
+            <li class="ab-reason" data-reveal>
+              <p class="ab-index" aria-hidden="true">
+                {reason.index}
+              </p>
+              <h3 class="ab-title">{reason.title}</h3>
+              <p class="ab-body">{reason.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
 
-  <section class="container-site py-16 md:py-24" data-reveal>
-    <div class="grid gap-5 md:grid-cols-2">
-      <div class="card p-6">
-        <h2 class="text-lg font-bold">團隊</h2>
-        <p class="mt-3 text-sm text-ink-muted">團隊介紹整理中，正式成員資訊確認後補上。</p>
-      </div>
-      <div class="card p-6">
-        <h2 class="text-lg font-bold">合作方式</h2>
-        <p class="mt-3 text-sm text-ink-muted">合作流程與方式說明整理中。</p>
-      </div>
+  <MissionColumns items={MISSION_ITEMS} />
+
+  {/* ---- 合作客戶 Logo：沿用首頁輪播（multiply 混色需灰底） ---- */}
+  <section class="border-t border-line bg-page">
+    <div class="container-site pt-16 md:pt-20" data-reveal>
+      <SectionLabel zh="合作客戶" en="Clients" />
+      <p class="ab-clients-lead heading-sub">與政府機關及企業一起，把服務做得更好用</p>
+    </div>
+    <div class="pt-10 pb-16 md:pb-20">
+      <PartnerLogos />
     </div>
   </section>
 
   <ContactCta />
 </BaseLayout>
+
+<style>
+  .ab-reasons {
+    margin-top: 2.5rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .ab-reason {
+    display: grid;
+    gap: 0.5rem 2.5rem;
+    padding-block: 2rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  @media (min-width: 900px) {
+    .ab-reasons {
+      margin-top: 3.5rem;
+    }
+
+    .ab-reason {
+      grid-template-columns: 3rem minmax(0, 7fr) minmax(0, 6fr);
+      align-items: baseline;
+      padding-block: 2.5rem;
+    }
+  }
+
+  .ab-index {
+    color: var(--color-brand);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .ab-title {
+    font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .ab-body {
+    margin-top: 0.25rem;
+    color: var(--color-ink-secondary);
+    line-height: 1.8;
+  }
+
+  @media (min-width: 900px) {
+    .ab-body {
+      margin-top: 0;
+    }
+  }
+
+  .ab-clients-lead {
+    margin-top: 1rem;
+    max-width: 40rem;
+  }
+</style>

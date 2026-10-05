@@ -11,9 +11,6 @@ import SectionLabel from '../components/SectionLabel.astro';
 import MissionPoint from '../components/about/MissionPoint.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { MISSION_ITEMS } from '../data/mission';
-
-// 品牌對應詞（同 MissionScrollStory 的 tabs）
-const WORDS = ['更深', '更廣', '更遠'];
 ---
 
 <BaseLayout
@@ -34,7 +31,7 @@ const WORDS = ['更深', '更廣', '更遠'];
         {
           MISSION_ITEMS.map((item, i) => (
             <div data-reveal>
-              <MissionPoint item={item} word={WORDS[i]!} eager={i === 0} />
+              <MissionPoint item={item} eager={i === 0} />
             </div>
           ))
         }

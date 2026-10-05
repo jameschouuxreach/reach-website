@@ -49,6 +49,8 @@ const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
 </article>
 
 <style>
+  /* 交錯對齊（業主指示）：兩欄等寬，文字與 GIF 點陣各自撐滿所在欄，
+     故「更廣」的點陣左右緣＝「更深／更遠」文字欄左右緣，「更廣」文字欄＝「更深／更遠」點陣左右緣 */
   .mp {
     display: grid;
     gap: 1.75rem;
@@ -58,26 +60,18 @@ const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
     .mp {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: center;
-      gap: 2.5rem;
+      gap: 3rem;
     }
-  }
 
-  /* 圖左文右的列：圖片靠右（貼中間欄距），與其他列「圖片貼中間欄距」對稱 */
-  @media (min-width: 768px) {
     .mp-reverse .mp-media {
       order: -1;
-      justify-self: end;
     }
   }
 
   @media (min-width: 1024px) {
     .mp {
-      gap: 4rem;
+      gap: 6rem;
     }
-  }
-
-  .mp-text {
-    max-width: 34rem;
   }
 
   .mp-title {
@@ -128,16 +122,24 @@ const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
     }
   }
 
-  /* GIF 點陣幾乎貼齊圖片邊緣，圖片一律貼中間欄距（文右列靠左、圖左列靠右）：
-     交錯排列時，點陣在中間欄距兩側的邊緣與上下列文字切齊 */
+  /* GIF 畫布＝點陣外緣再加每側 10 單位留白（回彈＋線寬；點陣寬 598、畫布 618，見 GIF 產生腳本），
+     圖片放大 618/598 並左移 10/598，讓點陣外緣剛好落在欄位邊緣 */
   .mp-media {
     width: 100%;
-    max-width: 340px;
+    max-width: 340px; /* 手機單欄時限寬 */
+  }
+
+  @media (min-width: 768px) {
+    .mp-media {
+      max-width: none;
+    }
   }
 
   .mp-media img {
     display: block;
-    width: 100%;
+    width: calc(100% * 618 / 598);
+    max-width: none;
     height: auto;
+    margin-left: calc(-100% * 10 / 598);
   }
 </style>

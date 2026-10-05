@@ -11,9 +11,11 @@ interface Props {
   item: MissionItem;
   /** 只有第一列 eager，其餘 lazy */
   eager?: boolean;
+  /** 桌機左右交換（圖左文右）；手機一律先文後圖 */
+  reverse?: boolean;
 }
 
-const { item, eager = false } = Astro.props;
+const { item, eager = false, reverse = false } = Astro.props;
 const src = `/images/about/mission-${item.index}`;
 // 案例連結文字一律在第一個逗號後換行，排成兩行（業主指示）
 const commaAt = item.caseLink.text.indexOf('，');
@@ -21,7 +23,7 @@ const linkHead = commaAt === -1 ? item.caseLink.text : item.caseLink.text.slice(
 const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
 ---
 
-<article class="mp">
+<article class:list={['mp', reverse && 'mp-reverse']}>
   <div class="mp-text">
     <h3 class="mp-title">
       <span class="mp-word">{item.word}</span><span class="mp-sep" aria-hidden="true">｜</span>{item.title}
@@ -57,6 +59,12 @@ const linkTail = commaAt === -1 ? '' : item.caseLink.text.slice(commaAt + 1);
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: center;
       gap: 2.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .mp-reverse .mp-media {
+      order: -1;
     }
   }
 

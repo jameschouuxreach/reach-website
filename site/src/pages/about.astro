@@ -29,7 +29,7 @@ import { MISSION_ITEMS } from '../data/mission';
         {
           MISSION_ITEMS.map((item, i) => (
             <div data-reveal>
-              <MissionPoint item={item} eager={i === 0} />
+              <MissionPoint item={item} eager={i === 0} reverse={i === 1} />
             </div>
           ))
         }

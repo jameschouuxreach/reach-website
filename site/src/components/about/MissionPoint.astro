@@ -17,19 +17,18 @@ interface Props {
 
 const { item, eager = false, reverse = false } = Astro.props;
 const src = `/images/about/mission-${item.index}`;
-/** 在第一個逗號後斷成兩行：案例連結文字（業主指示）；標題同理（欄寬 340px 放不下一行，避免自然折行斷在詞中） */
+/** 案例連結文字一律在第一個逗號後換行，排成兩行（業主指示） */
 function splitAtComma(text: string): [string, string] {
   const at = text.indexOf('，');
   return at === -1 ? [text, ''] : [text.slice(0, at + 1), text.slice(at + 1)];
 }
 const [linkHead, linkTail] = splitAtComma(item.caseLink.text);
-const [titleHead, titleTail] = splitAtComma(item.title);
 ---
 
 <article class:list={['mp', reverse && 'mp-reverse']}>
   <div class="mp-text">
     <h3 class="mp-title">
-      {item.word}<span class="mp-sep" aria-hidden="true">｜</span>{titleHead}{titleTail && <br />}{titleTail}
+      {item.word}<span class="mp-sep" aria-hidden="true">｜</span>{item.title}
     </h3>
     <p class="mp-body">{item.body}</p>
     <a href={item.caseLink.href} class="mp-link">
@@ -52,8 +51,9 @@ const [titleHead, titleTail] = splitAtComma(item.title);
 </article>
 
 <style>
-  /* 交錯對齊（業主指示）：兩欄等寬，文字與 GIF 點陣各自撐滿所在欄，
-     故「更廣」的點陣左右緣＝「更深／更遠」文字欄左右緣，「更廣」文字欄＝「更深／更遠」點陣左右緣 */
+  /* 交錯對齊（業主指示）：兩欄等寬，文字撐滿所在欄（維持原文案寬度），GIF 維持 340px 並貼內容區外側——
+     文右圖列 GIF 靠右、圖左文右列 GIF 靠左。三列的文字與點陣外緣都落在內容區左右兩緣，
+     文字與 GIF 之間的空間＝欄距＋（欄寬 − 340px） */
   .mp {
     display: grid;
     gap: 1.75rem;
@@ -63,20 +63,16 @@ const [titleHead, titleTail] = splitAtComma(item.title);
     .mp {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: center;
-      gap: 3rem;
+      gap: 4rem;
+    }
+
+    .mp-media {
+      justify-self: end;
     }
 
     .mp-reverse .mp-media {
       order: -1;
-    }
-  }
-
-  /* 桌機：兩欄固定為 GIF 原尺寸（340px），左右貼齊內容區兩側，剩餘空間全給中間欄距（文字與 GIF 拉開） */
-  @media (min-width: 1024px) {
-    .mp {
-      grid-template-columns: repeat(2, minmax(0, 340px));
-      justify-content: space-between;
-      gap: 4rem;
+      justify-self: start;
     }
   }
 
@@ -129,16 +125,10 @@ const [titleHead, titleTail] = splitAtComma(item.title);
   }
 
   /* GIF 畫布＝點陣外緣再加每側 10 單位留白（回彈＋線寬；點陣寬 598、畫布 618，見 GIF 產生腳本），
-     圖片放大 618/598 並左移 10/598，讓點陣外緣剛好落在欄位邊緣 */
+     圖片放大 618/598 並左移 10/598，讓點陣外緣剛好落在容器邊緣 */
   .mp-media {
     width: 100%;
-    max-width: 340px; /* 手機單欄時限寬 */
-  }
-
-  @media (min-width: 768px) {
-    .mp-media {
-      max-width: none;
-    }
+    max-width: 340px;
   }
 
   .mp-media img {

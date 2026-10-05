@@ -7,7 +7,6 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
-import SectionLabel from '../components/SectionLabel.astro';
 import MissionPoint from '../components/about/MissionPoint.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { MISSION_ITEMS } from '../data/mission';
@@ -24,9 +23,8 @@ import { MISSION_ITEMS } from '../data/mission';
 
   <section class="bg-surface">
     <div class="container-site py-16 md:py-24">
-      <div data-reveal>
-        <SectionLabel zh="我們的使命" en="WHY WE DO" />
-      </div>
+      {/* 區塊標籤依業主指示拿掉；保留隱藏 h2 維持標題階層（h1 → h2 → 各點 h3） */}
+      <h2 class="sr-only">我們的使命</h2>
       <div class="ab-points">
         {
           MISSION_ITEMS.map((item, i) => (
@@ -46,13 +44,11 @@ import { MISSION_ITEMS } from '../data/mission';
   .ab-points {
     display: grid;
     gap: 3.5rem;
-    margin-top: 2.5rem;
   }
 
   @media (min-width: 768px) {
     .ab-points {
       gap: 5rem;
-      margin-top: 3.5rem;
     }
   }
 </style>

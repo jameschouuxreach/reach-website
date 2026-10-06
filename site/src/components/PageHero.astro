@@ -3,15 +3,24 @@
 interface Props {
   title: string;
   intro?: string;
+  /** 導言改為加粗加大的副標樣式（heading-sub，手機 22px → 桌機 28px）；關於致遠、專案實例使用 */
+  introLead?: boolean;
 }
 
-const { title, intro } = Astro.props;
+const { title, intro, introLead = false } = Astro.props;
 ---
 
 <section class="border-b border-line bg-page">
   <div class="container-site py-16 md:py-24">
     <h1 class="heading-section max-w-3xl">{title}</h1>
-    {intro && <p class="mt-5 max-w-2xl text-lg leading-relaxed text-ink-secondary">{intro}</p>}
+    {
+      intro &&
+        (introLead ? (
+          <p class="heading-sub mt-5 max-w-4xl text-ink-secondary">{intro}</p>
+        ) : (
+          <p class="mt-5 max-w-2xl text-lg leading-relaxed text-ink-secondary">{intro}</p>
+        ))
+    }
     <slot />
   </div>
 </section>

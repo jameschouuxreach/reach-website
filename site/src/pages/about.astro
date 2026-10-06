@@ -16,10 +16,8 @@ import { MISSION_ITEMS } from '../data/mission';
   title="關於致遠"
   description="認識致遠體驗設計：我們的使命，以及這些理念如何落實在真實專案中。"
 >
-  {/* 副標加粗加大（業主指示）：不用 PageHero 的 intro 樣式，改由 slot 放 heading-sub 字級（手機 22px → 桌機 28px） */}
-  <PageHero title="關於致遠">
-    <p class="heading-sub mt-5 max-w-3xl text-ink-secondary">從複雜，致清晰，陪你走得更深、更廣、更遠</p>
-  </PageHero>
+  {/* 副標加粗加大（業主指示） */}
+  <PageHero title="關於致遠" intro="從複雜，致清晰，陪你走得更深、更廣、更遠" introLead />
 
   <section class="bg-surface">
     <div class="container-site py-16 md:py-24">

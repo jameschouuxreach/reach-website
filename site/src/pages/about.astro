@@ -39,15 +39,24 @@ import { MISSION_ITEMS } from '../data/mission';
 </BaseLayout>
 
 <style>
+  /* 三點各自加上下 padding（業主指示），點與點之間＝gap＋上下 padding；
+     手機 72px → 120px、桌機 128px → 176px，區塊頂／底也各多出一份 padding */
   .ab-points {
     display: grid;
-    gap: 4.5rem;
+    gap: 3rem;
   }
 
-  /* 列距加大（業主反映上下太擠） */
+  .ab-points > * {
+    padding-block: 1.5rem;
+  }
+
   @media (min-width: 768px) {
     .ab-points {
-      gap: 8rem;
+      gap: 6rem;
+    }
+
+    .ab-points > * {
+      padding-block: 2.5rem;
     }
   }
 </style>

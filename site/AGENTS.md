@@ -25,10 +25,9 @@ Manage the background server with `astro dev stop`, `astro dev status`, and `ast
 | branch | 網址 | 說明 |
 |---|---|---|
 | `main` | https://reach-website-6cb.pages.dev | v1 基準版（2026-08-25 併入 main）；Cloudflare 正式分支、GitHub 預設分支 |
-| `case-on` | https://case-on.reach-website-6cb.pages.dev | 主要開發線：包含 v2、服務頁、好齡居 A～E、企業／公共服務頁、關於頁改版與聯絡表單（2026-10-06 由 contact-form 改名） |
-| `about-v2` | https://about-v2.reach-website-6cb.pages.dev | 關於致遠改版：只保留使命，三點分列（版型比照政府頁）、右側為原版九宮格動畫 GIF；拿掉團隊與合作方式（內容已併入 case-on，另一工作階段完成後刪除） |
+| `case-on` | https://case-on.reach-website-6cb.pages.dev | 主要開發線：包含 v2、服務頁、好齡居 A～E、企業／公共服務頁、關於頁改版（原 about-v2）與聯絡表單（2026-10-06 由 contact-form 改名） |
 
-2026-10-06 分支整理：其餘分支已刪除，最後狀態保存為 `archive/<原分支名>` 標籤（`case-v4`、`case-v5`、`service-v1`、`service-v2`、`reach-web-v2`、`reach-web-v2-1`、`reach-web-v2-2`、`mission-redesign`、`mission-redesign-v2`、`visual-beta-1`、`gh-pages`）。標籤不會觸發部署；要重新看某個舊版，用 `git branch <新分支名> archive/<原分支名>` 還原後 push，就會得到新的預覽網址。
+2026-10-06 分支整理：其餘分支已刪除，最後狀態保存為 `archive/<原分支名>` 標籤（`about-v2`、`case-v4`、`case-v5`、`service-v1`、`service-v2`、`reach-web-v2`、`reach-web-v2-1`、`reach-web-v2-2`、`mission-redesign`、`mission-redesign-v2`、`visual-beta-1`、`gh-pages`）。標籤不會觸發部署；要重新看某個舊版，用 `git branch <新分支名> archive/<原分支名>` 還原後 push，就會得到新的預覽網址。
 
 原始碼一律維持根路徑寫法（`/images/...`）。正式網域確認後，在 Cloudflare 專案的 Custom domains 綁定，並更新 `src/config.ts` 的 `SITE_URL`。
 

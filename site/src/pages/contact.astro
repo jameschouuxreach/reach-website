@@ -1,6 +1,15 @@
 ---
+/**
+ * 聯絡我們（2026-10-06 表單上線）：送出到 Cloudflare Function /api/contact，寫入 Notion 並寄通知信。
+ * - 欄位（精簡版）：必填 姓名、Email、想討論的問題、個資同意；選填 組織名稱、電話。規則見 src/lib/contactForm.ts。
+ * - 從服務頁「專案類型評估」結果過來時，scripts/contact-form.ts 會顯示評估摘要，由使用者決定是否一併送出。
+ * - 送出需要 JavaScript（Turnstile 人機驗證）；無 JS 時送出鈕維持停用並顯示說明，不會把個資以網址參數送出。
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
+import { CONTACT_FALLBACK_EMAIL, TURNSTILE_SITE_KEY } from '../config';
+import { CONTACT_LIMITS } from '../lib/contactForm';
+import { PROJECT_TYPES } from '../data/services';
 
 const prepareItems = [
   { label: '組織／服務名稱', hint: '你所屬的機關、公司或團隊，以及要討論的服務或產品。' },
@@ -8,6 +17,9 @@ const prepareItems = [
   { label: '期望時程', hint: '預計啟動與完成的時間，或重要的里程碑。' },
   { label: '聯絡方式', hint: '方便我們回覆你的 email 或電話。' },
 ];
+
+/** 評估摘要用的方案名稱（slug → 中文名稱），由腳本讀取 */
+const projectTitles = JSON.stringify(Object.fromEntries(PROJECT_TYPES.map((item) => [item.slug, item.title])));
 ---
 
 <BaseLayout
@@ -38,64 +50,289 @@ const prepareItems = [
             ))
           }
         </ul>
-        <p class="mt-8 text-sm text-ink-muted">
-          正式 email、電話與地址確認後將公布於本頁。
-        </p>
+        {
+          CONTACT_FALLBACK_EMAIL ? (
+            <p class="mt-8 text-sm text-ink-muted">
+              也可以直接寫信給我們：<a href={`mailto:${CONTACT_FALLBACK_EMAIL}`} class="font-semibold text-link underline underline-offset-4">{CONTACT_FALLBACK_EMAIL}</a>
+            </p>
+          ) : (
+            <p class="mt-8 text-sm text-ink-muted">正式 email、電話與地址確認後將公布於本頁。</p>
+          )
+        }
       </div>
 
-      <div class="card p-6 md:p-8" data-reveal>
-        <h2 class="text-lg font-bold">聯絡表單（示意）</h2>
-        <p class="mt-2 text-sm text-ink-muted">表單服務尚未啟用，以下為視覺原型，暫時無法送出。</p>
-        <form class="mt-6 space-y-5" aria-label="聯絡表單原型（尚未啟用）">
-          <div class="flex flex-col gap-2">
-            <label for="contact-org" class="text-sm font-semibold">組織／服務名稱</label>
-            <input
-              type="text"
-              id="contact-org"
-              name="org"
-              disabled
-              class="min-h-11 rounded-lg border border-line-strong bg-page px-4 text-ink disabled:cursor-not-allowed"
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <label for="contact-problem" class="text-sm font-semibold">目前遇到的問題</label>
-            <textarea
-              id="contact-problem"
-              name="problem"
-              rows="4"
-              disabled
-              class="rounded-lg border border-line-strong bg-page px-4 py-3 text-ink disabled:cursor-not-allowed"
-            ></textarea>
-          </div>
-          <div class="flex flex-col gap-2">
-            <label for="contact-schedule" class="text-sm font-semibold">期望時程</label>
-            <input
-              type="text"
-              id="contact-schedule"
-              name="schedule"
-              disabled
-              class="min-h-11 rounded-lg border border-line-strong bg-page px-4 text-ink disabled:cursor-not-allowed"
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <label for="contact-email" class="text-sm font-semibold">聯絡方式</label>
-            <input
-              type="text"
-              id="contact-email"
-              name="contact"
-              disabled
-              class="min-h-11 rounded-lg border border-line-strong bg-page px-4 text-ink disabled:cursor-not-allowed"
-            />
-          </div>
-          <button
-            type="button"
-            disabled
-            class="btn-primary w-full opacity-50 disabled:cursor-not-allowed"
-          >
-            表單尚未啟用
-          </button>
-        </form>
+      <div class="card p-6 md:p-8" data-contact-root data-project-titles={projectTitles} data-fallback-email={CONTACT_FALLBACK_EMAIL}>
+        <div data-contact-form-wrap>
+          <h2 class="text-lg font-bold">填寫聯絡表單</h2>
+          <p class="mt-2 text-sm text-ink-muted">標示 <span class="cf-required" aria-hidden="true">*</span> 為必填。</p>
+
+          <form class="mt-6 space-y-5" data-contact-form novalidate aria-label="聯絡表單">
+
+            {/* 送出失敗或欄位有誤時的提示，顯示後聚焦這裡 */}
+            <div class="cf-alert" data-contact-alert role="alert" tabindex="-1" hidden></div>
+
+            <div class="cf-field">
+              <label for="contact-name" class="cf-label">姓名<span class="cf-required" aria-hidden="true">*</span></label>
+              <input type="text" id="contact-name" name="name" autocomplete="name" required maxlength={CONTACT_LIMITS.name} class="cf-input" aria-describedby="contact-name-error" />
+              <p id="contact-name-error" class="cf-error" data-error-for="name" hidden></p>
+            </div>
+
+            <div class="cf-field">
+              <label for="contact-email" class="cf-label">Email<span class="cf-required" aria-hidden="true">*</span></label>
+              <input type="email" id="contact-email" name="email" autocomplete="email" inputmode="email" required maxlength={CONTACT_LIMITS.email} class="cf-input" aria-describedby="contact-email-error" />
+              <p id="contact-email-error" class="cf-error" data-error-for="email" hidden></p>
+            </div>
+
+            <div class="cf-field">
+              <label for="contact-org" class="cf-label">組織名稱<span class="cf-optional">（選填）</span></label>
+              <input type="text" id="contact-org" name="org" autocomplete="organization" maxlength={CONTACT_LIMITS.org} class="cf-input" aria-describedby="contact-org-error" />
+              <p id="contact-org-error" class="cf-error" data-error-for="org" hidden></p>
+            </div>
+
+            <div class="cf-field">
+              <label for="contact-phone" class="cf-label">電話<span class="cf-optional">（選填）</span></label>
+              <input type="tel" id="contact-phone" name="phone" autocomplete="tel" maxlength={CONTACT_LIMITS.phone} class="cf-input" aria-describedby="contact-phone-error" />
+              <p id="contact-phone-error" class="cf-error" data-error-for="phone" hidden></p>
+            </div>
+
+            <div class="cf-field">
+              <label for="contact-message" class="cf-label">想討論的問題<span class="cf-required" aria-hidden="true">*</span></label>
+              <p id="contact-message-hint" class="cf-hint">簡單描述目前的情況與困擾即可，也可以寫下期望的時程。</p>
+              <textarea id="contact-message" name="message" rows="5" required maxlength={CONTACT_LIMITS.message} class="cf-input cf-textarea" aria-describedby="contact-message-hint contact-message-error"></textarea>
+              <p id="contact-message-error" class="cf-error" data-error-for="message" hidden></p>
+            </div>
+
+            {/* 專案類型評估摘要：有暫存的評估結果時由腳本填入並顯示 */}
+            <fieldset class="cf-assessment" data-contact-assessment hidden>
+              <legend class="cf-assessment-legend">你的專案類型評估</legend>
+              <dl class="cf-assessment-list" data-contact-assessment-list></dl>
+              <p class="cf-assessment-result">推薦方向：<strong data-contact-assessment-result></strong></p>
+              <label class="cf-check">
+                <input type="checkbox" name="includeAssessment" checked data-contact-assessment-include />
+                <span>一併附上這份評估結果，讓我們更快了解你的情況</span>
+              </label>
+            </fieldset>
+
+            {/* 誘餌欄位：視覺與輔助科技都隱藏，真人不會填 */}
+            <div class="cf-trap" aria-hidden="true">
+              <label for="contact-website">網站</label>
+              <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <div class="cf-field">
+              <label class="cf-check">
+                <input type="checkbox" name="consent" required aria-describedby="contact-consent-error" />
+                <span>
+                  我同意致遠體驗設計蒐集上述資料，僅用於回覆本次詢問與後續合作聯繫。<span class="cf-required" aria-hidden="true">*</span>
+                </span>
+              </label>
+              <p id="contact-consent-error" class="cf-error" data-error-for="consent" hidden></p>
+            </div>
+
+            <div class="cf-field">
+              <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-language="zh-tw" data-contact-turnstile></div>
+              <p class="cf-error" data-error-for="turnstile" hidden></p>
+            </div>
+
+            <noscript>
+              <p class="cf-hint">表單需要啟用 JavaScript 才能送出。{CONTACT_FALLBACK_EMAIL && `也可以直接寫信到 ${CONTACT_FALLBACK_EMAIL}。`}</p>
+            </noscript>
+
+            {/* 預設停用：無 JS 時無法送出（也阻止按 Enter 的隱含送出），腳本載入後才啟用 */}
+            <button type="submit" class="btn-primary w-full" data-contact-submit disabled>送出</button>
+          </form>
+        </div>
+
+        <div class="cf-success" data-contact-success role="status" tabindex="-1" hidden>
+          <p class="cf-success-title">已收到你的訊息，謝謝！</p>
+          <p class="cf-success-body">我們會盡快以你留下的 Email 回覆。</p>
+        </div>
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  import '../scripts/contact-form';
+</script>
+
+<style>
+  /* 送出時聚焦錯誤欄位或提示：預留固定頁首（約 73px）的高度，避免被蓋住 */
+  .cf-input,
+  .cf-alert,
+  .cf-check input {
+    scroll-margin-top: 6rem;
+  }
+
+  .cf-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cf-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--neutral-900);
+  }
+
+  .cf-required {
+    margin-left: 0.125rem;
+    color: #b42318;
+  }
+
+  .cf-optional {
+    margin-left: 0.25rem;
+    font-weight: 400;
+    color: var(--neutral-500);
+  }
+
+  .cf-hint {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--neutral-500);
+  }
+
+  .cf-input {
+    min-height: 2.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--neutral-300);
+    background: var(--neutral-0);
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    color: var(--neutral-900);
+  }
+
+  .cf-textarea {
+    padding-block: 0.75rem;
+    line-height: 1.7;
+    resize: vertical;
+  }
+
+  .cf-input:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 1px;
+    border-color: var(--color-brand);
+  }
+
+  .cf-input[aria-invalid='true'] {
+    border-color: #b42318;
+  }
+
+  .cf-error {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    font-weight: 600;
+    color: #b42318;
+  }
+
+  .cf-alert {
+    border-radius: 0.5rem;
+    border: 1px solid #fda29b;
+    background: #fef3f2;
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: #912018;
+  }
+
+  .cf-alert:focus-visible {
+    outline: 2px solid #b42318;
+    outline-offset: 2px;
+  }
+
+  .cf-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--neutral-700);
+    cursor: pointer;
+  }
+
+  .cf-check input {
+    flex: 0 0 auto;
+    margin-top: 0.25rem;
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: var(--color-brand);
+  }
+
+  .cf-assessment {
+    border-radius: 0.75rem;
+    border: 1px solid var(--reach-blue-200);
+    background: var(--reach-blue-50);
+    padding: 1rem 1.125rem;
+  }
+
+  .cf-assessment-legend {
+    float: left;
+    width: 100%;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--reach-blue-700);
+  }
+
+  .cf-assessment-list {
+    clear: both;
+    margin-top: 0.75rem;
+    display: grid;
+    gap: 0.625rem;
+  }
+
+  .cf-assessment-list :global(dt) {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--neutral-600);
+  }
+
+  .cf-assessment-list :global(dd) {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    font-weight: 600;
+    color: var(--neutral-900);
+  }
+
+  .cf-assessment-result {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+    color: var(--neutral-700);
+  }
+
+  .cf-trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .cf-turnstile {
+    min-height: 65px;
+  }
+
+  .cf-success {
+    padding-block: 1rem;
+  }
+
+  .cf-success:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+
+  .cf-success-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .cf-success-body {
+    margin-top: 0.5rem;
+    line-height: 1.7;
+    color: var(--neutral-600);
+  }
+</style>

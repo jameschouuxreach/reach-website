@@ -4,10 +4,13 @@
  * - 題目、文案、題序與推薦規則一律 import 自 data/projectAssessment.ts，本檔不複製任何規則。
  * - 原生 <dialog>.showModal()：背景 inert、Tab 不外漏、Escape 關閉皆由瀏覽器處理；不監聽 backdrop click（避免誤觸丟失答案）。
  * - 不支援 <dialog>、找不到節點或 showModal 失敗時不攔截 CTA，連結照常前往 /contact/。
- * - 答案只存在記憶體；關閉即清除，不用 localStorage／sessionStorage／cookie／網址參數，也不發送任何請求。
+ * - 答案只存在記憶體；關閉即清除，不用 localStorage／cookie／網址參數，也不發送任何請求。
+ *   唯一例外（2026-10-06 聯絡表單上線）：在結果頁按「與我們討論需求」時，把答案 value 暫存到 sessionStorage，
+ *   讓聯絡頁詢問使用者是否一併送出；關閉分頁即清除，暫存失敗（隱私模式等）時照常前往聯絡頁。
  */
 import {
   ASSESSMENT_COPY,
+  ASSESSMENT_HANDOFF_KEY,
   applyAnswer,
   getQuestionSequence,
   getStepCount,
@@ -232,6 +235,16 @@ function initProjectAssessment(): void {
     status.textContent = '';
   };
 
+  /** 結果頁前往聯絡頁：暫存答案供聯絡表單帶入（只在答案完整、可產生推薦時） */
+  const handOffAnswers = (): void => {
+    if (view !== 'result') return;
+    try {
+      sessionStorage.setItem(ASSESSMENT_HANDOFF_KEY, JSON.stringify({ answers, savedAt: Date.now() }));
+    } catch {
+      // 無法暫存時不影響前往聯絡頁
+    }
+  };
+
   const restart = (): void => {
     reset();
     renderQuestion();
@@ -268,6 +281,7 @@ function initProjectAssessment(): void {
   prevButton.addEventListener('click', goPrev);
   restartButton.addEventListener('click', restart);
   closeButton.addEventListener('click', close);
+  contactLink.addEventListener('click', handOffAnswers);
 
   // 關閉（× 或 Escape）：還原背景捲動、清除答案、焦點回到「開始評估」CTA
   dialog.addEventListener('close', () => {

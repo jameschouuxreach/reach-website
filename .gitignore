@@ -16,3 +16,6 @@ npm-debug.log*
 # macOS（exFAT 外接碟會產生 AppleDouble 檔）
 .DS_Store
 ._*
+
+# wrangler pages dev 的本機狀態
+.wrangler/

@@ -355,3 +355,65 @@ export function recommend(answers: AssessmentAnswers): AssessmentResult {
     scopeNote: answers.scope === 'scope-unknown' ? ASSESSMENT_COPY.result.scopeNote : undefined,
   };
 }
+
+/* ---------------------------------------------------------------- 評估結果帶入聯絡表單（2026-10-06 聯絡表單上線） */
+
+/**
+ * 結果頁按「與我們討論需求」時，腳本把答案暫存在 sessionStorage 的這個 key，聯絡頁讀取後讓使用者決定是否一併送出。
+ * 只存答案 value（不存文字），關閉分頁即清除；聯絡頁送出成功或使用者按「不附上」時刪除。
+ */
+export const ASSESSMENT_HANDOFF_KEY = 'reach-assessment-handoff';
+
+/** 暫存超過這個時間就視為過期（毫秒） */
+export const ASSESSMENT_HANDOFF_TTL = 2 * 60 * 60 * 1000;
+
+/**
+ * 把來路不明的資料（sessionStorage、表單 POST）還原為合法答案：只接受題目中存在的 value，
+ * 且第 2 題必須屬於第 1 題的分支、整組答案要完整；任何一處不合法都回傳 undefined，不做部分接受。
+ */
+export function parseAssessmentAnswers(raw: unknown): AssessmentAnswers | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const source = raw as Record<string, unknown>;
+  let answers: AssessmentAnswers = {};
+  for (const question of getQuestionSequenceForParse(source)) {
+    const value = source[question.step];
+    if (value === undefined) continue;
+    if (typeof value !== 'string' || !question.options.some((option) => option.value === value)) return undefined;
+    answers = { ...answers, [question.step]: value };
+  }
+  // 不該出現的多餘答案（例如 established-research 卻帶了第 5 題）視為不合法
+  const expected = new Set(getQuestionSequence(answers).map((question) => question.step));
+  for (const key of Object.keys(source)) {
+    if (source[key] !== undefined && !expected.has(key as AssessmentStepId)) return undefined;
+  }
+  return isAssessmentComplete(answers) ? answers : undefined;
+}
+
+/** 依第 1 題（若合法）決定要檢查的題目（含第 5 題，是否該有第 5 題由呼叫端再檢查）；第 1 題不合法時只檢查第 1 題 */
+function getQuestionSequenceForParse(source: Record<string, unknown>): AssessmentQuestion[] {
+  const stage = source.stage;
+  const valid = typeof stage === 'string' && getAssessmentQuestion('stage')!.options.some((option) => option.value === stage);
+  return valid ? getQuestionSequence({ stage: stage as StageValue }) : [getAssessmentQuestion('stage')!];
+}
+
+export interface AssessmentSummaryItem {
+  step: AssessmentStepId;
+  question: string;
+  answer: string;
+}
+
+export interface AssessmentSummary {
+  items: AssessmentSummaryItem[];
+  recommendedSlugs: ProjectAssessmentSlug[];
+}
+
+/** 把完整答案轉成「題目＋所選文字」清單與推薦方案，供聯絡頁顯示與後端寫入 Notion／通知信 */
+export function summarizeAssessment(answers: AssessmentAnswers): AssessmentSummary {
+  const items = getQuestionSequence(answers).map((question) => {
+    const value = answers[question.step];
+    const option = question.options.find((candidate) => candidate.value === value);
+    if (!option) throw new Error(`[projectAssessment] 第「${question.id}」題沒有合法答案`);
+    return { step: question.step, question: question.title, answer: option.label };
+  });
+  return { items, recommendedSlugs: recommend(answers).recommendedSlugs };
+}

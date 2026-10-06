@@ -9,7 +9,7 @@
  * 總覽主張與五段 H2 由同一份 PARTS 常數輸出，保證逐字相同。
  *
  * 圖片來源（結案簡報 PDF，頁碼從封面算第 1 頁；來源頁與裁切方式另見《好齡居專案實例-版本E-實作紀錄.md》）：
- *   E01 v4/nexdo-v4-hero.webp（沿用 D 版開場合成圖）
+ *   E01 v5/e01-hero.webp：D 版開場合成圖的同一套素材（Monkr 筆電＋白色 Logo）重新合成，筆電完整置入畫面、不再超出右緣（2026-10-01 指示）
  *   E02 p.13、E03 p.17、E04 p.50、E05 p.28、E06 p.37、E11 p.77：依來源頁重繪為 HTML，不放整頁簡報
  *   E07 改版前：p.54 內嵌的舊首頁整頁截圖（1222×4096）；改版後：doc/素材「B.黃＆綠：Home Page.png」（1440×8128，即 p.55 內嵌截圖的原尺寸版）
  *   E08 同上改版後首頁裁四段：y 0–780／850–1727／4850–6310／6320–7488
@@ -195,11 +195,11 @@ const DESCRIPTION = '致遠從受眾研究出發，協助好齡居確立品牌�
           </div>
         </dl>
 
-        {/* E01：沿用 D 版開場合成圖，保留原比例與 Logo */}
+        {/* E01：D 版開場素材重新合成，筆電完整落在畫面內 */}
         <figure class="ne-fig ne-fig-hero">
           <div class="ne-frame">
             <img
-              src="/images/work/nexdo/v4/nexdo-v4-hero.webp"
+              src={`${IMG}/e01-hero.webp`}
               alt="好齡居 Logo 與筆電中的首頁改版設計"
               width="1920"
               height="1080"
@@ -260,7 +260,7 @@ const DESCRIPTION = '致遠從受眾研究出發，協助好齡居確立品牌�
       <div class="container-site">
         <p class="ne-kicker">{`${RESEARCH.num} ${RESEARCH.name}`}</p>
         <h2 class="ne-h2" tabindex="-1">{RESEARCH.claim}</h2>
-        <p class="ne-sub ne-sub-pair"><span>問卷找出購買族群。</span><span>訪談理解雙方顧慮。</span></p>
+        <p class="ne-sub">問卷找出購買族群，訪談理解雙方顧慮。</p>
 
         <h3 class="ne-h3">從問卷找出主要溝通對象</h3>
         <p class="ne-p">
@@ -308,7 +308,7 @@ const DESCRIPTION = '致遠從受眾研究出發，協助好齡居確立品牌�
       <div class="container-site">
         <p class="ne-kicker">{`${BRAND.num} ${BRAND.name}`}</p>
         <h2 class="ne-h2" tabindex="-1">{BRAND.claim}</h2>
-        <p class="ne-sub ne-sub-pair"><span>從家庭需求出發。</span><span>確立品牌主張與溝通方式。</span></p>
+        <p class="ne-sub">從家庭需求出發，確立品牌主張與溝通方式。</p>
 
         <h3 class="ne-h3">為多元服務，找到一個清楚的主打方向</h3>
         <p class="ne-p">
@@ -751,7 +751,7 @@ const DESCRIPTION = '致遠從受眾研究出發，協助好齡居確立品牌�
     outline: none;
   }
 
-  /* 副標：H2 下 16px；研究／品牌兩句在桌面各自一行，手機自然換行 */
+  /* 副標：H2 下 16px */
   .ne-sub {
     margin-top: 1rem;
     max-width: var(--ne-sub);
@@ -759,12 +759,6 @@ const DESCRIPTION = '致遠從受眾研究出發，協助好齡居確立品牌�
     line-height: 1.6;
     font-weight: 500;
     color: var(--neutral-600);
-  }
-
-  @media (min-width: 768px) {
-    .ne-sub-pair span {
-      display: block;
-    }
   }
 
   /* 副標→第一小節 40px；小節之間 38px／60px */
@@ -1346,7 +1340,7 @@ const DESCRIPTION = '致遠從受眾研究出發，協助好齡居確立品牌�
   @media (min-width: 1024px) {
     .ne-compare {
       grid-template-columns: 1fr 1fr;
-      align-items: start;
+      align-items: stretch; /* 兩欄等高：改版前首頁較短，避免左欄提早結束留下大片空白 */
     }
   }
 
@@ -1459,8 +1453,17 @@ const DESCRIPTION = '致遠從受眾研究出發，協助好齡居確立品牌�
     }
   }
 
+  /* 兩張局部比例不同（3:1／1.9:1），框統一為較高者的比例、圖片垂直置中，讓兩欄的圖框與說明對齊 */
   .ne-strategy-shot {
+    display: flex;
+    align-items: center;
+    aspect-ratio: 530 / 280;
     background: #fdf7f3;
+  }
+
+  .ne-strategy-shot img {
+    width: 100%;
+    height: auto;
   }
 
   .ne-strategy-name {

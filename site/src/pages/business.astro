@@ -1,76 +1,87 @@
 ---
+/**
+ * 企業與服務團隊內頁（2026-10-01 規格 doc/開發規格/business-v1）：
+ * Hero → 痛點 3 列圖文 → 解法 3 列圖文 → 相關案例 → 單一 CTA。
+ * 版面比照公共服務頁的逐列圖文與 CTA；本頁單一受眾，不設 Tab，也不需要額外 JavaScript。
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
-import ContactCta from '../components/ContactCta.astro';
 import CaseCard from '../components/CaseCard.astro';
+import IllustratedPoint from '../components/business/IllustratedPoint.astro';
+import BusinessCta from '../components/business/BusinessCta.astro';
 import { CASES } from '../data/cases';
+import {
+  BUSINESS_HERO,
+  BUSINESS_PAIN_HEADING,
+  BUSINESS_PAINS,
+  BUSINESS_SOLUTION_HEADING,
+  BUSINESS_SOLUTIONS,
+} from '../data/business';
 
-// 相關案例：合作金庫、好齡居
-const relatedCases = CASES.filter((c) => ['合作金庫銀行', '好齡居'].includes(c.name));
-
-const painPoints = [
-  {
-    title: '看得到現象，找不到原因',
-    body: '數據顯示流失與抱怨，但團隊難以確定問題發生在體驗的哪一個環節。',
-  },
-  {
-    title: '部門各自優化，整體卻沒有變好',
-    body: '每個單位都在改善自己的環節，使用者感受到的卻仍是斷裂的服務。',
-  },
-  {
-    title: '重大決策缺乏依據',
-    body: '要投入的資源不小，卻只能憑經驗與直覺判斷方向，風險難以評估。',
-  },
-];
+// 相關案例：好齡居（A 版）→ 合作金庫銀行。資料不存在的項目略過；全部不存在時整區不輸出
+const relatedCases = [
+  CASES.find((item) => item.href === '/work/nexdo-a/'),
+  CASES.find((item) => item.name === '合作金庫銀行'),
+].filter((item) => item !== undefined);
 ---
 
 <BaseLayout
   title="企業與服務團隊"
   description="致遠體驗設計協助企業從使用者、服務流程與組織全局中找出關鍵施力點，讓體驗改善轉為商業價值。"
 >
-  <PageHero
-    title="找對問題，讓體驗改善轉為商業價值"
-    intro="從使用者、服務流程與組織全局中找出關鍵施力點，讓重大決策建立在理解之上。"
-  />
+  <PageHero title={BUSINESS_HERO.title} intro={BUSINESS_HERO.intro} />
 
-  <section class="container-site py-16 md:py-24" data-reveal>
-    <h2 class="heading-sub">企業常見的體驗與決策難題</h2>
-    <div class="mt-6 grid gap-5 md:grid-cols-3">
-      {
-        painPoints.map((point) => (
-          <div class="card p-6">
-            <h3 class="text-lg font-bold">{point.title}</h3>
-            <p class="mt-3 text-sm leading-relaxed text-ink-secondary">{point.body}</p>
-          </div>
-        ))
-      }
-    </div>
-  </section>
-
-  <section class="border-y border-line bg-page" data-reveal>
-    <div class="container-site py-16 md:py-24">
-      <h2 class="heading-sub">如何從全局釐清關鍵問題</h2>
-      <p class="mt-4 max-w-2xl text-ink-secondary">
-        我們把使用者旅程、服務流程與組織分工放在同一張圖上檢視，找出真正牽動成效的環節，再評估投入的優先順序，讓改善資源用在對的地方。
-      </p>
-    </div>
-  </section>
-
-  <section class="container-site py-16 md:py-24" data-reveal>
-    <h2 class="heading-sub">對應的服務方式</h2>
-    <p class="mt-4 max-w-2xl text-ink-secondary">
-      正式服務分類與說明規劃中。服務方式將對應上述難題，涵蓋研究、全局梳理與多方協作。
-    </p>
-  </section>
-
-  <section class="border-t border-line bg-page" data-reveal>
-    <div class="container-site py-16 md:py-24">
-      <h2 class="heading-sub">相關案例</h2>
-      <div class="mt-6 grid gap-x-8 gap-y-14 sm:grid-cols-2">
-        {relatedCases.map((item) => <CaseCard {...item} />)}
+  {/* 圖文區白底：插圖為不透明白底 PNG，避免在灰底上出現硬矩形 */}
+  <div class="bg-surface">
+    <section class="container-site py-12 md:py-20" aria-labelledby="biz-pain-heading">
+      <h2 id="biz-pain-heading" class="biz-section-title">{BUSINESS_PAIN_HEADING}</h2>
+      <div class="biz-points">
+        {BUSINESS_PAINS.map((point, index) => <IllustratedPoint {...point} eager={index === 0} />)}
       </div>
+    </section>
+    <div class="border-t border-line">
+      <section class="container-site py-12 md:py-20" aria-labelledby="biz-solution-heading">
+        <h2 id="biz-solution-heading" class="biz-section-title">{BUSINESS_SOLUTION_HEADING}</h2>
+        <div class="biz-points">
+          {BUSINESS_SOLUTIONS.map((point) => <IllustratedPoint {...point} />)}
+        </div>
+      </section>
     </div>
-  </section>
+  </div>
 
-  <ContactCta />
+  {
+    relatedCases.length > 0 && (
+      <section class="border-t border-line bg-page" data-reveal>
+        <div class="container-site py-16 md:py-24">
+          <h2 class="heading-sub">相關案例</h2>
+          <div class="mt-6 grid gap-x-8 gap-y-14 sm:grid-cols-2">
+            {relatedCases.map((item) => <CaseCard {...item} />)}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <BusinessCta />
 </BaseLayout>
+
+<style>
+  /* 比照 public-sector.astro 的 ps-section-title／ps-points */
+  .biz-section-title {
+    font-size: clamp(1.625rem, 1.3rem + 1.4vw, 2.25rem); /* 手機 26px → 桌機 36px */
+    line-height: 1.4;
+  }
+
+  .biz-points {
+    display: grid;
+    gap: 3rem;
+    margin-top: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .biz-points {
+      gap: 4rem;
+      margin-top: 3.5rem;
+    }
+  }
+</style>

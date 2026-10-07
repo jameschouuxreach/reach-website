@@ -26,3 +26,21 @@ export const ROUTES = [
   { path: '/business/', label: '企業與服務團隊' },
   { path: '/contact/', label: '聯絡我們' },
 ] as const;
+
+/**
+ * 聯絡表單的 Turnstile（Cloudflare 人機驗證）Site Key，公開值、可進 git。
+ * 由 Cloudflare Pages 的建置環境變數 PUBLIC_TURNSTILE_SITE_KEY 提供；未設定時用 Cloudflare 官方的「一律通過」測試金鑰，
+ * 只適合本機與預覽。正式上線前務必在 Cloudflare 設定真正的 Site Key，並把對應的 Secret Key 設為 TURNSTILE_SECRET_KEY。
+ */
+export const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
+export const TURNSTILE_SITE_KEY: string = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || TURNSTILE_TEST_SITE_KEY;
+
+/** 公司聯絡資訊（2026-10-07 業主提供）：頁尾與聯絡頁共用，改這裡即全站更新 */
+export const CONTACT_INFO = {
+  email: 'cho@uxreach.com',
+  facebook: 'https://www.facebook.com/ReachExperienceDesign/',
+  address: '臺北市中山區興亞里松江路64巷10-2號',
+} as const;
+
+/** 表單送不出去時提示的備用聯絡信箱 */
+export const CONTACT_FALLBACK_EMAIL: string = CONTACT_INFO.email;

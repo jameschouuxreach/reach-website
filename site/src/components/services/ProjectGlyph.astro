@@ -1,0 +1,35 @@
+---
+/**
+ * 六個專案類型的標誌（2026-08-31 業主提供示意圖，重繪為 SVG，正本在 src/assets/services/）。
+ * 以 Astro SVG component 直接 inline，供專案卡右下角與專案頁第一區塊當裝飾；純裝飾，一律 aria-hidden。
+ * 標誌只用 Reach Blue 100／200／300／400，不新增其他色彩。
+ */
+import type { ProjectType } from '../../data/services';
+import KeyIssue from '../../assets/services/key-issue.svg';
+import ComprehensiveDiscovery from '../../assets/services/comprehensive-discovery.svg';
+import AdvisoryPartnership from '../../assets/services/advisory-partnership.svg';
+import CrossDomainIntegration from '../../assets/services/cross-domain-integration.svg';
+import ArchitectureRestructuring from '../../assets/services/architecture-restructuring.svg';
+import FlowOptimization from '../../assets/services/flow-optimization.svg';
+
+const GLYPHS: Record<string, typeof KeyIssue> = {
+  'key-issue': KeyIssue,
+  'comprehensive-discovery': ComprehensiveDiscovery,
+  'advisory-partnership': AdvisoryPartnership,
+  'cross-domain-integration': CrossDomainIntegration,
+  'architecture-restructuring': ArchitectureRestructuring,
+  'flow-optimization': FlowOptimization,
+};
+
+interface Props {
+  slug: ProjectType['slug'];
+  class?: string;
+}
+
+// 其餘 props（class 與父層 scoped style 的 data-astro-cid-*）一律轉交 <svg>，父層才能用 scoped CSS 定位標誌
+const { slug, ...rest } = Astro.props;
+const Glyph = GLYPHS[slug];
+if (!Glyph) throw new Error(`[ProjectGlyph] 找不到專案類型「${slug}」的標誌，請在 src/assets/services/ 補上`);
+---
+
+<Glyph {...rest} aria-hidden="true" focusable="false" />

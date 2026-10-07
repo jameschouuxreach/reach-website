@@ -1,0 +1,149 @@
+---
+/**
+ * 企業頁專用 CTA（不改全站 ContactCta）：視覺比照 public-sector/RoleCta.astro——品牌藍底、白字、
+ * 右欄白色分隔線＋Reach us＋白底膠囊按鈕；本頁只有單一受眾，不含角色小標或 Tab 切換。
+ */
+import { BUSINESS_CTA } from '../../data/business';
+---
+
+<section class="biz-cta-band" aria-labelledby="biz-cta-title">
+  <div class="container-site py-20 md:py-28">
+    <div class="biz-cta-grid">
+      <div>
+        <h2 id="biz-cta-title" class="biz-cta-title">{BUSINESS_CTA.title}</h2>
+        <p class="biz-cta-desc">{BUSINESS_CTA.description}</p>
+      </div>
+      <div class="biz-cta-right">
+        <p class="biz-cta-en">Reach us</p>
+        <div class="mt-6 md:mt-8">
+          <a href={BUSINESS_CTA.href} class="biz-btn-on-blue">
+            {BUSINESS_CTA.label}
+            <span class="biz-cta-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .biz-cta-band {
+    background-color: var(--reach-blue-500);
+    color: var(--neutral-0);
+  }
+
+  .biz-cta-grid {
+    /* 與 ContactCta／RoleCta 相同的字級公式，Reach us 字級按比例推導 */
+    --hero-fs: clamp(2.5rem, 5.25vw - 3px, 4.125rem);
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .biz-cta-grid {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 3rem;
+    }
+  }
+
+  .biz-cta-title {
+    margin: 0;
+    color: var(--neutral-0);
+    font-size: clamp(1.625rem, 1.25rem + 1.6vw, 2.5rem);
+    line-height: 1.35;
+    font-weight: 700;
+  }
+
+  .biz-cta-desc {
+    margin-top: 1rem;
+    max-width: 36rem;
+    color: var(--neutral-0);
+    line-height: 1.8;
+  }
+
+  .biz-cta-right {
+    border-inline-start: 2px solid var(--neutral-0);
+    padding-inline-start: clamp(1.25rem, 3vw, 3rem);
+  }
+
+  @media (min-width: 768px) {
+    .biz-cta-right {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  .biz-cta-en {
+    margin: 0;
+    font-size: 1.9375rem;
+    line-height: 1.15;
+    font-weight: 600;
+    color: var(--neutral-0);
+  }
+
+  @media (min-width: 768px) {
+    .biz-cta-en {
+      font-size: calc(var(--hero-fs) * 0.68);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .biz-cta-en {
+      font-size: calc(var(--hero-fs) * 0.75);
+    }
+  }
+
+  .biz-btn-on-blue {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem; /* 觸控目標 44px */
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    font-size: 0.9375rem;
+    background-color: var(--neutral-0);
+    color: var(--color-brand);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 200ms ease, transform 200ms ease;
+  }
+
+  .biz-btn-on-blue:hover {
+    background-color: var(--reach-blue-50);
+  }
+
+  .biz-btn-on-blue:active {
+    transform: translateY(1px);
+  }
+
+  .biz-btn-on-blue:focus-visible {
+    outline: 2px solid var(--neutral-0);
+    outline-offset: 3px;
+  }
+
+  .biz-btn-on-blue .biz-cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  .biz-btn-on-blue:hover .biz-cta-arrow,
+  .biz-btn-on-blue:focus-visible .biz-cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .biz-btn-on-blue,
+    .biz-btn-on-blue .biz-cta-arrow {
+      transition: none;
+    }
+    .biz-btn-on-blue:active,
+    .biz-btn-on-blue:hover .biz-cta-arrow,
+    .biz-btn-on-blue:focus-visible .biz-cta-arrow {
+      transform: none;
+    }
+  }
+</style>

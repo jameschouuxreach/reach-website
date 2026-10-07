@@ -1,0 +1,129 @@
+---
+/**
+ * 常見專案類型：探索型三卡＋優化型三卡，目前只在 /services/ 使用（四個服務類別頁已改用 ServiceItemProjectTabs）。
+ * - 文案一律取自 src/data/services.ts，不接受頁面自行傳入另一份。
+ * - 根節點固定 id="project-types"（專案頁「常見專案類型」返回入口），同一頁只能出現一次。
+ * - 標題階層由 headingLevel 決定：'h2'（預設）→ H2（區塊）→ H3（群組、收尾）→ H4（專案卡）；
+ *   'h1'（頁面關閉服務項目區塊、本區塊成為頁首時）→ H1 → H2 → H3，避免頁面沒有 H1 或跳級；此時不畫區塊上緣分隔線。
+ *   showIntro=false 時區塊標題仍以 sr-only 保留。
+ * - 群組標題為第一人稱情境句（2026-09-08 業主指示；同日移除 2026-08-31 加入的群組副標，以及區塊標題下原有的說明段落）。
+ *   標題內的 PROJECT_FAMILIES[].em 片段套藍色螢光筆底色（.svc-group-em，Blue 200，同首頁「找出關鍵／推動改變」的色塊），
+ *   一開始就完整顯示、不做掃過動畫（2026-09-08 業主指示：先套首頁同款掃過動畫、同日改為靜態底色）。
+ * - showAssessment：區塊末尾掛「專案類型評估」入口（ProjectAssessmentEntry：收尾卡＋Modal；2026-09-08 抽成共用元件，
+ *   專案類型頁的常見問題下方也用同一個）。
+ */
+import {
+  PROJECT_FAMILIES,
+  PROJECT_FAMILY_ORDER,
+  PROJECT_TYPES_ANCHOR,
+  getProjectTypesByFamily,
+} from '../../data/services';
+import ProjectTypeCard from './ProjectTypeCard.astro';
+import ProjectAssessmentEntry from './ProjectAssessmentEntry.astro';
+
+interface Props {
+  showIntro?: boolean;
+  showAssessment?: boolean;
+  /** 區塊標題層級；本區塊是頁面第一個區塊、頁面沒有其他 H1 時傳 'h1' */
+  headingLevel?: 'h1' | 'h2';
+}
+
+const { showIntro = true, showAssessment = true, headingLevel = 'h2' } = Astro.props;
+
+const isLead = headingLevel === 'h1';
+const IntroHeading = headingLevel;
+const GroupHeading = isLead ? 'h2' : 'h3';
+const cardHeadingLevel = isLead ? 'h3' : 'h4';
+
+// 群組標題切出畫記片段（同 AudienceCard 的做法）；找不到片段時整句原樣顯示
+const groups = PROJECT_FAMILY_ORDER.map((family) => {
+  const { label, em } = PROJECT_FAMILIES[family];
+  const emIndex = em ? label.indexOf(em) : -1;
+  return {
+    family,
+    label,
+    em: emIndex >= 0 ? em : undefined,
+    pre: emIndex >= 0 ? label.slice(0, emIndex) : label,
+    post: emIndex >= 0 && em ? label.slice(emIndex + em.length) : '',
+    projects: getProjectTypesByFamily(family),
+  };
+});
+---
+
+<section id={PROJECT_TYPES_ANCHOR} class:list={['svc-project-types bg-page', isLead ? '' : 'border-t border-line']}>
+  <div class="container-site py-16 md:py-24">
+    {
+      showIntro ? (
+        <div class="max-w-3xl">
+          <p class="flex items-baseline gap-3">
+            <span class="text-base font-bold text-brand">常見專案類型</span>
+            <span class="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted" aria-hidden="true">
+              COMMON ENGAGEMENTS
+            </span>
+          </p>
+          {/* 兩行為設計：逗號後換行（2026-09-14 業主指示，作法同首頁 Hero） */}
+          <IntroHeading class="heading-section mt-4">
+            <span class="block">從你的問題和需求出發，</span>
+            <span class="block">看看哪種專案適合你</span>
+          </IntroHeading>
+        </div>
+      ) : (
+        <IntroHeading class="sr-only">常見專案類型</IntroHeading>
+      )
+    }
+
+    {/* 不做進場淡入，捲到即完整呈現（2026-08-28 業主指示；原兩群組共用一個 data-reveal） */}
+    <div class:list={[showIntro ? 'mt-12 md:mt-16' : '']}>
+      {
+        groups.map((group, groupIndex) => (
+          <div class:list={['svc-group', groupIndex > 0 ? 'mt-20 md:mt-24' : '']}>
+            <div class="max-w-3xl">
+              <GroupHeading class="heading-sub">
+                {group.em ? (
+                  <>
+                    {group.pre}
+                    <span class="svc-group-em">{group.em}</span>
+                    {group.post}
+                  </>
+                ) : (
+                  group.label
+                )}
+              </GroupHeading>
+            </div>
+            <div class="mt-8 grid gap-6 md:mt-10 md:grid-cols-2 lg:grid-cols-3">
+              {group.projects.map((project) => (
+                <ProjectTypeCard {...project} headingLevel={cardHeadingLevel} />
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    {
+      showAssessment && (
+        <div class="mt-16 md:mt-24">
+          <ProjectAssessmentEntry headingLevel={GroupHeading} />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  /* 由專案頁返回 /services/#project-types 時避開 sticky Header（72px＋緩衝） */
+  .svc-project-types {
+    scroll-margin-top: 88px;
+  }
+
+  /* 群組標題關鍵詞：藍色螢光筆底色（同首頁 .ai-em 的色塊），靜態、一開始就完整顯示 */
+  .svc-group-em {
+    color: var(--color-text);
+    background-image: linear-gradient(var(--reach-blue-200), var(--reach-blue-200));
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: 0 50%;
+    padding-inline: 0.06em;
+    margin-inline: -0.03em;
+  }
+</style>

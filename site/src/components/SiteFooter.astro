@@ -1,5 +1,6 @@
 ---
 import { SITE_NAME, SITE_NAME_EN } from '../config';
+import ContactInfo from './ContactInfo.astro';
 
 const FOOTER_NAV = [
   { path: '/services/', label: '服務內容' },
@@ -27,9 +28,9 @@ const year = new Date().getFullYear();
             <span class="text-sm text-ink-muted">{SITE_NAME_EN}</span>
           </span>
         </a>
-        <p class="mt-4 max-w-xs text-sm leading-relaxed text-ink-muted">
-          正式聯絡資訊（email、電話、地址與社群連結）待補。
-        </p>
+        <div class="mt-4 max-w-sm">
+          <ContactInfo size="sm" />
+        </div>
       </div>
 
       <nav aria-label="網站導覽">

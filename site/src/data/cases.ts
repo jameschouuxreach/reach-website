@@ -1,11 +1,12 @@
 /**
- * 精選案例資料（順序：好齡居 A → 好齡居 B → 桃園卡 → 合作金庫；
- * 首頁維持四張，兩版好齡居並列第一排；報稅系統暫不展示）。
+ * 精選案例資料（順序：好齡居 A → 好齡居 B → 好齡居 C → 合作金庫；
+ * 首頁維持四張；桃園卡佔位卡於 v2.2 由好齡居 C 版取代；報稅系統暫不展示）。
  * 專案類型（types）僅使用已提供素材（合作客戶logo.pdf）中的描述；
  * 未提供者顯示「案例整理中」，不得捏造。
  *
- * 好齡居目前以兩種敘事風格並列測試（A 悠識務實版／B AJA 品牌敘事版），
- * 內容依據《好齡居專案實例-版本A/B》指示文件；擇定後保留一版並改用 /work/nexdo。
+ * 好齡居目前以三種敘事風格並列測試（A 悠識務實版／B AJA 品牌敘事版／C 小瑜觀點版），
+ * 內容依據《好齡居專案實例-版本A/B/C》指示文件；擇定後保留一版並改用 /work/nexdo。
+ * 2026-09-11 另有 D 版（NEXDO_D_CASE）：只在 /cases/ 列表顯示，不加入下方首頁共用的 CASES。
  */
 export interface CaseItem {
   name: string;
@@ -13,6 +14,8 @@ export interface CaseItem {
   types: string[];
   mediaNote?: string;
   eyebrow?: string;
+  /** 標題上方的品牌色小標（提供時才顯示） */
+  kicker?: string;
   summary?: string;
   image?: { src: string; alt: string };
   href?: string;
@@ -49,10 +52,18 @@ export const CASES: CaseItem[] = [
     cta: '查看專案',
   },
   {
-    name: '桃園卡',
-    tag: '公共服務',
-    types: ['案例整理中'],
-    mediaNote: '需要素材：專案代表圖或介面示意（需授權）',
+    // 版本 C：小瑜觀點版。2026-08-28 依業主指示改卡片版式：標題上方加藍色小標、不顯示摘要、tag 改為五項
+    name: '好齡居｜重新定義長照服務的角色與價值',
+    tag: '生活服務',
+    types: ['網站改版', '資訊架構', '服務定位', '內容策略', '品牌研究'],
+    eyebrow: '好齡居 NEXDO',
+    kicker: '樂齡居住服務品牌及網站優化',
+    image: {
+      src: '/images/work/nexdo/nexdo-home-hero-20260826.jpg',
+      alt: '好齡居現行網站首頁，以家庭生活情境呈現樂齡居住服務',
+    },
+    href: '/work/nexdo-c/',
+    cta: '查看專案',
   },
   {
     name: '合作金庫銀行',
@@ -61,3 +72,41 @@ export const CASES: CaseItem[] = [
     mediaNote: '需要素材：網銀流程改造專案代表圖',
   },
 ];
+
+/**
+ * 好齡居 D 版（第四版，2026-09-11）列表入口：依《好齡居專案實例-版本D》第 4.5 節新增，
+ * 只在 /cases/ 顯示（C 版之後、合作金庫之前）；不得加入首頁共用的 CASES 陣列。
+ * 2026-09-15 業主指示：小標改「重新定義長照服務的角色與價值」、摘要與圖說皆拿掉、標籤加「資訊架構」「研究分析」，
+ * 版式因此與共用 CaseCard 相同，改直接以 CaseCard 呈現（原 CaseCardCaptioned 已移除）。
+ */
+export const NEXDO_D_CASE: CaseItem = {
+  name: '好齡居｜受眾研究、品牌定位與網站改版',
+  tag: '生活服務',
+  types: ['品牌定位', '網站改版', '內容策略', '資訊架構', '研究分析'],
+  eyebrow: '好齡居 NEXDO',
+  kicker: '重新定義長照服務的角色與價值',
+  image: {
+    src: '/images/work/nexdo/v4/nexdo-v4-hero.webp',
+    alt: '好齡居白色 Logo 與筆電中的新版首頁設計',
+  },
+  href: '/work/nexdo-d/',
+  cta: '查看專案',
+};
+
+/**
+ * 好齡居 E 版（第五版，2026-09-30）列表入口：依《好齡居專案實例-版本E》第 6 節新增，
+ * 只在 /cases/ 顯示（D 版之後、合作金庫之前）；不得加入首頁共用的 CASES 陣列。
+ */
+export const NEXDO_E_CASE: CaseItem = {
+  name: '好齡居｜從受眾研究到品牌與網站改版',
+  tag: '生活服務',
+  types: ['研究分析', '品牌定位', '資訊架構', '網站改版', '內容策略'],
+  eyebrow: '好齡居 NEXDO',
+  kicker: '第五版｜好齡居 NEXDO',
+  image: {
+    src: '/images/work/nexdo/v4/nexdo-v4-hero.webp',
+    alt: '好齡居 Logo 與筆電中的首頁改版設計',
+  },
+  href: '/work/nexdo-e/',
+  cta: '查看專案',
+};

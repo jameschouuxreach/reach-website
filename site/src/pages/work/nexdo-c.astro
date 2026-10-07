@@ -1,0 +1,1241 @@
+---
+/**
+ * 好齡居專案實例｜版本 C：小瑜觀點版。
+ * 依《好齡居專案實例-版本C-小瑜觀點版.md》製作：Our Approach 前置＋頁內錨點、
+ * 四個策略章節皆以「Before／我們如何判斷／After」呈現、研究圖表重製為網頁原生圖；
+ * 預設不公開研究規模數字與族群百分比，不宣稱未驗證的商業成效。
+ * 現行網站截圖擷取日期：2026-08-26（檔名帶日期）。
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const CAPTURE_DATE = '2026 年 8 月 26 日';
+
+const INFO = ['受眾研究', '品牌與服務定位', '資訊架構重整', '網站與內容策略', '2026'];
+
+const APPROACH = [
+  {
+    num: '01',
+    name: '受眾研究',
+    desc: '用問卷掌握需求分布，再透過深度訪談理解子女與長輩的購買動機、顧慮與互動關係。',
+    href: '#research',
+    link: '前往研究發現',
+  },
+  {
+    num: '02',
+    name: '品牌與服務定位',
+    desc: '重新界定主要服務對象、品牌角色與服務分類，讓好齡居不再只是多種服務的集合。',
+    href: '#brand',
+    link: '前往定位策略',
+  },
+  {
+    num: '03',
+    name: '網站架構',
+    desc: '把原本依公司內部分工排列的服務，改成使用者能從生活問題開始理解的入口。',
+    href: '#architecture',
+    link: '前往網站策略',
+  },
+  {
+    num: '04',
+    name: '內容治理',
+    desc: '將研究洞察整理成可持續使用的寫作原則，再讓 AI 協助檢查內容是否偏離品牌定位。',
+    href: '#content',
+    link: '前往內容策略',
+  },
+];
+
+const RESEARCH_FLOW = ['問卷掌握需求分布', '訪談理解關係與原因', '收斂受眾及策略方向'];
+
+const OLD_CATEGORIES = ['居家照護', '適老換屋', '居家改造', '關懷陪伴'];
+const NEW_CATEGORIES = ['居住安全', '清潔收納', '租房搬家', '樂齡健康'];
+
+const TRAIT_LAYERS = [
+  { label: '服務基本盤', traits: ['專業', '完善'], note: '讓子女相信服務可靠、判斷有依據' },
+  { label: '進入家庭的方式', traits: ['溫暖', '彈性', '共創'], note: '讓長輩感受到自己仍參與決定' },
+];
+
+const STAGES = [
+  { num: '01', name: '建立印象', desc: '先以生活轉折與陪伴建立關聯，讓人確認品牌理解自己的情境。', block: '首頁 Hero' },
+  { num: '02', name: '理解服務', desc: '從生活問題進入服務入口，再認識延伸服務。', block: '我們提供／我們還提供' },
+  { num: '03', name: '取得信任', desc: '以真實故事與品牌內容降低第一次接觸的疑慮。', block: '真實故事／好齡居誌' },
+  { num: '04', name: '引導行動', desc: '先說明合作如何進行，再提供容易開始的聯絡方式。', block: '顧問諮詢流程／聯絡表單' },
+];
+
+/** 現行首頁長頁截圖上的區塊標記（百分比依 2026-08-26 擷取時的各區塊位置） */
+const MARKERS = [
+  { num: '01', top: 0, height: 8.3 },
+  { num: '02', top: 8.3, height: 35.4 },
+  { num: '04', top: 43.7, height: 9 },
+  { num: '03', top: 52.7, height: 29.8 },
+  { num: '04', top: 84.2, height: 8.7 },
+];
+
+const PRINCIPLES = [
+  '談效益，而非服務規格',
+  '提供專業建議',
+  '用日常關心拉近距離',
+  '避免失能化語言',
+  '建立夥伴關係',
+  '服務完善，也保留選擇',
+  '看見小投入帶來的改善',
+];
+
+const AI_FLOW = ['研究定義原則', 'AI 輔助檢查', '人員確認與修改'];
+
+const LIVE_SHOTS = [
+  {
+    src: '/images/work/nexdo/nexdo-home-hero-20260826.jpg',
+    alt: '好齡居現行網站首頁，以「從整理開始，人生每個轉折，都有好齡居守護您的安心日常」與家庭情境開場',
+    caption: '品牌先從生活轉折與陪伴建立關聯。',
+    width: 2880,
+    height: 1800,
+  },
+  {
+    src: '/images/work/nexdo/nexdo-home-services-20260826.jpg',
+    alt: '好齡居現行首頁的服務入口卡片，以居住安全、收納清潔、租房搬家等生活情境介紹服務',
+    caption: '服務入口由內部名稱改為使用者能辨識的生活情境。',
+    width: 1600,
+    height: 2090,
+  },
+  {
+    src: '/images/work/nexdo/nexdo-home-steps-20260826.jpg',
+    alt: '好齡居現行首頁以填表預約、真人顧問、透明溝通、安心出發四個步驟說明合作流程',
+    caption: '使用者在聯絡前就能預期合作如何進行。',
+    width: 2880,
+    height: 1534,
+  },
+  {
+    src: '/images/work/nexdo/nexdo-about-hero-20260826.jpg',
+    alt: '好齡居現行網站關於頁，以「因為懂，所以想陪你一起」與跨世代家庭情境說明品牌角色',
+    caption: '品牌以理解與陪伴說明自己如何進入家庭。',
+    width: 2880,
+    height: 1800,
+  },
+];
+
+const CHANGES = [
+  { num: '01', name: '受眾', desc: '從籠統的樂齡客群，釐清為購買服務的子女與接受服務的長輩兩種角色。' },
+  { num: '02', name: '服務', desc: '從依內部分工分類，改為從居住安全、整理、健康與搬遷等生活問題開始。' },
+  { num: '03', name: '品牌', desc: '從多元服務供應者，重新定位為兼顧專業判斷與家庭溝通的第三方。' },
+  { num: '04', name: '網站與內容', desc: '從一次性的頁面與文案，建立可持續使用的首頁架構、內容原則與 AI 輔助流程。' },
+];
+---
+
+<BaseLayout
+  title="好齡居品牌與網站優化：從受眾研究到服務定位｜致遠專案實例"
+  description="致遠如何透過受眾研究，協助好齡居釐清子女與長輩的需求差異，重整服務分類、品牌角色、網站架構與內容原則。"
+  isHome
+  ogTitle="好齡居｜重新定義長照服務的角色與價值"
+  ogDescription="從研究不同世代的真實需求，到建立可持續使用的品牌、服務與網站策略。"
+  ogImage="/images/work/nexdo/nexdo-og-20260826.jpg"
+>
+  {/* ---- Hero｜直接說明致遠做了什麼 ---- */}
+  <section class="bg-page">
+    <div class="container-site pb-14 pt-16 md:pb-20 md:pt-24">
+      <p class="wc-label" data-reveal>好齡居 NEXDO｜品牌研究・服務定位・網站策略</p>
+      <h1 class="wc-h1" data-reveal>從跨世代需求研究，重新整理好齡居的品牌、服務與網站</h1>
+      <p class="mt-6 max-w-3xl text-lg leading-loose text-ink-secondary" data-reveal>
+        當購買服務的是子女、真正接受服務的是長輩，品牌不能只對其中一方說話。我們協助好齡居看清雙方需求，找出適合進入家庭的角色，並把研究判斷轉化為可執行的網站與內容方向。
+      </p>
+      <ul class="mt-8 flex flex-wrap gap-2" data-reveal>
+        {INFO.map((item) => <li class="wc-pill">{item}</li>)}
+      </ul>
+
+      {/* 網站 Before／After（依 目錄-19 分別裁出舊／新網站畫面重製；手機上下排列） */}
+      <figure class="mt-12" data-reveal>
+        <div class="wc-ba">
+          <div class="wc-ba-col">
+            <p class="wc-ba-tag wc-ba-tag-before">
+              <span>Before</span>
+              依內部分工介紹服務
+            </p>
+            <div class="wc-ba-frame">
+              <img
+                src="/images/work/nexdo/nexdo-site-before.jpg"
+                alt="好齡居改版前的網站，以「精緻專業的樂齡居家整合服務」與熱門精選、房屋住宅等服務清單開場"
+                width="1140"
+                height="1380"
+                class="wc-ba-img"
+              />
+            </div>
+          </div>
+          <div class="wc-ba-col">
+            <p class="wc-ba-tag wc-ba-tag-after">
+              <span>After</span>
+              從家庭的生活需求開始
+            </p>
+            <div class="wc-ba-frame wc-ba-frame-after">
+              <img
+                src="/images/work/nexdo/nexdo-site-after.jpg"
+                alt="好齡居改版後的網站，以「從家庭環境到銀髮健康」帶出居住安全、清潔收納等生活情境入口"
+                width="1120"
+                height="1380"
+                class="wc-ba-img"
+              />
+            </div>
+          </div>
+        </div>
+        <figcaption class="mt-3 text-sm text-ink-muted">研究不只改變了畫面，也重新決定網站要先回答誰的問題。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ---- Our Approach｜先讓訪客知道專案做了哪些事 ---- */}
+  <section class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-label" data-reveal>Our Approach｜我們的方式</p>
+      <h2 class="wc-h2" data-reveal>從理解人，到重新安排品牌如何被看見</h2>
+      <div class="wc-prose" data-reveal>
+        <p>
+          本案不是先決定網站要畫成什麼樣子，而是依序釐清四件事：誰在找服務、雙方為何難以達成共識、品牌應該扮演什麼角色，以及這些判斷如何落實到網站與日常內容。
+        </p>
+      </div>
+      <ol class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal>
+        {
+          APPROACH.map((a) => (
+            <li class="wc-approach">
+              <p class="text-sm font-bold text-brand">{a.num}</p>
+              <h3 class="mt-2 text-lg font-bold text-ink">{a.name}</h3>
+              <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-secondary">{a.desc}</p>
+              <a href={a.href} class="wc-anchor-link">
+                {a.link}
+                <span aria-hidden="true">↓</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  {/* ---- Challenge｜服務很多，使用者卻不知道該從哪裡開始 ---- */}
+  <section class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-label" data-reveal>The Challenge</p>
+      <h2 class="wc-h2" data-reveal>好齡居需要解決的，不只是網站怎麼分類服務</h2>
+      <div class="wc-prose" data-reveal>
+        <p>
+          好齡居涵蓋居住安全、整理收納、健康支持與搬遷等服務。原有網站依照內部分工介紹項目，雖然完整，卻要求使用者先理解公司的專業分類，才能判斷哪一項與自己有關。
+        </p>
+        <p>
+          更深一層的問題是：主動搜尋與購買服務的通常是子女，真正要接受改變的卻是長輩。子女關心安全與風險，長輩在意自主、尊嚴，以及自己是否仍能參與決定。品牌若只強調「為長者改善」，可能在進入家庭前就被拒絕。
+        </p>
+      </div>
+
+      {/* 子女在意／長輩在意（依 目錄-68 重製，去除可辨識資訊） */}
+      <figure class="mt-12" data-reveal>
+        <div class="wc-gap">
+          <div class="wc-gap-card">
+            <p class="text-sm font-bold text-brand">子女在意</p>
+            <ul class="wc-gap-list">
+              <li>安全</li>
+              <li>風險</li>
+              <li>是否有人協助處理</li>
+            </ul>
+          </div>
+          <p class="wc-gap-center">同一份關心，<br class="hidden md:inline" />可能形成不同的理解。</p>
+          <div class="wc-gap-card">
+            <p class="text-sm font-bold text-brand">長輩在意</p>
+            <ul class="wc-gap-list">
+              <li>自主</li>
+              <li>尊嚴</li>
+              <li>是否仍有選擇</li>
+            </ul>
+          </div>
+        </div>
+      </figure>
+
+      <p class="wc-key" data-reveal>
+        <span class="wc-key-label">關鍵問題</span>
+        好齡居要如何讓子女看見專業，也讓長輩感受到自己不是被安排？
+      </p>
+    </div>
+  </section>
+
+  {/* ---- 研究發現｜先分清楚找服務的人與接受服務的人 ---- */}
+  <section id="research" class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-method" data-reveal><span>受眾研究</span>問卷研究＋深度訪談</p>
+      <h2 class="wc-h2" data-reveal>我們先找出決策關係，再決定品牌要對誰說話</h2>
+      <div class="wc-prose" data-reveal>
+        <p>
+          我們以問卷掌握不同年齡、居住狀況與購買情境的需求，再透過深度訪談理解需求背後的家庭關係。研究顯示，服務購買者與使用者經常不是同一個人：子女負責搜尋與評估，長輩則決定改變能否真正進入生活。
+        </p>
+        <p>
+          這讓專案方向從「列出更多服務」轉為「同時建立兩種理解」：讓子女快速判斷服務是否專業可靠，也避免用失能與被照顧的語言定義長輩。
+        </p>
+      </div>
+
+      {/* 研究流程三步驟（依 目錄-14、目錄-16 重製；研究規模數字預設不顯示） */}
+      <figure class="mt-12" data-reveal>
+        <ol class="wc-flow">
+          {
+            RESEARCH_FLOW.map((step, i) => (
+              <li class="wc-flow-step">
+                <span class="wc-step-num">{i + 1}</span>
+                <span class="font-semibold text-ink">{step}</span>
+                {i < RESEARCH_FLOW.length - 1 && <span class="wc-flow-arrow" aria-hidden="true">→</span>}
+              </li>
+            ))
+          }
+        </ol>
+      </figure>
+
+      {/* 購買者／使用者角色差異（依 目錄-54 重製，不用 Persona 人臉） */}
+      <figure class="mt-8 grid gap-4 md:grid-cols-2" data-reveal>
+        <div class="wc-role">
+          <p class="text-sm font-bold uppercase tracking-wide text-ink-muted">購買服務的人</p>
+          <p class="mt-2 text-xl font-bold text-ink">子女</p>
+          <p class="mt-2 leading-relaxed text-ink-secondary">負責搜尋、比較與評估，關心服務是否專業可靠，以及做了之後能不能更放心。</p>
+        </div>
+        <div class="wc-role">
+          <p class="text-sm font-bold uppercase tracking-wide text-ink-muted">接受服務的人</p>
+          <p class="mt-2 text-xl font-bold text-ink">長輩</p>
+          <p class="mt-2 leading-relaxed text-ink-secondary">決定改變能否真正進入生活，在意自主與尊嚴，也在意自己是否仍被當成做決定的人。</p>
+        </div>
+      </figure>
+      <p class="mt-3 text-sm text-ink-muted" data-reveal>研究先確認找服務的人與接受服務的人並不相同，再決定品牌與網站要同時回應誰。</p>
+
+      <p class="wc-key" data-reveal>
+        <span class="wc-key-label">關鍵判斷</span>
+        網站面對的不是單一客群，而是一段需要被協調的家庭決策。
+      </p>
+    </div>
+  </section>
+
+  {/* ---- 策略一｜用生活問題重整服務架構 ---- */}
+  <section id="architecture" class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-method" data-reveal><span>策略一</span>資訊架構重整</p>
+      <h2 class="wc-h2" data-reveal>從「公司提供什麼」，改成「使用者現在遇到什麼」</h2>
+
+      <div class="wc-decision" data-reveal>
+        <div class="wc-dec wc-dec-before">
+          <p class="wc-dec-label">Before</p>
+          <p>原有分類以居家照護、適老換屋、居家改造、關懷陪伴等專業服務為主，反映公司如何執行，卻不一定符合使用者描述問題的方式。</p>
+        </div>
+        <div class="wc-dec wc-dec-judge">
+          <p class="wc-dec-label">我們如何判斷</p>
+          <p>研究發現，使用者多半從生活情境開始思考：家中是否安全、物品是否難以整理、是否需要搬家，以及如何維持健康生活。</p>
+        </div>
+        <div class="wc-dec wc-dec-after">
+          <p class="wc-dec-label">After</p>
+          <p>我們協助好齡居將主要入口重整為居住安全、清潔收納、租房搬家與樂齡健康，讓使用者先找到與自己有關的問題，再理解相應服務；軟裝設計則保留為獨立服務。</p>
+        </div>
+      </div>
+
+      {/* 分類 Before／After（依 目錄-17、目錄-44 重製；箭頭表示分類邏輯改變，非一對一更名） */}
+      <figure class="mt-12" data-reveal>
+        <div class="wc-cat">
+          <div class="wc-cat-panel">
+            <p class="text-sm font-bold text-ink-muted">依內部分工分類</p>
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {OLD_CATEGORIES.map((c) => <li class="wc-chip">{c}</li>)}
+            </ul>
+          </div>
+          <div class="wc-cat-arrow" aria-hidden="true">→</div>
+          <div class="wc-cat-panel wc-cat-panel-after">
+            <p class="text-sm font-bold text-brand">依生活問題分類</p>
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {NEW_CATEGORIES.map((c) => <li class="wc-chip wc-chip-brand">{c}</li>)}
+              <li class="wc-chip wc-chip-outline">軟裝設計（獨立服務）</li>
+            </ul>
+          </div>
+        </div>
+        <figcaption class="mt-3 text-sm text-ink-muted">服務沒有變少，使用者理解服務的起點改變了。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ---- 策略二｜重新界定品牌進入家庭的角色 ---- */}
+  <section id="brand" class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-method" data-reveal><span>策略二</span>品牌定位</p>
+      <h2 class="wc-h2" data-reveal>品牌不替任何一方做決定，而是讓雙方更容易開始討論</h2>
+
+      <div class="wc-decision" data-reveal>
+        <div class="wc-dec wc-dec-before">
+          <p class="wc-dec-label">Before</p>
+          <p>品牌若只站在子女一側強調風險與改善，容易讓長輩感到自己被當成需要處理的問題；但若只維持現況，也無法回應子女對安全的擔心。</p>
+        </div>
+        <div class="wc-dec wc-dec-judge">
+          <p class="wc-dec-label">我們如何判斷</p>
+          <p>訪談讓我們看見，真正阻礙服務的往往不是沒有需求，而是雙方對「為什麼要改」沒有共同理解。好齡居需要兼顧專業判斷與平等溝通。</p>
+        </div>
+        <div class="wc-dec wc-dec-after">
+          <p class="wc-dec-label">After</p>
+          <p>我們將品牌定位收斂為「懂生活的鄰居」：用專業與完善建立信任，用溫暖、彈性與共創保留每個人的聲音；不代替家人說服長輩，而是協助家庭找到能共同接受的改變方式。</p>
+        </div>
+      </div>
+
+      {/* 品牌特質兩層（依 目錄-45 重製，不用人物形象照） */}
+      <figure class="mt-12" data-reveal>
+        <div class="grid gap-4 md:grid-cols-[2fr_3fr]">
+          {
+            TRAIT_LAYERS.map((layer, i) => (
+              <div class:list={['wc-trait-layer', i === 1 && 'wc-trait-layer-warm']}>
+                <p class="text-sm font-bold text-ink-muted">{layer.label}</p>
+                <ul class="mt-4 grid gap-3" style={`grid-template-columns: repeat(${layer.traits.length}, minmax(0, 1fr))`}>
+                  {layer.traits.map((t) => <li class="wc-trait">{t}</li>)}
+                </ul>
+                <p class="mt-4 text-sm text-ink-secondary">{layer.note}</p>
+              </div>
+            ))
+          }
+        </div>
+        <figcaption class="mt-3 text-sm text-ink-muted">品牌定位不只定義說什麼，也定義服務如何與家庭互動。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ---- 策略三｜把首頁從服務目錄改成理解路徑 ---- */}
+  <section id="homepage" class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-method" data-reveal><span>策略三</span>首頁策略</p>
+      <h2 class="wc-h2" data-reveal>不要一開始展示所有服務，先回答「這與我有什麼關係」</h2>
+
+      <div class="wc-decision" data-reveal>
+        <div class="wc-dec wc-dec-before">
+          <p class="wc-dec-label">Before</p>
+          <p>當多元服務同時出現在首頁，使用者必須自行理解分類、比較差異，再判斷是否值得聯絡；資訊完整，理解成本卻留給第一次接觸品牌的人。</p>
+        </div>
+        <div class="wc-dec wc-dec-judge">
+          <p class="wc-dec-label">我們如何判斷</p>
+          <p>使用者需要先確認品牌是否理解自己的生活情境，再理解能提供哪些協助、服務是否可信，最後才會考慮進一步諮詢。</p>
+        </div>
+        <div class="wc-dec wc-dec-after">
+          <p class="wc-dec-label">After</p>
+          <p>我們將首頁規劃為建立印象、理解服務、取得信任、引導行動四個任務。現行網站先以生活轉折與陪伴建立關聯，再呈現服務入口、合作流程與聯絡方式。</p>
+        </div>
+      </div>
+
+      {/* 四階段＋現行首頁長頁截圖標記（依 目錄-29 重製；標記位置依 2026-08-26 現行首頁） */}
+      <figure class="mt-12" data-reveal>
+        <div class="wc-stage-grid">
+          <div class="wc-long" tabindex="0" role="region" aria-label="好齡居現行首頁整頁截圖，手機版可在框內捲動">
+            {/* 標記百分比以圖片本身高度為基準（inner），外層只負責限高捲動 */}
+            <div class="wc-long-inner">
+              <img
+                src="/images/work/nexdo/nexdo-home-long-20260826.jpg"
+                alt="好齡居現行首頁整頁截圖，標記出建立印象、理解服務、取得信任與引導行動四個階段對應的區塊"
+                width="800"
+                height="4729"
+                loading="lazy"
+                class="w-full"
+              />
+              {
+                MARKERS.map((m) => (
+                  <span class="wc-mark" style={`top:${m.top}%;height:${m.height}%`} aria-hidden="true">
+                    <span class="wc-mark-num">{m.num}</span>
+                  </span>
+                ))
+              }
+            </div>
+          </div>
+          <ol class="wc-stages">
+            {
+              STAGES.map((s) => (
+                <li class="wc-stage">
+                  <span class="wc-stage-num">{s.num}</span>
+                  <div>
+                    <p class="text-lg font-bold text-ink">{s.name}</p>
+                    <p class="mt-1 leading-relaxed text-ink-secondary">{s.desc}</p>
+                    <p class="mt-2 text-sm text-ink-muted">對應區塊：{s.block}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <figcaption class="mt-3 text-sm text-ink-muted">
+          每個首頁區塊都有明確任務，而不是堆疊品牌與服務資訊。標記依 {CAPTURE_DATE} 的現行首頁；區塊順序以現行網站為準。
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ---- 策略四｜把研究轉成可持續使用的內容原則 ---- */}
+  <section id="content" class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-method" data-reveal><span>策略四</span>內容策略與 AI 輔助</p>
+      <h2 class="wc-h2" data-reveal>不只改寫一次文案，而是建立之後也能沿用的判斷方式</h2>
+
+      <div class="wc-decision" data-reveal>
+        <div class="wc-dec wc-dec-before">
+          <p class="wc-dec-label">Before</p>
+          <p>品牌文案如果只追求親切，仍可能無意間以高齡、失能或被照顧的角度描述長輩；不同人撰寫時，也容易逐漸偏離品牌定位。</p>
+        </div>
+        <div class="wc-dec wc-dec-judge">
+          <p class="wc-dec-label">我們如何判斷</p>
+          <p>我們將研究中反覆出現的顧慮整理為七項內容原則，包括談生活效益而非規格、提供專業建議、避免失能化語言、保留選擇，以及建立平等共創的關係。</p>
+        </div>
+        <div class="wc-dec wc-dec-after">
+          <p class="wc-dec-label">After</p>
+          <p>原則確立後，再以 AI 協助找出可能偏離定位的句子、解釋問題並提出修改方向。AI 提高檢查效率，品牌與人的理解仍由團隊做最後判斷。</p>
+        </div>
+      </div>
+
+      {/* 文案 Before／After（依 目錄-84 扶手案例重製） */}
+      <figure class="mt-12 grid gap-4 md:grid-cols-2" data-reveal>
+        <div class="wc-copy wc-copy-before">
+          <p class="wc-dec-label">Before</p>
+          <p class="mt-3 text-xl font-bold leading-relaxed">「安裝安全扶手，起身才不會跌倒。」</p>
+          <p class="mt-3 text-sm">從風險與缺陷描述長輩——正確，卻讓人先看見自己的退化。</p>
+        </div>
+        <div class="wc-copy wc-copy-after">
+          <p class="wc-dec-label">After</p>
+          <p class="mt-3 text-xl font-bold leading-relaxed">「馬桶邊加個手把，站起來就不費力。」</p>
+          <p class="mt-3 text-sm">說明改變讓生活更輕鬆——同一個服務，看見的是效益。</p>
+        </div>
+      </figure>
+
+      {/* 七項原則名稱＋AI 輔助流程（依 目錄-85、目錄-87、目錄-89 重製；不公開完整 Prompt） */}
+      <figure class="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr]" data-reveal>
+        <div class="wc-panel">
+          <p class="text-sm font-bold text-ink">七項內容原則</p>
+          <ol class="mt-4 grid gap-2 sm:grid-cols-2">
+            {
+              PRINCIPLES.map((p, i) => (
+                <li class="wc-principle">
+                  <span class="text-sm font-bold text-brand">{`0${i + 1}`}</span>
+                  <span class="text-ink-secondary">{p}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <div class="wc-panel">
+          <p class="text-sm font-bold text-ink">AI 輔助檢查流程</p>
+          <ol class="mt-4 space-y-5">
+            {
+              AI_FLOW.map((step, i) => (
+                <li class="flex items-center gap-4">
+                  <span class="wc-step-num">{i + 1}</span>
+                  <span class="font-semibold text-ink">{step}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <figcaption class="text-sm text-ink-muted lg:col-span-2">先有研究形成的標準，AI 才知道該協助檢查什麼。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ---- 落地畫面｜研究判斷如何出現在現行網站 ---- */}
+  <section id="live" class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-label" data-reveal>On the Live Site｜落地畫面</p>
+      <h2 class="wc-h2" data-reveal>從服務名稱到瀏覽順序，研究結果已進入真實接觸點</h2>
+      <div class="wc-prose" data-reveal>
+        <p>
+          現行網站已反映本案主要策略：以生活情境說明品牌價值、用居住安全等四類需求作為主要服務入口，呈現從預約諮詢到陪伴執行的合作流程，並以陪伴、理解與共同決定的語言介紹品牌。
+        </p>
+        <p>這些畫面不是研究報告之後附加的視覺包裝，而是前述受眾、服務與品牌判斷的具體結果。</p>
+      </div>
+
+      <div class="mt-12 grid gap-8 md:grid-cols-2" data-reveal>
+        {
+          LIVE_SHOTS.map((shot) => (
+            <figure>
+              <div class="wc-shot">
+                <img src={shot.src} alt={shot.alt} width={shot.width} height={shot.height} loading="lazy" class="wc-shot-img" />
+              </div>
+              <figcaption class="mt-3 text-sm text-ink-muted">{shot.caption}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
+      <p class="mt-6 text-sm text-ink-muted" data-reveal>現行網站畫面擷取於 {CAPTURE_DATE}。</p>
+      <p class="mt-6" data-reveal>
+        <a href="https://www.nexdo.tw/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 font-semibold text-brand">
+          查看好齡居現行網站
+          <span aria-hidden="true">↗</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  {/* ---- What We Changed｜致遠推動的四項改變 ---- */}
+  <section class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-label" data-reveal>What We Changed</p>
+      <h2 class="wc-h2" data-reveal>同一份研究，改變了受眾、服務、品牌與網站四個層次</h2>
+      <ol class="wc-changes" data-reveal>
+        {
+          CHANGES.map((c) => (
+            <li class="wc-change">
+              <p class="text-sm font-bold text-brand">{c.num}</p>
+              <p class="mt-2 text-xl font-bold text-ink">{c.name}</p>
+              <p class="mt-2 leading-relaxed text-ink-secondary">{c.desc}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  {/* ---- Closing｜把複雜問題變成可以執行的方向 ---- */}
+  <section class="border-t border-line bg-page">
+    <div class="container-site py-16 md:py-24">
+      <p class="wc-label" data-reveal>Closing</p>
+      <h2 class="wc-h2" data-reveal>好齡居需要的不是多一版網站，而是先知道品牌該如何進入一個家庭</h2>
+      <div class="wc-prose" data-reveal>
+        <p>
+          我們從子女與長輩之間的需求差異出發，逐步協助好齡居界定受眾、重整服務、找到品牌角色，再把這些判斷落實到網站與內容工作中。
+        </p>
+        <p>
+          這正是致遠在專案中扮演的角色：不只提出一個好看的結果，而是把研究、決策與執行串在一起，讓團隊知道為什麼這樣改，也知道接下來如何繼續使用。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ---- 頁尾 CTA ---- */}
+  <section class="wc-cta-band">
+    <div class="container-site py-20 text-center md:py-24" data-reveal>
+      <h2 class="heading-section text-white">你的服務很多，客戶卻不知道該從哪裡開始嗎？</h2>
+      <p class="mt-4 text-lg text-white/90">與我們聊聊你的需求，一起找到改變的起點。</p>
+      <div class="mt-9 flex justify-center">
+        <a href="/contact/" class="wc-cta-btn">
+          聯絡我們
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* 圖片與區塊進場：依指示位移 ≤20px、時長 300–500ms（覆蓋全站 650ms） */
+  :global(html.js) [data-reveal] {
+    transition-duration: 450ms;
+  }
+
+  /* 頁內錨點：避開 sticky 導覽列 */
+  section[id] {
+    scroll-margin-top: 6rem;
+  }
+
+  .wc-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-brand);
+  }
+
+  .wc-h1 {
+    margin-top: 1rem;
+    max-width: 52rem;
+    font-size: clamp(1.875rem, 1.3rem + 2.4vw, 3.5rem);
+    line-height: 1.25;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .wc-h2 {
+    margin-top: 0.875rem;
+    max-width: 48rem;
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+    line-height: 1.35;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .wc-prose {
+    margin-top: 1.5rem;
+    max-width: 44rem;
+  }
+
+  .wc-prose p {
+    line-height: 2;
+    color: var(--neutral-600);
+  }
+
+  .wc-prose p + p {
+    margin-top: 1rem;
+  }
+
+  .wc-pill {
+    border-radius: 9999px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 0.375rem 0.875rem;
+    font-size: 0.875rem;
+    color: var(--neutral-600);
+  }
+
+  /* 方法標籤：章節第一眼就看到用了什麼方法 */
+  .wc-method {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--neutral-600);
+  }
+
+  .wc-method span {
+    border-radius: 9999px;
+    background: var(--reach-blue-50);
+    border: 1px solid var(--reach-blue-200);
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-brand);
+  }
+
+  /* 關鍵問題／關鍵判斷 */
+  .wc-key {
+    margin-top: 2.5rem;
+    max-width: 44rem;
+    border-left: 3px solid var(--color-brand);
+    padding-left: 1.5rem;
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem);
+    line-height: 1.6;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .wc-key-label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--color-brand);
+  }
+
+  /* Hero：網站 Before／After */
+  .wc-ba {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .wc-ba {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .wc-ba-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--neutral-700);
+  }
+
+  .wc-ba-tag span {
+    border-radius: 9999px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .wc-ba-tag-before span {
+    background: var(--neutral-100);
+    color: var(--neutral-500);
+  }
+
+  .wc-ba-tag-after span {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  .wc-ba-frame {
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+  }
+
+  .wc-ba-frame-after {
+    border-color: var(--reach-blue-300);
+  }
+
+  .wc-ba-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 8 / 7;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* Our Approach 卡片 */
+  .wc-approach {
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 1.5rem;
+  }
+
+  .wc-anchor-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 1.25rem;
+    min-height: 2.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-link);
+    text-decoration: none;
+  }
+
+  .wc-anchor-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* Challenge：子女／長輩雙欄 */
+  .wc-gap {
+    display: grid;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .wc-gap {
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .wc-gap-card {
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 1.75rem;
+  }
+
+  .wc-gap-list {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .wc-gap-list li {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--neutral-900);
+  }
+
+  .wc-gap-center {
+    max-width: 12rem;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.6;
+    color: var(--color-brand);
+  }
+
+  @media (max-width: 767px) {
+    .wc-gap-center {
+      max-width: none;
+      padding: 0.25rem 0;
+    }
+  }
+
+  /* 研究流程 */
+  .wc-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+
+  .wc-flow-step {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .wc-flow-arrow {
+    margin-left: 0.25rem;
+    font-size: 1.25rem;
+    color: var(--neutral-400);
+  }
+
+  .wc-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    background: var(--color-brand);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .wc-role {
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 1.75rem;
+  }
+
+  /* 策略章節：Before／我們如何判斷／After 三欄 */
+  .wc-decision {
+    margin-top: 2rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    .wc-decision {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .wc-dec {
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    padding: 1.5rem;
+  }
+
+  .wc-dec p:last-child {
+    margin-top: 0.75rem;
+    line-height: 1.9;
+    color: var(--neutral-600);
+  }
+
+  .wc-dec-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .wc-dec-before {
+    background: var(--neutral-100);
+  }
+
+  .wc-dec-before .wc-dec-label {
+    color: var(--neutral-500);
+  }
+
+  .wc-dec-judge {
+    background: var(--neutral-0);
+    border-top: 3px solid var(--neutral-900);
+  }
+
+  .wc-dec-judge .wc-dec-label {
+    color: var(--neutral-900);
+  }
+
+  .wc-dec-after {
+    background: var(--reach-blue-50);
+    border-color: var(--reach-blue-300);
+  }
+
+  .wc-dec-after .wc-dec-label {
+    color: var(--color-brand);
+  }
+
+  .wc-dec-after p:last-child {
+    color: var(--neutral-700);
+  }
+
+  /* 服務分類 Before／After */
+  .wc-cat {
+    display: grid;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  @media (min-width: 768px) {
+    .wc-cat {
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+  }
+
+  .wc-cat-panel {
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 1.75rem;
+  }
+
+  .wc-cat-panel-after {
+    background: var(--reach-blue-50);
+    border-color: var(--reach-blue-300);
+  }
+
+  .wc-cat-arrow {
+    text-align: center;
+    font-size: 1.75rem;
+    color: var(--neutral-400);
+  }
+
+  @media (max-width: 767px) {
+    .wc-cat-arrow {
+      transform: rotate(90deg);
+    }
+  }
+
+  .wc-chip {
+    border-radius: 9999px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
+    color: var(--neutral-600);
+  }
+
+  .wc-chip-brand {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .wc-chip-outline {
+    border-color: var(--reach-blue-300);
+    color: var(--color-brand);
+  }
+
+  /* 品牌特質兩層 */
+  .wc-trait-layer {
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 1.75rem;
+  }
+
+  .wc-trait-layer-warm {
+    background: var(--reach-blue-50);
+    border-color: var(--reach-blue-300);
+  }
+
+  .wc-trait {
+    border-radius: 10px;
+    background: var(--neutral-100);
+    padding: 1rem 0.5rem;
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--neutral-900);
+  }
+
+  .wc-trait-layer-warm .wc-trait {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  /* 首頁四階段＋長頁截圖標記 */
+  .wc-stage-grid {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .wc-stage-grid {
+      grid-template-columns: minmax(0, 220px) 1fr;
+      gap: 3rem;
+    }
+
+    /* 長頁截圖很高：四階段清單 sticky 跟隨，不需要來回捲動對照 */
+    .wc-stages {
+      position: sticky;
+      top: 6rem;
+    }
+  }
+
+  .wc-long {
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+  }
+
+  .wc-long-inner {
+    position: relative;
+  }
+
+  .wc-long-inner img {
+    display: block;
+  }
+
+  /* 手機：長頁截圖改為框內捲動，避免撐出兩千多 px 妨礙跳讀（tabindex 讓鍵盤可捲） */
+  @media (max-width: 767px) {
+    .wc-long {
+      max-height: 560px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  .wc-mark {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 2px solid var(--color-brand);
+    border-bottom: 2px solid var(--color-brand);
+    background: rgb(11 92 255 / 0.1);
+    pointer-events: none;
+  }
+
+  .wc-mark-num {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0.2rem 0.55rem;
+    border-bottom-right-radius: 8px;
+    background: var(--color-brand);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  .wc-stages {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .wc-stage {
+    display: flex;
+    gap: 1rem;
+    border-top: 1px solid var(--neutral-200);
+    padding-top: 1.25rem;
+  }
+
+  .wc-stage-num {
+    flex-shrink: 0;
+    width: 2.25rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+
+  /* 內容策略 */
+  .wc-copy {
+    border-radius: 12px;
+    padding: 1.75rem;
+  }
+
+  .wc-copy-before {
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-100);
+    color: var(--neutral-500);
+  }
+
+  .wc-copy-before .wc-dec-label {
+    color: var(--neutral-500);
+  }
+
+  .wc-copy-after {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  .wc-copy-after .wc-dec-label {
+    color: rgb(255 255 255 / 0.8);
+  }
+
+  .wc-copy-after p:last-child {
+    color: rgb(255 255 255 / 0.9);
+  }
+
+  .wc-panel {
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+    padding: 1.75rem;
+  }
+
+  .wc-principle {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    border-radius: 8px;
+    background: var(--neutral-50);
+    padding: 0.625rem 0.875rem;
+  }
+
+  /* 落地畫面 */
+  .wc-shot {
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-0);
+  }
+
+  .wc-shot-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* What We Changed：2×2，極淡灰線連接 */
+  .wc-changes {
+    margin-top: 2.5rem;
+    display: grid;
+    border-top: 1px solid var(--neutral-200);
+    border-left: 1px solid var(--neutral-200);
+  }
+
+  @media (min-width: 768px) {
+    .wc-changes {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .wc-change {
+    border-right: 1px solid var(--neutral-200);
+    border-bottom: 1px solid var(--neutral-200);
+    padding: 1.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .wc-change {
+      padding: 2.25rem;
+    }
+  }
+
+  .wc-cta-band {
+    background-color: var(--reach-blue-500);
+  }
+
+  .wc-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    background-color: var(--neutral-0);
+    color: var(--color-brand);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 200ms ease;
+  }
+
+  .wc-cta-btn:hover {
+    background-color: var(--reach-blue-50);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wc-cta-btn {
+      transition: none;
+    }
+  }
+</style>

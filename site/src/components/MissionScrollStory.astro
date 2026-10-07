@@ -1,10 +1,12 @@
 ---
 /**
- * 我們的使命：釘住式捲動敘事（v3）。
- * - 桌機＋JS：260vh 跑道內一個 100vh sticky 畫面；區塊滑到定位後釘住，
- *   繼續捲動驅動三階段。左側字幕以 Hero 式垂直滑動輪替（第一點初始即顯示，無進場動畫）；
- *   每次輪替與右側該階段動畫同一進度門檻同時開始，階段窗結束後才輪到下一點。
- * - 右側 SVG（v2 九宮格）：初始只有中心實心白圓；三階段：外圍八圓 無→虛線→實線
+ * 我們的使命：三點敘事（v5，2026-08-28 起不再鎖定捲動）。
+ * - 桌機＋JS：一個「視窗高 − 導覽列」的單屏區塊，頁面自由捲動；三點只由頂端 tabs 切換。
+ *   區塊捲入視窗即從「01 更深」自動播第一段，完全捲出即重置，回場一律從 01 重播
+ *   （與其他區塊的進場動畫同一慣例，見 mission-scroll.ts）。
+ *   左側字幕（標題、內文、具體舉例卡）以 Hero 式垂直滑動輪替（往下滑）。
+ * - 右側 SVG（v2 九宮格）：初始只有中心實心白圓；三階段：外圍八圓各由單一線條
+ *   自頂點順時針一筆畫滿一圈
  *   → 十六條連線（中心對外八條＋外圈相鄰八條，動畫同時）→ 外圍圓填滿。九圓大小一致。
  * - 行動版／reduced-motion／無 JS：改為三段靜態排列（文字＋對應終態圖）。
  */
@@ -12,6 +14,8 @@ interface MissionItem {
   index: string;
   title: string;
   body: string;
+  /** 具體舉例：這一點如何落實在專案中 */
+  example: { project: string; body: string };
 }
 
 interface Props {
@@ -28,9 +32,15 @@ const CX = 400;
 const CY = 400;
 const R = 54; // 九圓同大小
 const STEP = 245; // 九宮格相鄰圓心距
-const SEGMENTS = 12; // 每個外圍圓 12 段 30° 弧段
 const STROKE = 3.2;
 const CAP_INSET = STROKE / 2; // 圓角端點內縮：讓 round cap 剛好停在圓周
+// 釘住版 SVG 的 viewBox 裁到圓陣實際外緣（外圈圓 + 線寬），盒子＝圖示本體，
+// 左欄才能精準對齊圖示頂端與底端
+const FIG_EDGE = STEP + R + STROKE / 2;
+const FIG_VIEWBOX = `${CX - FIG_EDGE} ${CY - FIG_EDGE} ${FIG_EDGE * 2} ${FIG_EDGE * 2}`;
+// 圓半徑佔圖示邊長的比例：左欄「標題＋內文」上方、「舉例卡」下方各多留一個半徑，
+// 讓文字頂端與卡片底端對齊最上／最下排圓的圓心（實際像素 = 圖示寬 × 此比例）
+const FIG_R_RATIO = Math.round((R / (FIG_EDGE * 2)) * 10000) / 10000;
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
@@ -74,18 +84,18 @@ const links = [
   }),
 ];
 
-/** 每段 30° 弧段：起點固定、順時針（SVG y 軸向下，角度遞增即順時針） */
-function arcSegments(cx: number, cy: number): string[] {
-  return Array.from({ length: SEGMENTS }, (_, s) => {
-    const a0 = ((s * 30 - 90) * Math.PI) / 180;
-    const a1 = (((s + 1) * 30 - 90) * Math.PI) / 180;
-    const x0 = round(cx + R * Math.cos(a0));
-    const y0 = round(cy + R * Math.sin(a0));
-    const x1 = round(cx + R * Math.cos(a1));
-    const y1 = round(cy + R * Math.sin(a1));
-    return `M ${x0} ${y0} A ${R} ${R} 0 0 1 ${x1} ${y1}`;
-  });
+/** 單一線條畫滿整圈：自頂點起順時針一筆到底（搭配 pathLength=1 以 dasharray 畫線） */
+function circlePath(cx: number, cy: number): string {
+  const top = `${round(cx)} ${round(cy - R)}`;
+  const bottom = `${round(cx)} ${round(cy + R)}`;
+  return `M ${top} A ${R} ${R} 0 1 1 ${bottom} A ${R} ${R} 0 1 1 ${top}`;
 }
+
+/** 舉例卡標題「專案名｜副標」拆兩段：第一行小標「真實案例｜專案名」、第二行大標＝副標 */
+const examples = items.map((item) => {
+  const [name = '', ...rest] = item.example.project.split('｜');
+  return { name, sub: rest.join('｜') };
+});
 
 // Tabs 詞語（品牌對應：更深→01、更廣→02、更遠→03）
 const TAB_WORDS = ['更深', '更廣', '更遠'];
@@ -108,40 +118,60 @@ const staticFigures = [
           <span class="ms-label-en" aria-hidden="true">WHY WE DO</span>
         </h2>
 
-        <div class="msp-grid">
-          {/* 左：Tabs＋字幕輪替槽（Hero 式垂直滑動；第一點初始即顯示） */}
+        {/* Tabs：整個區塊正上方（標籤之下、兩欄之上），對齊畫面中軸置中，自由切換三點 */}
+        <div class="msp-tabs" role="tablist" aria-label="三項定位切換">
+          {
+            items.map((item, i) => (
+              <button
+                type="button"
+                role="tab"
+                aria-selected={i === 0 ? 'true' : 'false'}
+                class:list={['msp-tab', i === 0 && 'is-active']}
+                data-msp-tab={i}
+              >
+                {item.index} {TAB_WORDS[i]}
+              </button>
+            ))
+          }
+        </div>
+
+        <div class="msp-grid" style={`--ms-r-ratio: ${FIG_R_RATIO}`}>
+          {/* 左：字幕輪替槽（Hero 式垂直滑動；第一點初始即顯示）。
+              與右側圖示等高：標題＋內文對齊最上排圓心，舉例卡底端對齊最下排圓心 */}
           <div class="msp-leftcol">
-            <div class="msp-tabs" role="tablist" aria-label="三項定位切換">
+            <div class="msp-copy">
+              {/* 標題與內文各自的滑動遮罩（如 Hero 右欄第二、三行） */}
+              <div class="msp-slot">
+                {
+                  items.map((item, i) => (
+                    <h3 class:list={['ms-title', 'msp-item', i === 0 && 'is-current']} data-msp-title>
+                      {item.title}
+                    </h3>
+                  ))
+                }
+              </div>
+              <div class="msp-slot msp-slot-body">
+                {
+                  items.map((item, i) => (
+                    <p class:list={['ms-body', 'msp-item', i === 0 && 'is-current']} data-msp-body>
+                      {item.body}
+                    </p>
+                  ))
+                }
+              </div>
+            </div>
+            {/* 具體舉例卡：這一點如何落實在專案中（卡片同格堆疊，隨點切換） */}
+            <div class="msp-slot msp-slot-example">
               {
                 items.map((item, i) => (
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={i === 0 ? 'true' : 'false'}
-                    class:list={['msp-tab', i === 0 && 'is-active']}
-                    data-msp-tab={i}
+                  <div
+                    class:list={['ms-example', 'msp-item', i === 0 && 'is-current']}
+                    data-msp-example
                   >
-                    {item.index} {TAB_WORDS[i]}
-                  </button>
-                ))
-              }
-            </div>
-            {/* 標題與內文各自的滑動遮罩（如 Hero 右欄第二、三行） */}
-            <div class="msp-slot">
-              {
-                items.map((item, i) => (
-                  <h3 class:list={['ms-title', 'msp-item', i === 0 && 'is-current']} data-msp-title>
-                    {item.title}
-                  </h3>
-                ))
-              }
-            </div>
-            <div class="msp-slot msp-slot-body">
-              {
-                items.map((item, i) => (
-                  <p class:list={['ms-body', 'msp-item', i === 0 && 'is-current']} data-msp-body>
-                    {item.body}
-                  </p>
+                    <p class="ms-example-label">真實案例｜{examples[i]!.name}</p>
+                    <p class="ms-example-title">{examples[i]!.sub}</p>
+                    <p class="ms-example-body">{item.example.body}</p>
+                  </div>
                 ))
               }
             </div>
@@ -149,7 +179,7 @@ const staticFigures = [
 
           {/* 右：SVG（初始只有中心實心圓） */}
           <div class="msp-figure">
-            <svg viewBox="0 0 800 800" data-mission-svg class="ms-svg" aria-hidden="true" focusable="false">
+            <svg viewBox={FIG_VIEWBOX} data-mission-svg class="ms-svg" aria-hidden="true" focusable="false">
               <circle cx={CX} cy={CY} r={R} class="ms-center" />
               {
                 links.map((l) => (
@@ -157,11 +187,7 @@ const staticFigures = [
                 ))
               }
               <g class="ms-arcs">
-                {
-                  rings.map((r) =>
-                    arcSegments(r.cx, r.cy).map((d) => <path d={d} pathLength="1" class="ms-arc" />),
-                  )
-                }
+                {rings.map((r) => <path d={circlePath(r.cx, r.cy)} pathLength="1" class="ms-arc" />)}
               </g>
               <g class="ms-ringfulls">
                 {rings.map((r) => <circle cx={r.cx} cy={r.cy} r={R} class="ms-ringfull" />)}
@@ -189,6 +215,11 @@ const staticFigures = [
             </p>
             <h3 class="ms-title">{item.title}</h3>
             <p class="ms-body">{item.body}</p>
+            <div class="ms-example ms-fb-example">
+              <p class="ms-example-label">真實案例｜{examples[i]!.name}</p>
+              <p class="ms-example-title">{examples[i]!.sub}</p>
+              <p class="ms-example-body">{item.example.body}</p>
+            </div>
             <div class="ms-fig-wrap" aria-hidden="true">
               <svg viewBox="0 0 800 800" class="ms-fig" aria-hidden="true" focusable="false">
                 <circle cx={CX} cy={CY} r={R} class="msf-solid" />
@@ -218,17 +249,18 @@ const staticFigures = [
     background-color: var(--reach-blue-500);
   }
 
-  /* ---- 變體切換：預設後備版；桌機＋JS＋允許動態時改釘住版 ---- */
+  /* ---- 變體切換：預設後備版；桌機＋JS＋允許動態時改互動版 ---- */
   .msp-desktop {
     display: none;
-    /* 路線 B：鎖定時區塊頂端對齊導覽列底部，高度＝視窗高 − 導覽列（桌機 72px，
-       與 SiteHeader md:h-[72px] 對應；實際鎖定位置由腳本量測 header 高度） */
-    height: calc(100vh - 72px);
+    /* 至少一屏高（視窗高 − 導覽列 72px，與 SiteHeader md:h-[72px] 對應），內容較高時隨內容長高。
+       2026-08-28：原為固定 height，使用者放大瀏覽器預設字級（rem 內容變大）時會把 tab 與標題壓在一起 */
+    min-height: calc(100vh - 72px);
+    flex-direction: column;
   }
 
   @media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
     :global(html.js) .msp-desktop {
-      display: block;
+      display: flex;
     }
 
     :global(html.js) .msp-fallback {
@@ -236,32 +268,55 @@ const staticFigures = [
     }
   }
 
-  /* ---- 版面（100vh 單屏） ---- */
+  /* ---- 版面（至少一屏，可隨內容長高） ---- */
   .msp-pin {
-    height: 100%;
-    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   .msp-frame {
-    height: 100%;
+    flex: 1;
     display: flex;
     flex-direction: column;
     padding-block: 5rem 3rem;
   }
 
+  /* 兩欄同高（列高＝圖示或左欄較高者），整列在剩餘空間垂直置中。
+     --ms-fig＝圖示邊長：右欄寬 52cqw 的 75%＝39cqw，480px／56vh 封頂；
+     以 container 單位定義，左欄的內距才能引用同一個尺寸 */
   .msp-grid {
+    --ms-fig: min(39cqw, 480px, 56vh);
     flex: 1;
     display: grid;
     grid-template-columns: 48fr 52fr;
-    align-items: center;
-    min-height: 0;
+    align-items: stretch;
+    align-content: center;
+    /* tabs 到內容的最小間距固定 3rem；高螢幕多出的空間才由 align-content 置中分配。
+       不再設 min-height: 0（那會允許整列被壓扁） */
+    margin-top: 3rem;
+    container-type: inline-size;
   }
 
-  /* Tabs：圓角 pill；active 白底品牌字、inactive 無底白字、hover 半透明白底 */
+  /* 左欄：標題＋內文在頂端、舉例卡在底端，與右側圖示上下緣對齊 */
+  .msp-leftcol {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* 標題＋內文上方多留一個圓半徑 → 文字頂端對齊最上排圓心 */
+  .msp-copy {
+    padding-top: calc(var(--ms-fig) * var(--ms-r-ratio, 0.09));
+  }
+
+  /* Tabs：區塊正上方（標籤之下）、水平置中對齊畫面中軸；
+     圓角 pill；active 白底品牌字、inactive 無底白字、hover 半透明白底 */
   .msp-tabs {
     display: flex;
+    justify-content: center;
     gap: 0.5rem;
-    margin-bottom: 2.25rem;
+    margin-top: 2rem;
   }
 
   .msp-tab {
@@ -308,17 +363,27 @@ const staticFigures = [
     margin-top: 1.25rem;
   }
 
+  /* 具體舉例卡與內文之間留較大間距，區分「理念」與「案例」；
+     下方多留一個圓半徑 → 卡片底端對齊最下排圓心
+     （用 margin 而非 padding：槽有 overflow:hidden，padding 區會露出滑出中的舊卡） */
+  .msp-slot-example {
+    margin-top: 3rem;
+    margin-bottom: calc(var(--ms-fig) * var(--ms-r-ratio, 0.09));
+  }
+
+  /* 切換方向＝往下滑（2026-08-28 業主指示反轉）：
+     未輪到的項目停在上方（-110%），切入時往下滑到定位；已過的項目（.is-past）停在下方（110%） */
   .msp-item {
     grid-area: 1 / 1;
     opacity: 0;
-    transform: translateY(110%);
+    transform: translateY(-110%);
     transition:
       transform 850ms cubic-bezier(0.83, 0, 0.17, 1),
       opacity 600ms ease;
   }
 
-  .msp-item.is-above {
-    transform: translateY(-110%);
+  .msp-item.is-past {
+    transform: translateY(110%);
   }
 
   .msp-item.is-current {
@@ -335,13 +400,14 @@ const staticFigures = [
     align-items: center;
     justify-content: center;
     min-height: 0;
-    height: 100%;
   }
 
+  /* viewBox 已裁到圓陣本體（原 800 盒的 75%），寬度上限同比縮小以維持畫面上的圖示大小；
+     以 vh 封頂取代 max-height，避免盒子被壓扁後留白、失去對齊基準 */
   .ms-svg {
-    width: min(100%, 640px);
+    width: var(--ms-fig);
     height: auto;
-    max-height: 74vh;
+    aspect-ratio: 1;
   }
 
   /* ---- 反白版區塊標籤 ---- */
@@ -389,6 +455,40 @@ const staticFigures = [
     max-width: 30em;
   }
 
+  /* ---- 具體舉例卡（兩個變體共用）：底色同 Hero（--color-page）。
+     第一行小標「真實案例｜專案名」品牌色、第二行大標 --neutral-700（#353B45）、
+     內文＝Hero 右欄第三行中文句的 --color-text-secondary ---- */
+  .ms-example {
+    max-width: 30em;
+    padding: 1.25rem 1.5rem 1.375rem;
+    border-radius: 1rem;
+    background-color: var(--color-page);
+    color: var(--color-text-secondary);
+  }
+
+  .ms-example-label {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    font-weight: 600;
+    color: var(--color-brand);
+  }
+
+  .ms-example-title {
+    margin-top: 0.375rem;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    font-weight: 700;
+    /* 業主指示（2026-08-28）：比 --color-text 淡一階，介於標題黑與內文灰之間 */
+    color: var(--neutral-700);
+  }
+
+  .ms-example-body {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: var(--color-text-secondary);
+  }
+
   /* ---- 主 SVG 元素狀態（CSS 變數預設＝最終完整狀態；JS 逐幀覆寫） ---- */
   .ms-svg {
     --ms-arc: 1;
@@ -420,8 +520,8 @@ const staticFigures = [
     stroke-dashoffset: 0;
   }
 
-  /* 收尾：完整實線圓淡入時，分段弧線同步淡出；
-     另以長度門檻處理 round cap 在 0 長度時的殘留圓點（96 顆小點→透明） */
+  /* 收尾：完整實線圓淡入時，畫圓線條同步淡出；
+     另以長度門檻處理 round cap 在 0 長度時的殘留圓點（8 顆起筆點→透明） */
   .ms-arcs {
     opacity: min(calc(1 - var(--ms-ringfull)), calc(var(--ms-arc) * 25), 1);
   }
@@ -455,6 +555,10 @@ const staticFigures = [
 
   .ms-fb-panel + .ms-fb-panel {
     border-top: 1px solid rgb(255 255 255 / 0.22);
+  }
+
+  .ms-fb-example {
+    margin-top: 1.75rem;
   }
 
   .ms-fig-wrap {

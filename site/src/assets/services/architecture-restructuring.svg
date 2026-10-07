@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- 架構重整型：重建清楚的層級與結構。三個節點（Reach Blue 200 實心圓，半徑 40）＋頂點落在三個圓心的三角形，
+       以 Reach Blue 300 半透明（0.34）疊在圓上：與圓重疊處變深、三角形獨立區域很淡（依原圖的疊色構成）。 -->
+  <circle cx="100" cy="57" r="40" fill="#BED1FF"/>
+  <circle cx="51" cy="143" r="40" fill="#BED1FF"/>
+  <circle cx="149" cy="143" r="40" fill="#BED1FF"/>
+  <path d="M100 57L149 143H51Z" fill="#8EB0FF" fill-opacity="0.34"/>
+</svg>

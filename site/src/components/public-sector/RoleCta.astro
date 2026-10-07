@@ -1,0 +1,179 @@
+---
+/**
+ * 公共服務內頁專用的角色 CTA（不改全站 ContactCta）：沿用其品牌藍底、白字、白底膠囊按鈕與 Reach us 右欄。
+ * 每個角色各輸出一組；無 JS 時兩組都顯示（附角色小標），Tab 初始化後由 public-sector-tabs 只留目前角色那組。
+ */
+import { ROLES, ROLE_CTA_ACTION } from '../../data/public-sector';
+---
+
+<section class="ps-cta-band" aria-label="聯絡我們">
+  <div class="container-site py-20 md:py-28" data-reveal>
+    {
+      ROLES.map((role) => (
+        <div class="ps-cta-grid" data-role-cta={role.id}>
+          <div>
+            <p class="ps-cta-role">{role.label}</p>
+            <h2 class="ps-cta-title">{role.cta.title}</h2>
+            <p class="ps-cta-desc">{role.cta.description}</p>
+          </div>
+          <div class="ps-cta-right">
+            <p class="ps-cta-en">Reach us</p>
+            <div class="mt-6 md:mt-8">
+              <a href={ROLE_CTA_ACTION.href} class="ps-btn-on-blue">
+                {ROLE_CTA_ACTION.label}
+                <span class="ps-cta-arrow" aria-hidden="true">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .ps-cta-band {
+    background-color: var(--reach-blue-500);
+    color: var(--neutral-0);
+  }
+
+  .ps-cta-grid {
+    /* 與 ContactCta 相同的字級公式，Reach us 字級按比例推導 */
+    --hero-fs: clamp(2.5rem, 5.25vw - 3px, 4.125rem);
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  /* 無 JS 時兩組上下排列，中間以白色細線分隔 */
+  .ps-cta-grid + .ps-cta-grid {
+    margin-top: 3.5rem;
+    padding-top: 3.5rem;
+    border-top: 1px solid rgb(255 255 255 / 0.4);
+  }
+
+  @media (min-width: 768px) {
+    .ps-cta-grid {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 3rem;
+    }
+  }
+
+  /* 角色小標只在無 JS（兩組並陳）時需要；Tab 初始化後隱藏 */
+  .ps-cta-role {
+    margin: 0 0 0.75rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  :global([data-ps-roles][data-ready]) .ps-cta-role {
+    display: none;
+  }
+
+  :global([data-ps-roles][data-ready]) .ps-cta-grid + .ps-cta-grid {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .ps-cta-title {
+    margin: 0;
+    color: var(--neutral-0);
+    font-size: clamp(1.625rem, 1.25rem + 1.6vw, 2.5rem);
+    line-height: 1.35;
+    font-weight: 700;
+  }
+
+  .ps-cta-desc {
+    margin-top: 1rem;
+    max-width: 36rem;
+    color: var(--neutral-0);
+    line-height: 1.8;
+  }
+
+  /* 右欄：比照 ContactCta——左側白色分隔線、Reach us＋按鈕 */
+  .ps-cta-right {
+    border-inline-start: 2px solid var(--neutral-0);
+    padding-inline-start: clamp(1.25rem, 3vw, 3rem);
+  }
+
+  @media (min-width: 768px) {
+    .ps-cta-right {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  .ps-cta-en {
+    margin: 0;
+    font-size: 1.9375rem;
+    line-height: 1.15;
+    font-weight: 600;
+    color: var(--neutral-0);
+  }
+
+  @media (min-width: 768px) {
+    .ps-cta-en {
+      font-size: calc(var(--hero-fs) * 0.68);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .ps-cta-en {
+      font-size: calc(var(--hero-fs) * 0.75);
+    }
+  }
+
+  .ps-btn-on-blue {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem; /* 觸控目標 44px */
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    font-size: 0.9375rem;
+    background-color: var(--neutral-0);
+    color: var(--color-brand);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 200ms ease, transform 200ms ease;
+  }
+
+  .ps-btn-on-blue:hover {
+    background-color: var(--reach-blue-50);
+  }
+
+  .ps-btn-on-blue:active {
+    transform: translateY(1px);
+  }
+
+  .ps-btn-on-blue:focus-visible {
+    outline: 2px solid var(--neutral-0);
+    outline-offset: 3px;
+  }
+
+  .ps-btn-on-blue .ps-cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  .ps-btn-on-blue:hover .ps-cta-arrow,
+  .ps-btn-on-blue:focus-visible .ps-cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ps-btn-on-blue,
+    .ps-btn-on-blue .ps-cta-arrow {
+      transition: none;
+    }
+    .ps-btn-on-blue:hover .ps-cta-arrow,
+    .ps-btn-on-blue:focus-visible .ps-cta-arrow {
+      transform: none;
+    }
+  }
+</style>

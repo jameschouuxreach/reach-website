@@ -1,7 +1,52 @@
 ---
+/**
+ * 致遠觀點列表：PageHero → 文章卡（桌機兩欄、手機單欄）→ 既有 ContactCta。
+ * 封面沿用文章圖 1（真實配圖），標題／摘要取自 src/data/insights.ts，與文章頁、sitemap 共用同一份 metadata。
+ *
+ * 2026-09-23：改為兩欄版型。第二張為「版型預覽用假資料卡」，由 SHOW_LAYOUT_PLACEHOLDER 控制，
+ * 只為了確認兩欄排版，未提供 href 故不可點擊（比照 CaseCard 的 Wrapper 慣例），
+ * 並以灰階佔位框＋「版型預覽」標籤明確標示，確認版型後把旗標改成 false 即可移除。
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import ContactCta from '../components/ContactCta.astro';
+import { FIRST_INSIGHT_ARTICLE } from '../data/insights';
+
+/** 版型預覽用假資料卡開關（確認兩欄版型後改 false 或整段移除） */
+const SHOW_LAYOUT_PLACEHOLDER = true;
+
+interface InsightCard {
+  href?: string;
+  category: string;
+  title: string;
+  description: string;
+  cover?: { src: string; width: number; height: number };
+  cta: string;
+  isPlaceholder?: boolean;
+}
+
+const cards: InsightCard[] = [
+  {
+    href: FIRST_INSIGHT_ARTICLE.path,
+    category: FIRST_INSIGHT_ARTICLE.category,
+    title: FIRST_INSIGHT_ARTICLE.title,
+    description: FIRST_INSIGHT_ARTICLE.description,
+    cover: { src: '/images/insights/figure-supermarket.webp', width: 1600, height: 800 },
+    cta: '閱讀文章',
+  },
+  ...(SHOW_LAYOUT_PLACEHOLDER
+    ? [
+        {
+          category: '版型預覽',
+          title: '（範例）第二篇文章的標題會放在這裡，長度大約是一到兩行',
+          description:
+            '（範例）這張是排版預覽用的假資料卡，只用來確認兩欄版型，不是真實文章。實際摘要大約兩到三行，說明這篇文章會談什麼、適合誰看。',
+          cta: '文章準備中',
+          isPlaceholder: true,
+        } satisfies InsightCard,
+      ]
+    : []),
+];
 ---
 
 <BaseLayout
@@ -10,34 +55,145 @@ import ContactCta from '../components/ContactCta.astro';
 >
   <PageHero
     title="致遠觀點"
-    intro="關於研究、設計與組織協作的觀察與思考，文章陸續整理中。"
+    intro="從真實困擾出發，分享研究與設計如何幫助團隊找到改善方向。"
+    introLead
   />
 
   <section class="container-site py-16 md:py-24" data-reveal>
-    <div class="mb-6 flex flex-wrap gap-2" aria-hidden="true">
+    <ul class="grid list-none gap-10 p-0 md:grid-cols-2 md:gap-x-8 md:gap-y-14">
       {
-        ['全部', '使用者研究', '服務設計', '數位轉型'].map((tag) => (
-          <span class="rounded-full border border-line bg-surface px-4 py-1.5 text-sm text-ink-muted">{tag}</span>
-        ))
+        cards.map((card) => {
+          const Wrapper = card.href ? 'a' : 'div';
+          const wrapperProps = card.href
+            ? { href: card.href, class: 'insight-card block h-full no-underline' }
+            : { class: 'insight-card insight-card--placeholder block h-full' };
+          return (
+            <li>
+              <Wrapper {...wrapperProps}>
+                {card.cover ? (
+                  <div class="insight-card-cover overflow-hidden rounded-xl border border-line">
+                    <img
+                      src={card.cover.src}
+                      alt=""
+                      width={card.cover.width}
+                      height={card.cover.height}
+                      loading="lazy"
+                      decoding="async"
+                      class="insight-card-cover-img"
+                    />
+                  </div>
+                ) : (
+                  <div class="media-placeholder insight-card-cover-empty rounded-xl">封面圖（版型預覽）</div>
+                )}
+                <p
+                  class:list={[
+                    'mt-6 text-sm font-bold tracking-wide',
+                    card.isPlaceholder ? 'text-ink-muted' : 'text-brand',
+                  ]}
+                >
+                  {card.category}
+                </p>
+                <h2
+                  class:list={[
+                    'insight-card-title mt-2 text-xl font-bold md:text-[1.375rem]',
+                    card.isPlaceholder ? 'text-ink-muted' : 'text-ink',
+                  ]}
+                >
+                  {card.title}
+                </h2>
+                <p
+                  class:list={['mt-3 leading-relaxed', card.isPlaceholder ? 'text-ink-muted' : 'text-ink-secondary']}
+                >
+                  {card.description}
+                </p>
+                <p
+                  class:list={[
+                    'insight-card-cta mt-5 inline-flex items-center gap-1.5 font-semibold',
+                    card.isPlaceholder ? 'text-ink-muted' : 'text-brand',
+                  ]}
+                >
+                  {card.cta}
+                  {!card.isPlaceholder && (
+                    <span class="cta-arrow" aria-hidden="true">
+                      →
+                    </span>
+                  )}
+                </p>
+              </Wrapper>
+            </li>
+          );
+        })
       }
-    </div>
-    <p class="mb-6 text-sm text-ink-muted">分類為預留結構，文章上線後啟用。</p>
-    <div class="grid gap-5 md:grid-cols-3">
-      {
-        [1, 2, 3].map(() => (
-          <div class="card overflow-hidden">
-            <div class="media-placeholder aspect-[16/9] rounded-none border-x-0 border-t-0">
-              文章封面圖（待補）
-            </div>
-            <div class="p-6">
-              <h2 class="text-lg font-bold text-ink-muted">文章整理中</h2>
-              <p class="mt-2 text-sm text-ink-muted">正式文章標題與內容確認後上線。</p>
-            </div>
-          </div>
-        ))
-      }
-    </div>
+    </ul>
   </section>
 
   <ContactCta />
 </BaseLayout>
+
+<style>
+  /* 封面：文章圖 1（真實配圖），hover 時比照 CaseCard 的輕微放大 */
+  .insight-card-cover {
+    background-color: var(--color-surface-accent);
+  }
+
+  .insight-card-cover-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1600 / 800;
+    object-fit: cover;
+    transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* 版型預覽用的灰階佔位封面：與真實封面同比例，避免兩欄高度差太多 */
+  .insight-card-cover-empty {
+    aspect-ratio: 1600 / 800;
+  }
+
+  a.insight-card:hover .insight-card-cover-img,
+  a.insight-card:focus-visible .insight-card-cover-img {
+    transform: scale(1.03);
+  }
+
+  .insight-card-title,
+  .insight-card-cta {
+    transition: color 200ms ease;
+  }
+
+  a.insight-card:hover .insight-card-title,
+  a.insight-card:focus-visible .insight-card-title,
+  a.insight-card:hover .insight-card-cta,
+  a.insight-card:focus-visible .insight-card-cta {
+    color: var(--color-brand);
+  }
+
+  a.insight-card:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 4px;
+    border-radius: 12px;
+  }
+
+  .insight-card-cta .cta-arrow {
+    transition: transform 200ms ease;
+  }
+
+  a.insight-card:hover .cta-arrow,
+  a.insight-card:focus-visible .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .insight-card-title,
+    .insight-card-cta,
+    .insight-card-cta .cta-arrow,
+    .insight-card-cover-img {
+      transition: none;
+    }
+    a.insight-card:hover .cta-arrow,
+    a.insight-card:focus-visible .cta-arrow,
+    a.insight-card:hover .insight-card-cover-img,
+    a.insight-card:focus-visible .insight-card-cover-img {
+      transform: none;
+    }
+  }
+</style>

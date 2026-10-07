@@ -62,7 +62,9 @@
     color: var(--color-text);
     font-weight: 700;
     line-height: 1.3;
-    text-wrap: balance;
+    /* pretty：逐字塞滿第一行、只在最後一行會剩孤字時微調（2026-08-28 由 balance 改）。
+       balance 會把中文標題平均切成等長兩行，常斷在詞中間；不支援 pretty 的舊瀏覽器退回一般換行 */
+    text-wrap: pretty;
   }
 
   :focus-visible {

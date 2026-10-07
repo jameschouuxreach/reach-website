@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionLabel from '../components/SectionLabel.astro';
-import MissionScrollStory from '../components/MissionScrollStory.astro';
 import TextLink from '../components/TextLink.astro';
 import AudienceCard from '../components/AudienceCard.astro';
 import CaseCard from '../components/CaseCard.astro';
@@ -9,24 +8,6 @@ import PartnerLogos from '../components/PartnerLogos.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { CASES } from '../data/cases';
 import { SITE_NAME, SITE_NAME_EN } from '../config';
-
-const positioning = [
-  {
-    index: '01',
-    title: '讓決策源自理解',
-    body: '透過研究走進使用者的真實情境，理解問題如何發生，讓每一步都有脈絡可循。',
-  },
-  {
-    index: '02',
-    title: '讓全局清晰可見',
-    body: '從使用者體驗到組織營運，我們梳理流程、角色及互動，找出能牽動全局的關鍵施力點。',
-  },
-  {
-    index: '03',
-    title: '讓改變真實發生',
-    body: '理解多方需求與現實限制，在複雜組織中找到可行路徑，讓洞察落地、讓設計產生影響。',
-  },
-];
 ---
 
 <BaseLayout
@@ -40,7 +21,9 @@ const positioning = [
     window.scrollTo(0, 0);
   </script>
 
-  {/* ---- 2. Hero：滿版海報式＋四幕輪播（v1.1）。左欄中文主標打字輪替，右欄 Reach 句同步切換 ---- */}
+  {/* ---- 2. Hero：滿版海報式＋無縫循環輪播（v2.0）。開場＝品牌合併終態 →
+       體驗設計退場、致遠滑回合併點 → 「遠」拉霸輪轉落定「致深」→ 上下分離回句子
+       （右欄同步切 deeper）→ 深／廣／遠三幕 → 合併回品牌 → 循環 ---- */}
   <section class="bg-page">
     <div class="hero-band" data-hc>
       <div class="hero-grid" data-reveal data-reveal-once>
@@ -54,23 +37,27 @@ const positioning = [
             <span class="mt-3 block">陪你走得更深、更廣、更<span class="text-brand">遠</span></span>
           </span>
 
-          {/* 輪播動畫層 */}
+          {/* 輪播動畫層：初始態＝品牌開場（O1），兩行句子預設隱藏（is-faded），
+              避免 JS 就位前閃出原版標題；品牌行由腳本量測定位後顯示 */}
           <span class="hc-anim" aria-hidden="true">
-            <span class="hc-line block" data-hc-line1
+            <span class="hc-line is-faded block" data-hc-line1
               >從複雜，<span class="text-brand" data-hc-zhi>致</span>清晰</span
             >
-            {/* 深不預設 is-current：首次載入由腳本滑入（與換幕同一轉場） */}
-            <span class="hc-line mt-3 block" data-hc-line2
+            <span class="hc-line is-faded mt-3 block" data-hc-line2
               >陪你走得更<span class="hc-slot text-brand" data-hc-left
                 ><span class="hc-slide-item">深</span><span class="hc-slide-item">廣</span
                 ><span class="hc-slide-item">遠</span></span
               ></span
             >
-            {/* 第四幕：致遠合併後「體驗設計」自下方滑入 */}
+            {/* 品牌行：致遠合併後「體驗設計」自上方滑入；「遠」為字槽，
+                開頭段落在此拉霸輪轉（遠→深→廣→…→深）後上下分離回句子 */}
             <span class="hc-brand" data-hc-brand
               ><span class="text-brand hc-brand-char" data-hc-brand-zhi>致</span><span
-                class="text-brand hc-brand-char"
-                data-hc-brand-yuan>遠</span
+                class="hc-slot text-brand hc-brand-char"
+                data-hc-brand-slot
+                ><span class="hc-slide-item is-current" data-hc-brand-yuan>遠</span><span
+                  class="hc-slide-item">深</span
+                ><span class="hc-slide-item">廣</span></span
               ><span class="hc-brand-rest"
                 ><span class="hc-slide-item" data-hc-brand-rest>體驗設計</span></span
               ></span
@@ -94,21 +81,21 @@ const positioning = [
             <p class="hc-en-static"><span class="text-brand">Reach</span> better experiences</p>
           </div>
 
-          {/* 輪播動畫層：Reach 與主標同步一開始就顯示、固定不動；詞組與中文句垂直滑動輪替
-              （舊字上滑出、新字下方進），首幕兩行不預設 is-current，由腳本進場滑入 */}
+          {/* 輪播動畫層：Reach 固定不動；詞組與中文句垂直滑動輪替（舊字下滑出、
+              新字上方進）。初始態＝品牌開場（O1）：Experience／Design 預設 is-current */}
           <div class="hc-anim hc-right-anim" aria-hidden="true">
             <p class="hc-en"><span class="text-brand">Reach</span></p>
             <div class="hc-en hc-slide" data-hc-phrase>
               <span class="hc-slide-item">deeper understanding</span>
               <span class="hc-slide-item">the bigger picture</span>
               <span class="hc-slide-item">change that matters</span>
-              <span class="hc-slide-item">Experience</span>
+              <span class="hc-slide-item is-current">Experience</span>
             </div>
             <div class="hc-en hc-slide hc-line3" data-hc-zh>
               <span class="hc-slide-item hc-zh-item">讓決策源自理解</span>
               <span class="hc-slide-item hc-zh-item">讓全局清晰可見</span>
               <span class="hc-slide-item hc-zh-item">讓改變真實發生</span>
-              <span class="hc-slide-item">Design</span>
+              <span class="hc-slide-item is-current">Design</span>
             </div>
           </div>
         </div>
@@ -116,54 +103,25 @@ const positioning = [
     </div>
   </section>
 
-  {/* ---- 3. Why We Do／我們的使命（捲動敘事版，見 MissionScrollStory） ---- */}
-  <MissionScrollStory items={positioning} />
-
-  {/* ---- 4. What We Do／我們的服務 ---- */}
-  <section class="border-t border-line bg-page">
-    <div class="container-site sec-full">
-      <SectionLabel zh="我們的服務" en="WHAT WE DO" />
-      <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
-        <div data-reveal>
-          <h3 class="heading-sub max-w-xl">從未知到已知，讓改變有清楚的方向</h3>
-          <p class="mt-5 max-w-xl leading-loose text-ink-secondary">
-            面對複雜問題，我們從真實情境出發，結合研究、全局梳理與多方協作，釐清真正影響成效的關鍵，形成可執行的改善方向。
-          </p>
-          <p class="mt-8">
-            <TextLink href="/services/" label="服務項目" />
-          </p>
-        </div>
-
-        {/* 未知到已知：六個重疊圓由左至右、透明度遞增至品牌原色（無文字符號） */}
-        <div data-reveal>
-          <svg
-            viewBox="0 0 560 280"
-            class="wd-visual h-auto w-full"
-            role="img"
-            aria-label="示意圖：六個圓形由左至右重疊排列，顏色由淺至品牌藍原色，象徵從未知逐步走向已知"
-          >
-            {/* 實色（原透明度混色的烘焙值）；繪製順序左→右，右圓疊在左圓之上 */}
-            <circle class="wd-circle" cx="80" cy="140" r="80" fill="#DFE8FA"></circle>
-            <circle class="wd-circle" cx="156" cy="140" r="80" fill="#CCDCFB"></circle>
-            <circle class="wd-circle" cx="232" cy="140" r="80" fill="#B0C9FC"></circle>
-            <circle class="wd-circle" cx="308" cy="140" r="80" fill="#86ADFC"></circle>
-            <circle class="wd-circle" cx="384" cy="140" r="80" fill="#4D88FE"></circle>
-            <circle class="wd-circle" cx="460" cy="140" r="80" fill="var(--reach-blue-500)"></circle>
-          </svg>
-        </div>
-      </div>
-
+  {/* ---- 2.5 合作客戶 Logo 輪播（Hero 正下方；企業與政府交錯混排、左右淡出）。
+       首屏即露出上半：.hero-band 的 min-height 扣掉 --logo-peek（4rem），
+       等於此區上內距（2rem）＋約八成 logo 高（下緣被切），讓訪客知道下滑有內容。
+       不加 data-reveal：只露一半時 reveal 觀察器不會觸發，會整塊透明 ---- */}
+  <section class="bg-page">
+    <h2 class="sr-only">合作客戶</h2>
+    <div class="pt-8 pb-14">
+      <PartnerLogos />
     </div>
   </section>
 
-  {/* ---- 5. 我們與誰合作（獨立區塊，與其他區塊同級） ---- */}
+  {/* ---- 3. 服務對象（獨立區塊，與其他區塊同級；2026-09-08 業主指示移到「我們的服務」之上） ---- */}
   <section class="border-t border-line bg-page">
     <div class="container-site sec-full">
       <div data-reveal>
-        <SectionLabel zh="我們與誰合作" en="WHO WE WORK WITH" />
+        <SectionLabel zh="服務對象" en="WHO WE SERVE" />
         <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
           <div>
-            <h3 class="heading-sub max-w-xl">解法因情境而異，核心始終如一</h3>
+            <h3 class="heading-sub max-w-xl">依據不同客戶性質，量身打造解決方案</h3>
             <p class="mt-5 max-w-xl leading-loose text-ink-secondary">
               面對不同的目標、限制與協作方式，我們找出合適的切入點，讓解法符合情境，也能真正落地。
             </p>
@@ -276,27 +234,59 @@ const positioning = [
     </div>
   </section>
 
-  {/* ---- AI 主張（移至我們的經驗上方）---- */}
+  {/* ---- 4. What We Do／我們的服務 ---- */}
   <section class="border-t border-line bg-page">
-    <div class="container-site py-30 text-center md:py-42" data-reveal>
-      <h2 class="heading-section mx-auto max-w-4xl">
-        AI 讓產出<span class="ai-em">更快速</span>，我們讓成果<span class="ai-em">更精準</span>
-      </h2>
-      <p class="mx-auto mt-6 max-w-2xl leading-loose text-ink-secondary">
-        AI 能快速產出，但產出的價值仍取決於對問題的理解深度。<br
-          class="hidden md:inline"
-        />我們結合 AI 的效率、使用者研究與全局判斷，讓成果真正回應需求。
-      </p>
-      <div class="mt-9 flex justify-center">
-        <a href="/services/" class="ai-cta">
-          了解更多
-          <span class="cta-arrow" aria-hidden="true">→</span>
-        </a>
+    <div class="container-site sec-full">
+      <SectionLabel zh="我們的服務" en="WHAT WE DO" />
+      <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
+        <div data-reveal>
+          {/* 兩行為設計：第一行「從未知到已知，」；第二行以詞組（inline-block）為單位換行，
+              字級放大時只會在逗號處整段換到下一行，不會斷在詞中間 */}
+          <h3 class="heading-sub max-w-xl">
+            <span class="block">從未知到已知，</span>
+            <span class="block">
+              <span class="inline-block">我們以研究<span class="ai-em">找出關鍵</span>，</span><span class="inline-block">以設計<span class="ai-em">推動改變</span></span>
+            </span>
+          </h3>
+          <p class="mt-5 max-w-xl leading-loose text-ink-secondary">
+            面對複雜問題，我們從真實情境出發，結合研究、全局梳理與多方協作，釐清真正影響成效的關鍵，形成可執行的改善方向。
+          </p>
+          {/* 服務範疇 pills（2026-08-28 業主指示新增；樣式同案例卡 tag） */}
+          <ul class="mt-6 flex max-w-xl flex-wrap gap-2" aria-label="服務範疇">
+            {
+              ['研究分析', '體驗設計', '品牌與服務策略', '體驗顧問'].map((label) => (
+                <li class="rounded-full border border-line bg-surface px-3.5 py-1 text-sm text-ink-secondary">{label}</li>
+              ))
+            }
+          </ul>
+          <p class="mt-8">
+            <TextLink href="/services/" label="服務項目" />
+          </p>
+        </div>
+
+        {/* 未知到已知：六個重疊圓由左至右、透明度遞增至品牌原色（無文字符號） */}
+        <div data-reveal>
+          <svg
+            viewBox="0 0 560 280"
+            class="wd-visual h-auto w-full"
+            role="img"
+            aria-label="示意圖：六個圓形由左至右重疊排列，顏色由淺至品牌藍原色，象徵從未知逐步走向已知"
+          >
+            {/* 實色（原透明度混色的烘焙值）；繪製順序左→右，右圓疊在左圓之上 */}
+            <circle class="wd-circle" cx="80" cy="140" r="80" fill="#DFE8FA"></circle>
+            <circle class="wd-circle" cx="156" cy="140" r="80" fill="#CCDCFB"></circle>
+            <circle class="wd-circle" cx="232" cy="140" r="80" fill="#B0C9FC"></circle>
+            <circle class="wd-circle" cx="308" cy="140" r="80" fill="#86ADFC"></circle>
+            <circle class="wd-circle" cx="384" cy="140" r="80" fill="#4D88FE"></circle>
+            <circle class="wd-circle" cx="460" cy="140" r="80" fill="var(--reach-blue-500)"></circle>
+          </svg>
+        </div>
       </div>
+
     </div>
   </section>
 
-  {/* ---- 6. 精選案例 ---- */}
+  {/* ---- 5. 精選案例／我們的經驗 ---- */}
   <section class="border-t border-line bg-page">
     <div class="container-site sec-full">
       <div class="flex flex-wrap items-baseline justify-between gap-4" data-reveal>
@@ -309,11 +299,46 @@ const positioning = [
     </div>
   </section>
 
-  {/* ---- 7. 信任與合作（v1.1：Reach 品牌動態併入 Hero，此區保留合作 Logo）---- */}
+  {/* ---- AI 主張：左內容＋右 4×4 圓陣動畫（從混亂到一致，見 ai-grid.ts）---- */}
   <section class="border-t border-line bg-page">
-    <h2 class="sr-only">信任與合作</h2>
-    <div class="container-site sec-full" data-reveal>
-      <PartnerLogos />
+    <div class="container-site py-30 md:py-42">
+      <SectionLabel zh="AI 時代的體驗設計" en="UX × AI" />
+      <div class="mt-10 grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+        <div class="ai-title-col" data-reveal>
+          {/* 詞組單位換行：只在逗號處整段換行；字級另以欄寬封頂（.ai-title），
+              使用者放大瀏覽器字級時詞組仍放得進一行 */}
+          <h2 class="heading-section ai-title max-w-xl">
+            <span class="inline-block">AI 能讓產出<span class="ai-em">更快速</span>，</span><span class="inline-block">但我們能讓成果<span class="ai-em">更精準</span></span>
+          </h2>
+          <p class="mt-6 max-w-xl leading-loose text-ink-secondary">
+            AI 能快速產出，但產出的價值仍取決於對問題的理解深度。我們結合 AI
+            的效率、使用者研究與全局判斷，讓成果真正回應需求。
+          </p>
+          <div class="mt-9">
+            <a href="/ai/" class="ai-cta">
+              了解更多
+              <span class="cta-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+
+        {/* 右欄：16 圓 4×4，樣式同「服務對象」三圓的初始樣貌（上淺下中階），
+            各自不同角度起始；輪轉編排見 src/scripts/ai-grid.ts */}
+        <div data-reveal>
+          <div class="ai-grid" data-ai-grid aria-hidden="true">
+            {
+              Array.from({ length: 16 }).map(() => (
+                <svg viewBox="0 0 100 100" class="ai-orb">
+                  <g class="ai-orb-spin" data-ai-orb>
+                    <circle cx="50" cy="50" r="50" class="ai-orb-l" />
+                    <path d="M 0 50 A 50 50 0 0 0 100 50 Z" class="ai-orb-m" />
+                  </g>
+                </svg>
+              ))
+            }
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -322,10 +347,56 @@ const positioning = [
 
   <script>
     import '../scripts/hero-carousel';
+    import '../scripts/ai-grid';
   </script>
 </BaseLayout>
 
 <style>
+  /* AI 區標題：字級以欄寬封頂（最長詞組「AI 能讓產出更快速，」約 10.5 字寬 → 每字 ≤ 9cqw），
+     正常字級下不影響（heading-section 上限 48px 較小），只在使用者放大字級時生效 */
+  .ai-title-col {
+    container-type: inline-size;
+  }
+
+  .ai-title {
+    font-size: min(clamp(1.875rem, 1.35rem + 2.1vw, 3rem), 9cqw);
+  }
+
+  /* ---- AI 區塊 4×4 圓陣：每圓＝上淺下中階半圓（同三圓初始樣貌），
+     旋轉由 ai-grid.ts 驅動，回彈曲線同 --wwa-spring ---- */
+  .ai-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    max-width: 460px;
+    margin-inline: auto;
+  }
+
+  .ai-orb {
+    width: 100%;
+    height: auto;
+  }
+
+  .ai-orb-spin {
+    transform-box: view-box;
+    transform-origin: 50px 50px;
+    transition: transform 950ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  .ai-orb-l {
+    fill: #dfe8fa;
+  }
+
+  .ai-orb-m {
+    fill: #b0c9fc;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-orb-spin {
+      transition: none;
+    }
+  }
+
   /* AI 主張 CTA：藍框白底藍字 */
   .ai-cta {
     display: inline-flex;
@@ -419,10 +490,12 @@ const positioning = [
     }
   }
 
-  /* ---- 滿版 Hero：內距約 80px（5.5vw 封頂），桌機高度撐到視窗高扣掉 header ---- */
+  /* ---- Hero：左右內距約 80px（5.5vw 封頂）、上下內距縮小；
+     桌機高度＝視窗高 − header − --logo-peek，讓下方合作客戶 Logo 區塊首屏露出上半 ---- */
   .hero-band {
+    --logo-peek: 4rem; /* 與 2.5 合作客戶區塊的上內距（pt-8）＋約八成 logo 高對應 */
     padding-inline: clamp(1.25rem, 5.5vw, 5rem);
-    padding-block: 5rem 4rem;
+    padding-block: 3rem 2.5rem;
     overflow-x: clip; /* 垂直合併期間品牌行的隱形佔位盒可能超出，夾住避免水平捲動 */
   }
 
@@ -432,15 +505,20 @@ const positioning = [
       flex-direction: column;
       justify-content: center;
       /* header 桌機高 72px；svh 避免行動瀏覽器網址列造成跳動 */
-      min-height: calc(100svh - 4.5rem);
-      padding-block: 3rem;
+      min-height: calc(100svh - 4.5rem - var(--logo-peek));
+      padding-block: 2rem;
     }
   }
 
   /* ---- Hero 兩欄 ----
      --hero-fs 與 .heading-hero 的 clamp 公式一致，右欄字級按比例推導以維持左右等高 */
   .hero-grid {
-    --hero-fs: clamp(2.5rem, 5.25vw - 3px, 4.125rem);
+    /* 與 .heading-hero 同一條公式（上限 66px，不隨瀏覽器預設字級放大），
+       再以左欄實際可用寬封頂：主標最長一行「從複雜，致清晰」7 字，取 /7.1 留餘裕；
+       cqw 相對於 .hero-grid（見下方 container-type），左右欄共用同一基準 */
+    --hero-fs-base: clamp(2.5rem, 5.25vw - 3px, 66px);
+    --hero-fs: min(var(--hero-fs-base), calc((100cqw - var(--hero-lead)) / 7.1));
+    container-type: inline-size;
     /* 左欄前導內距：讓主標離左緣遠一點、靠近中間（手機為 0，md+ 於下方 media 設值） */
     --hero-lead: 0rem;
     /* 字槽滑動：時長與緩動（開頭漸快、結尾漸慢 easeInOutQuint）在此統一調整；
@@ -463,6 +541,11 @@ const positioning = [
       gap: 3rem;
     }
 
+    .hero-grid {
+      /* 兩欄：左欄可用寬＝(格寬 − gap 3rem)/2 − 前導內距 */
+      --hero-fs: min(var(--hero-fs-base), calc((50cqw - 1.5rem - var(--hero-lead)) / 7.1));
+    }
+
     .hero-grid > h1 {
       padding-inline-start: var(--hero-lead);
     }
@@ -480,6 +563,10 @@ const positioning = [
   .hc-right {
     border-inline-start: 2px solid var(--color-border);
     padding-inline-start: clamp(1.25rem, 3vw, 3rem);
+  }
+
+  .hero-grid > h1 {
+    font-size: var(--hero-fs);
   }
 
   [data-hc].is-resetting .hero-grid {
@@ -562,6 +649,36 @@ const positioning = [
     vertical-align: bottom;
   }
 
+  /* 體驗設計出現時的淡入（退場淡出的相反）：透明度預設前段就完成、
+     彼時字形還在遮罩外看不到，故將淡入延後 0.4×時長——字形進入遮罩後
+     才由透明轉濃、落定後收尾，淡入清楚可見。只掛在 is-current（進場後狀態），
+     退場（is-leaving）維持原本邊滑出邊淡出 */
+  .hc-brand-rest .hc-slide-item.is-current {
+    transition:
+      transform var(--hc-dur, 680ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1)),
+      opacity calc(var(--hc-dur, 680ms) * 0.7) ease calc(var(--hc-dur, 680ms) * 0.4);
+  }
+
+  /* no-anim 守門（同前述 scoping 特異度陷阱） */
+  .hc-brand-rest .hc-slide-item.no-anim {
+    transition: none;
+  }
+
+  /* 拉霸連續捲軸（由 JS 建立）：整串字直向堆疊，單一 transition 從頭捲到尾。
+     每格高度與 .hc-slot 的 1.12em 一致，字形在格內位置與字槽實體字重合 */
+  :global(.hc-spin-strip) {
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    width: 100%;
+    will-change: transform;
+  }
+
+  :global(.hc-spin-strip .hc-spin-cell) {
+    display: block;
+    height: 1.12em;
+  }
+
   /* FLIP 飛行字（致、遠）：由 JS 建立，繼承 h1 字體樣式 */
   :global(.hc-clone) {
     position: absolute;
@@ -616,6 +733,32 @@ const positioning = [
     color: var(--color-text-secondary);
   }
 
+  /* 停留進度畫記（右欄第二行詞組＋第三行中文句同時）：比 AI 區塊 .ai-em
+     （blue-200）淡一階的螢光筆待命，轉場結束後由 JS 掛上 is-sweeping 掃過 */
+  [data-hc-phrase] .hc-slide-item,
+  [data-hc-zh] .hc-zh-item {
+    background-image: linear-gradient(var(--reach-blue-100), var(--reach-blue-100));
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    background-position: 0 50%;
+    padding-inline: 0.06em;
+    margin-inline: -0.03em;
+  }
+
+  /* 掃過：延遲 0.5s 起筆、2s 掃完，加強版 ease-in-out——前段更快加速、
+     後段提早減速拉長收尾。畫滿後底線保留，隨字句一起滑出；
+     歸位後由 JS 移除 class 瞬間歸零。
+     注意：transition 需保留字槽原本的 transform／opacity 項目，
+     否則掛著 is-sweeping 離場時會失去滑出動畫（瞬間消失） */
+  [data-hc-phrase] .hc-slide-item.is-sweeping,
+  [data-hc-zh] .hc-zh-item.is-sweeping {
+    background-size: 100% 100%;
+    transition:
+      transform var(--hc-dur, 680ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1)),
+      opacity calc(var(--hc-dur, 680ms) * 0.7) ease,
+      background-size 2000ms cubic-bezier(0.35, 0, 0.12, 1) 500ms;
+  }
+
   /* 由主標字級推導；v1.9 右欄字級盡量貼近左欄（md 0.68、lg+ 0.75）。
      右塊自然高度略高於左欄兩行，由 grid align-items:center 互相垂直置中。 */
   @media (min-width: 768px) {
@@ -640,7 +783,7 @@ const positioning = [
   }
 
 
-  /* 垂直滑動字槽：舊字上滑出、新字自下方進（機制同 Animate UI「Rotating Text」，原生實作） */
+  /* 垂直滑動字槽：舊字下滑出、新字自上方進（機制同 Animate UI「Rotating Text」，原生實作） */
   .hc-slide {
     position: relative;
     overflow: hidden;
@@ -653,7 +796,7 @@ const positioning = [
     inset-inline-start: 0;
     white-space: nowrap;
     opacity: 0;
-    transform: translateY(130%);
+    transform: translateY(-130%);
     transition:
       transform var(--hc-dur, 680ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1)),
       opacity calc(var(--hc-dur, 680ms) * 0.7) ease;
@@ -666,7 +809,28 @@ const positioning = [
 
   .hc-slide-item.is-leaving {
     opacity: 0;
-    transform: translateY(-130%);
+    transform: translateY(130%);
+  }
+
+  /* 左欄「深廣遠」：比照開頭拉霸捲軸——純滑動、不淡出，
+     進出場字形由字槽 overflow 裁切（槽外恆不可見，opacity 可恆為 1） */
+  [data-hc-left] .hc-slide-item {
+    opacity: 1;
+    transition: transform var(--hc-dur, 680ms) var(--hc-ease, cubic-bezier(0.83, 0, 0.17, 1));
+  }
+
+  [data-hc-left] .hc-slide-item.is-leaving {
+    opacity: 1;
+  }
+
+  /* no-anim 守門：上列覆寫（含 is-sweeping）經 Astro scoping 後特異度高於
+     基礎 .no-anim，須在同等以上特異度重申 transition: none，
+     否則 snapGroup 的「瞬間歸位」會變成 850ms 可見動畫
+     （症狀：分離時深的落點量測錯位、換幕後殘字往上飄過字槽） */
+  [data-hc-left] .hc-slide-item.no-anim,
+  [data-hc-phrase] .hc-slide-item.no-anim,
+  [data-hc-zh] .hc-zh-item.no-anim {
+    transition: none;
   }
 
   .hc-slide-item.no-anim {
@@ -685,7 +849,7 @@ const positioning = [
     margin-top: 0.75rem;
   }
 
-  /* ---- 我們與誰合作：三圓切分圖示 ---- */
+  /* ---- 服務對象：三圓切分圖示 ---- */
   .ww-visual {
     max-width: 560px;
   }

@@ -1,0 +1,180 @@
+---
+/**
+ * 類別頁「這些執行項目，常見於哪些專案？」（2026-09-02 業主指示，取代原「常見專案類型」區塊）：
+ * - 上方為執行項目 tab 列（WAI-ARIA tabs 模式：點選切換，方向鍵／Home／End 可移動）。
+ * - 點選 tab 顯示引用該執行項目的專案卡（ProjectTypeCard，整卡連至專案說明頁）。
+ * - 伺服器端預設第一個 tab 選取、其餘面板 hidden；資料層已驗證每個執行項目至少被一個專案引用。
+ * - 切換 tab 時新面板的卡片逐張淡入上移（.svc-panel-enter 重新觸發動畫），即使兩個 tab 的專案相同，
+ *   也能看出畫面有更新（2026-09-02 業主指示）；prefers-reduced-motion 時不動畫。
+ */
+import type { ServiceCategory } from '../../data/services';
+import { PROJECT_TYPES } from '../../data/services';
+import ProjectTypeCard from './ProjectTypeCard.astro';
+
+interface Props {
+  category: ServiceCategory;
+}
+
+const { category } = Astro.props;
+
+const tabs = category.items.map((item) => ({
+  item,
+  projects: PROJECT_TYPES.filter((project) => project.serviceItemSlugs.includes(item.slug)),
+}));
+---
+
+<div data-item-tabs>
+  <div class="flex flex-wrap gap-3" role="tablist" aria-label="依執行項目查看常見專案">
+    {
+      tabs.map(({ item }, index) => (
+        <button
+          type="button"
+          id={`svc-tab-${item.slug}`}
+          class="svc-tab"
+          role="tab"
+          aria-selected={index === 0 ? 'true' : 'false'}
+          aria-controls={`svc-panel-${item.slug}`}
+          tabindex={index === 0 ? undefined : -1}
+        >
+          {item.title}
+        </button>
+      ))
+    }
+  </div>
+  {
+    tabs.map(({ item, projects }, index) => (
+      <div
+        id={`svc-panel-${item.slug}`}
+        role="tabpanel"
+        aria-labelledby={`svc-tab-${item.slug}`}
+        hidden={index !== 0}
+        class="mt-8 md:mt-10"
+      >
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <ProjectTypeCard {...project} headingLevel="h3" />
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .svc-tab {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 1.125rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      border-color 180ms ease,
+      color 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .svc-tab:hover {
+    border-color: var(--color-brand);
+    background-color: var(--reach-blue-50);
+    color: var(--color-brand);
+  }
+
+  .svc-tab[aria-selected='true'] {
+    border-color: var(--color-brand);
+    background-color: var(--color-brand);
+    color: var(--neutral-0);
+  }
+
+  .svc-tab:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-tab {
+      transition: none;
+    }
+  }
+
+  /* 切換 tab 時的卡片進場：JS 對新面板加 .svc-panel-enter 重新觸發（初載不動畫，由區塊 data-reveal 負責） */
+  .svc-panel-enter :global(.svc-link-card) {
+    animation: svc-card-in 360ms ease both;
+  }
+
+  .svc-panel-enter :global(.svc-link-card:nth-child(2)) {
+    animation-delay: 60ms;
+  }
+
+  .svc-panel-enter :global(.svc-link-card:nth-child(3)) {
+    animation-delay: 120ms;
+  }
+
+  .svc-panel-enter :global(.svc-link-card:nth-child(n + 4)) {
+    animation-delay: 180ms;
+  }
+
+  @keyframes svc-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-panel-enter :global(.svc-link-card) {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-item-tabs]').forEach((root) => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+
+    const select = (next: HTMLButtonElement, focus = false) => {
+      tabs.forEach((tab) => {
+        const active = tab === next;
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+        tab.tabIndex = active ? 0 : -1;
+        const panel = document.getElementById(tab.getAttribute('aria-controls') ?? '');
+        if (!panel) return;
+        panel.hidden = !active;
+        if (active) {
+          // 重新觸發卡片進場動畫（強制 reflow 讓 animation 重跑）
+          panel.classList.remove('svc-panel-enter');
+          void panel.offsetWidth;
+          panel.classList.add('svc-panel-enter');
+        }
+      });
+      if (focus) next.focus();
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => {
+        if (tab.getAttribute('aria-selected') === 'true') return; // 點同一個 tab 不重播動畫
+        select(tab);
+      });
+      tab.addEventListener('keydown', (event) => {
+        let target: number | undefined;
+        if (event.key === 'ArrowRight') target = (index + 1) % tabs.length;
+        else if (event.key === 'ArrowLeft') target = (index - 1 + tabs.length) % tabs.length;
+        else if (event.key === 'Home') target = 0;
+        else if (event.key === 'End') target = tabs.length - 1;
+        if (target === undefined) return;
+        event.preventDefault();
+        select(tabs[target], true);
+      });
+    });
+  });
+</script>

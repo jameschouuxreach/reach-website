@@ -1,0 +1,142 @@
+---
+/**
+ * 關於頁「我們的使命」的一列：標題（品牌詞＋大標合併一行，同為黑色；2026-10-05 業主指示由品牌藍改黑）＋內文＋案例連結文字（左）、原版九宮格動畫 GIF（右）；
+ * 手機單欄先文後圖。版型比照政府頁 IllustratedPoint。GIF 沿用 MissionScrollStory 九宮格幾何逐幀輸出（白底，2026-10-05 v2）：
+ * 01 中心深色點＋外圍淺色點順時針逐一出現 → 02 淺色連線 → 03 深色自中心圓周往外擴散（以圓心為中心的擴大圓裁切深色層），依序染深放射線、上下左右點、外圈連線、四角點；
+ * 配色取自首頁「服務對象」三圓：深色 #4d88fe（.ww-d）、淺色 #b0c9fc（.ww-m）；
+ * reduced-motion 改用同名 PNG 終態。圖示輔助相鄰正文，alt 留空。
+ */
+import type { MissionItem } from '../../data/mission';
+
+interface Props {
+  item: MissionItem;
+  /** 只有第一列 eager，其餘 lazy */
+  eager?: boolean;
+  /** 桌機左右交換（圖左文右）；手機一律先文後圖 */
+  reverse?: boolean;
+}
+
+const { item, eager = false, reverse = false } = Astro.props;
+const src = `/images/about/mission-${item.index}`;
+/** 案例連結文字一律在第一個逗號後換行，排成兩行（業主指示） */
+function splitAtComma(text: string): [string, string] {
+  const at = text.indexOf('，');
+  return at === -1 ? [text, ''] : [text.slice(0, at + 1), text.slice(at + 1)];
+}
+const [linkHead, linkTail] = splitAtComma(item.caseLink.text);
+---
+
+<article class:list={['mp', reverse && 'mp-reverse']}>
+  <div class="mp-text">
+    <h3 class="mp-title">
+      {item.word}<span class="mp-sep" aria-hidden="true">｜</span>{item.title}
+    </h3>
+    <p class="mp-body">{item.body}</p>
+    <a href={item.caseLink.href} class="mp-link">
+      {linkHead}{linkTail && <br />}{linkTail}<span class="mp-arrow" aria-hidden="true">&nbsp;→</span>
+    </a>
+  </div>
+  <div class="mp-media">
+    <picture>
+      <source srcset={`${src}.png`} media="(prefers-reduced-motion: reduce)" />
+      <img
+        src={`${src}.gif`}
+        alt=""
+        width="720"
+        height="720"
+        decoding="async"
+        loading={eager ? 'eager' : 'lazy'}
+      />
+    </picture>
+  </div>
+</article>
+
+<style>
+  /* 交錯對齊（業主指示）：兩欄等寬，文字撐滿所在欄（維持原文案寬度），GIF 維持 340px 並貼內容區外側——
+     文右圖列 GIF 靠右、圖左文右列 GIF 靠左。三列的文字與點陣外緣都落在內容區左右兩緣，
+     文字與 GIF 之間的空間＝欄距＋（欄寬 − 340px） */
+  .mp {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .mp {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 4rem;
+    }
+
+    .mp-media {
+      justify-self: end;
+    }
+
+    .mp-reverse .mp-media {
+      order: -1;
+      justify-self: start;
+    }
+  }
+
+  .mp-title {
+    font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem); /* 手機 22px → 桌機 28px，同政府頁 */
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .mp-body {
+    margin-top: 0.875rem;
+    color: var(--color-ink-secondary);
+    line-height: 1.8;
+  }
+
+  .mp-sep {
+    color: var(--color-ink-soft);
+    font-weight: 400;
+  }
+
+  /* 案例連結文字：品牌連結色、粗體，hover 底線；箭頭不換行跟在句尾 */
+  .mp-link {
+    display: inline-block;
+    margin-top: 1.25rem;
+    color: var(--color-link);
+    font-weight: 700;
+    line-height: 1.7;
+    text-decoration: none;
+  }
+
+  .mp-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .mp-arrow {
+    display: inline-block;
+    white-space: nowrap;
+    transition: transform 0.2s ease;
+  }
+
+  .mp-link:hover .mp-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mp-arrow {
+      transition: none;
+    }
+  }
+
+  /* GIF 畫布＝點陣外緣再加每側 10 單位留白（回彈＋線寬；點陣寬 598、畫布 618，見 GIF 產生腳本），
+     圖片放大 618/598 並左移 10/598，讓點陣外緣剛好落在容器邊緣 */
+  .mp-media {
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .mp-media img {
+    display: block;
+    width: calc(100% * 618 / 598);
+    max-width: none;
+    height: auto;
+    margin-left: calc(-100% * 10 / 598);
+  }
+</style>

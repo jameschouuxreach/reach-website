@@ -15,8 +15,9 @@ const MOBILE_EXTRA_ITEMS = [
 ] as const;
 
 const currentPath = Astro.url.pathname;
+/** 精確路徑或其後代路由皆為 active（如 /services/research/ 仍點亮「服務內容」） */
 const isActive = (path: string) =>
-  currentPath === path || currentPath === path.replace(/\/$/, '');
+  currentPath === path || currentPath === path.replace(/\/$/, '') || currentPath.startsWith(path);
 ---
 
 <header class="sticky top-0 z-40 border-b border-line bg-white/95">

@@ -1,0 +1,188 @@
+---
+/**
+ * 首篇觀點文章（2026-09-22 改版；2026-09-23 再改版，參考悠識研究 blog.userxper.com 文章頁調整版面）：
+ * Header → 麵包屑 → 類別 pill ＋H1＋副標＋目錄 → 內文（首節「前言」含 OS 兩句，獨立字體樣式、無邊框）
+ * → 六節正文（前言＋五節，各節固定 H2＋anchor）→ 結尾單一聯絡 CTA → 既有 Footer。
+ * 章節順序：前言 → 同樣是購物不順利 → 資訊架構重整 → 易用性測試 → 那麼我的網站應該從哪個問題下手
+ *（含專案比較表、報稅／交通部兩個案例小圖）→ 決定改版方向前；目錄的六個項目與此順序一致。
+ * 六張配圖皆為真實圖檔（public/images/insights/，本機已轉 WebP 並縮圖），不再是自製 HTML/SVG 插畫；
+ * 圖片與比較表寬度與內文同寬（見 insight-article.css，.insight-article 本身即為正文寬度框）。
+ * 不加 data-reveal（避免全站 reveal 使內容初始不可見）；全文於關閉 JavaScript 時仍可閱讀與導覽。
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleFigure from '../../components/insights/ArticleFigure.astro';
+import ProjectComparison from '../../components/insights/ProjectComparison.astro';
+import { FIRST_INSIGHT_ARTICLE, CONTACT_CTA } from '../../data/insights';
+import '../../styles/insight-article.css';
+
+/** 目錄：與下方六個 H2 的 id／文字一致，供 .insight-toc 產生錨點連結 */
+const TOC_ITEMS = [
+  { id: 'intro', label: '前言' },
+  { id: 'supermarket', label: '同樣是購物不順利，原因可能很不同' },
+  { id: 'information-architecture', label: '資訊架構重整：讓使用者輕鬆找到內容' },
+  { id: 'usability-testing', label: '易用性測試：讓使用者能夠順利操作' },
+  { id: 'choose-project', label: '那麼，我的網站應該從哪個問題下手？' },
+  { id: 'next-step', label: '決定改版方向前，你可以先做這件事……' },
+];
+---
+
+<BaseLayout title={FIRST_INSIGHT_ARTICLE.title} description={FIRST_INSIGHT_ARTICLE.description} ogType="article">
+  <section class="insight-article-section bg-page">
+    <div class="insight-article">
+      <nav class="insight-breadcrumb" aria-label="麵包屑">
+        <ol class="insight-breadcrumb-list">
+          <li class="insight-breadcrumb-item"><a href="/">首頁</a></li>
+          <li class="insight-breadcrumb-item" aria-hidden="true"><span class="insight-breadcrumb-sep">›</span></li>
+          <li class="insight-breadcrumb-item"><a href="/insights/">致遠觀點</a></li>
+        </ol>
+      </nav>
+
+      <p class="insight-eyebrow">{FIRST_INSIGHT_ARTICLE.category}</p>
+      <h1>{FIRST_INSIGHT_ARTICLE.title}</h1>
+      <p class="insight-subtitle">先搞懂網站問題，才知道要用哪種方式改善</p>
+
+      <nav class="insight-toc" aria-label="文章目錄">
+        <p class="insight-toc-title">目錄</p>
+        <ol class="insight-toc-list">
+          {
+            TOC_ITEMS.map((item, index) => (
+              <li class="insight-toc-item">
+                <a href={`#${item.id}`} class="insight-toc-link">
+                  <span class="insight-toc-number" aria-hidden="true">{index + 1}.</span>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      {/* 內文：與上方文章頁首（麵包屑／類別／標題／副標／目錄）明確分段，首節為「前言」 */}
+      <div class="insight-body">
+      <h2 id="intro">前言</h2>
+      <p class="insight-os">「資料明明都放在網站上，為什麼客戶還是一直打電話來問？」</p>
+      <p class="insight-os">「流程已經改好幾遍，怎麼還是有很多人卡關？」</p>
+
+      <p>你是不是也遇過類似的情況？</p>
+      <p>
+        知道網站需要改善，但一開會，有人想重整選單，有人建議放大按鈕，也有人主張乾脆全面改版。每個建議都有道理，你卻不確定：<strong
+          >哪一個，才能解決客戶的問題？</strong
+        >
+      </p>
+      <p>先別急著決定要改什麼。我們可以從逛超市的經驗，看看「不好用」背後可能發生了什麼。</p>
+
+      <h2 id="supermarket">同樣是購物不順利，原因可能很不同</h2>
+      <p>
+        想像你走進一間超市，準備買一瓶燕麥奶。你找過鮮奶區、飲料區，都沒看到，問了店員才知道，它被放在「健康食品區」。商品一直都在，只是它的位置不符合你的預期。
+      </p>
+      <p>
+        另一天，你到另一間店買洗髮精，很快就找到了想買的商品。但到了自助結帳機前，你卻停了下來：折價券不知道在哪裡輸入，付款後畫面也沒說清楚是否成功。最後，你還是需要店員協助。
+      </p>
+      <p>
+        <strong>兩次購物都遇到困難，但原因不一樣：一次是找不到，一次是操作卡住。</strong>
+        網站也一樣，使用者可能不知道該點哪個分類，也可能已經進入正確功能，卻無法完成想做的事。理解這個差別，就能開始找到改善方向。
+      </p>
+
+      <ArticleFigure
+        src="/images/insights/figure-supermarket.webp"
+        alt="兩格示意圖：第一格顧客拿著燕麥奶，面對鮮奶區、飲料區、健康食品區三個貨架標牌猶豫「東西放在哪裡？」；第二格顧客在自助結帳機前，掃描優惠券與結帳兩個步驟都顯示失敗，不確定是否成功。"
+        width={1600}
+        height={800}
+        caption="兩次購物，可能分別遇到『找不到內容』與『操作卡住』兩種困難。"
+      />
+
+      <h2 id="information-architecture">資訊架構重整：讓使用者輕鬆找到內容</h2>
+      <p>
+        先看第一間超市。顧客找不到燕麥奶，我們需要檢查商品怎麼分區、區名是否容易理解，以及顧客會預期在哪裡找到它。網站上的「資訊架構重整」，處理的就是類似問題：<strong
+          >網站內容與功能如何分類、命名，以及建立關係。</strong
+        >
+      </p>
+      <p>以家電網站為例，你想買一台除濕機，打開網站卻只看到一排型號與規格。每個字都看得懂，放在一起卻不知道哪台適合自己，只好一頁一頁打開比較。</p>
+      <p>如果以「適用坪數」或「節能等級」作為分類，你就能依家中空間或節能需求，先找到值得比較的產品，再查看詳細規格。型號與規格仍然有用，但你不必先成為家電專家，才能開始挑選。</p>
+      <p>資訊架構重整，就是從使用者的需求出發，思考哪些分類與名稱能幫助他尋找，哪些資訊需要放在一起。我們會先盤點內容、了解使用者怎麼找，再調整內容的安排與關聯。</p>
+      <p>提出新安排後，也需要請使用者試著找資料，確認它是否容易理解。這一步可以在完整網頁做好之前進行，提早發現問題，再調整方向。</p>
+
+      <ArticleFigure
+        src="/images/insights/figure-information-architecture.webp"
+        alt="兩格示意圖：第一格「以型號與規格呈現」，除濕機只以 N、S、P 系列分類，使用者疑惑不同系列差在哪裡、哪一款適合自己；第二格「依生活需求篩選」，改以小、中、大坪數作為分類，使用者選定坪數後表示這樣分類很清楚。"
+        width={1600}
+        height={800}
+        caption="用使用者熟悉的需求分類，幫助他更快找到合適的產品。"
+      />
+
+      <h2 id="usability-testing">易用性測試：讓使用者能夠順利操作</h2>
+      <p>再看第二間店。顧客很快就找到洗髮精，困難卻出現在結帳時，這時就需要觀察他實際怎麼操作。是不是沒看到掃描成功的提示，所以又掃了一次？是不是找不到折價券入口，才停下來求助？</p>
+      <p>這也是「易用性測試」的做法：請目標使用者完成具體任務，觀察他在哪裡猶豫、誤解或無法繼續。透過實際操作，我們能看見問題如何發生，再找出改善線索。</p>
+      <p>例如，請使用者在網站上完成一筆報名。你可能發現，他不是不願意填資料，而是不懂欄位的意思；也可能不是填錯太多次，而是錯誤訊息從未告訴他該怎麼改。</p>
+      <p>
+        有了這些觀察，團隊就更能判斷，應該修改欄位說明、調整步驟，還是補上清楚的完成提示。<strong
+          >測試的價值，是讓「我們猜他會卡住」變成「我們看見他為什麼卡住」。</strong
+        >
+      </p>
+      <p>雖然這裡用結帳說明，易用性測試也能觀察使用者找資料的過程，發現分類與命名的問題。因此，它也可以用來檢查資訊架構重整後的成果，確認新的安排是否有幫助。</p>
+
+      <ArticleFigure
+        src="/images/insights/figure-usability-test.webp"
+        alt="三格示意圖：使用者依序選擇報名方式、填寫姓名與生日；送出後畫面顯示「資料有誤，請重新確認」，使用者疑惑「我是哪裡填錯？」，畫面沒有指出是哪個欄位或該如何修正。"
+        width={1600}
+        height={728}
+        caption="光看畫面很難發現問題，觀察使用者實際操作，才能看見他在哪裡卡住。"
+      />
+
+      <h2 id="choose-project">那麼，我的網站應該從哪個問題下手？</h2>
+      <p>看到這裡，你可能已經想到幾個客戶的抱怨，卻發現兩邊都對得上：有人找不到入口，也有人進去之後做不完。一個網站可能同時存在兩種困難，專案中也經常需要一起處理。</p>
+
+      <ArticleFigure
+        src="/images/insights/figure-choose-project.webp"
+        alt="示意圖：資訊架構重整讓使用者從功能 A、B、C 之間找到入口；易用性測試接著檢查每個功能裡的步驟一、二、三是否順暢，顯示兩者分別處理不同環節，可以一起使用。"
+        width={1600}
+        height={800}
+        caption="資訊架構重整與易用性測試，分別處理『找得到』與『用得順』兩個環節。"
+      />
+
+      <p>
+        真正要判斷的是：<strong>目前最需要投入力氣的地方在哪裡？</strong>
+        因此，致遠會依主要問題與網站性質客製化執行方式，大致可以分為「架構重整型」與「流程優化型」兩種專案類型。
+      </p>
+
+      <ProjectComparison />
+
+      <p>以<strong>報稅系統優化專案</strong>為例，主要重點是改善民眾操作報稅系統的流程。但我們也同時調整首頁上不同報稅方式的資訊架構，讓各個入口的區分與選擇更直覺。</p>
+      <p>因為對民眾而言，順利完成報稅，從選對入口就已經開始。即使專案以流程優化為主，仍需要照顧資訊的安排，才能讓整段使用體驗銜接起來。</p>
+
+      <ArticleFigure
+        src="/images/insights/case-tax.webp"
+        alt="綜合所得稅申報系統的身分驗證選擇畫面，以健保卡、自然人憑證、金融憑證、戶口名簿戶號四張卡片呈現不同報稅方式的驗證與操作說明。"
+        width={1520}
+        height={855}
+        caption="除了優化報稅流程，也讓入口變得方便選擇。"
+      />
+
+      <p>
+        而對官網或以資訊瀏覽為主的網站來說，讓訪客容易找到、理解所需內容，往往是首要目標。當主要困難集中在資訊難找時，我們會以「架構重整型」規劃專案，把重心放在內容、分類與名稱的整理，同時檢查搜尋、篩選與頁面切換是否順暢，讓訪客找資料的過程也容易操作。
+      </p>
+
+      <ArticleFigure
+        src="/images/insights/case-motc.webp"
+        alt="交通部官網常用服務區塊，以道路和陸運、車輛和監理、鐵路和捷運、空運和海運、常用法規、觀光和氣象六個圖示分類呈現各項服務連結。"
+        width={1520}
+        height={883}
+        caption="重整交通部官網內容分類，讓常用功能方便好找。"
+      />
+
+      <h2 id="next-step">決定改版方向前，你可以先做這件事……</h2>
+      <p>找出客服最常收到的三個網站問題，記下使用者當時想做什麼、在哪裡停下來，以及最後需要什麼協助。這些具體情境，能幫助團隊縮小問題範圍。</p>
+      <p>例如，把「報名流程不好用」說得更具體，就可能是下面這個狀況。從這裡開始，團隊更容易討論要觀察什麼，以及如何確認修改是否有效。</p>
+      <blockquote>「很多客戶送出表單後，不知道自己有沒有報名成功，所以打電話來確認。」</blockquote>
+      <p>如果你已經累積了一些客戶反映，卻還不確定應該重新整理資訊，還是優先改善流程；或是你還不知道該如何判斷網站的問題，都歡迎與我們聊聊。我們會逐步陪你釐清使用者的困難，討論適合的專案方向與工作範圍。</p>
+
+      <p class="insight-cta-row">
+        <a href={CONTACT_CTA.href} class="btn-primary insight-cta rounded-full px-7">
+          {CONTACT_CTA.label}
+          <span class="cta-arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

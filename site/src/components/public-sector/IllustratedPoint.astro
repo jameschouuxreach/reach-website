@@ -1,0 +1,83 @@
+---
+/**
+ * 公共服務內頁的一列圖文：h3＋正文（左）、插圖（右）；手機單欄先文後圖。
+ * 插圖輔助相鄰正文，alt 留空避免朗讀重複；object-fit: contain 保留插圖全部留白，容器不加邊框、陰影或底板。
+ */
+import { ILLUSTRATION_SIZE, illustrationSrc } from '../../data/public-sector';
+
+interface Props {
+  id: string;
+  title: string;
+  body: string;
+  /** 只有預設可見的第一張圖 eager，其餘 lazy */
+  eager?: boolean;
+}
+
+const { id, title, body, eager = false } = Astro.props;
+---
+
+<div class="ps-point" id={`ps-point-${id}`}>
+  <div class="ps-point-text">
+    <h3 class="ps-point-title">{title}</h3>
+    <p class="ps-point-body">{body}</p>
+  </div>
+  <div class="ps-point-media">
+    <img
+      src={illustrationSrc(id)}
+      alt=""
+      width={ILLUSTRATION_SIZE.width}
+      height={ILLUSTRATION_SIZE.height}
+      decoding="async"
+      loading={eager ? 'eager' : 'lazy'}
+    />
+  </div>
+</div>
+
+<style>
+  .ps-point {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .ps-point {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .ps-point {
+      gap: 4rem;
+    }
+  }
+
+  .ps-point-text {
+    max-width: 34rem;
+  }
+
+  .ps-point-title {
+    font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem); /* 手機 22px → 桌機 28px */
+    line-height: 1.45;
+  }
+
+  .ps-point-body {
+    margin-top: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8; /* 字級沿用 body：手機 16px → 桌機 18px */
+  }
+
+  .ps-point-media {
+    width: 100%;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+
+  .ps-point-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+</style>

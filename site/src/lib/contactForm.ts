@@ -17,13 +17,12 @@ export const CONTACT_LIMITS: Record<ContactField, number> = {
   message: 2000,
 };
 
-export const CONTACT_LABELS: Record<ContactField | 'consent', string> = {
+export const CONTACT_LABELS: Record<ContactField, string> = {
   name: '姓名',
   email: 'Email',
   org: '組織名稱',
   phone: '電話',
   message: '想討論的問題',
-  consent: '個人資料蒐集同意',
 };
 
 export interface ContactSubmission {
@@ -34,7 +33,7 @@ export interface ContactSubmission {
   message: string;
 }
 
-export type ContactErrors = Partial<Record<ContactField | 'consent', string>>;
+export type ContactErrors = Partial<Record<ContactField, string>>;
 
 export type ContactValidation =
   | { ok: true; data: ContactSubmission }
@@ -49,7 +48,8 @@ const clean = (value: unknown): string =>
   typeof value === 'string' ? value.replace(/\r\n?/g, '\n').trim() : '';
 
 /**
- * 驗證表單內容。必填：姓名、Email、想討論的問題、同意勾選；選填：組織名稱、電話。
+ * 驗證表單內容。必填：姓名、Email、想討論的問題；選填：組織名稱、電話。
+ * （個資同意勾選欄已於 2026-10-07 依業主指示移除）
  * 錯誤訊息直接顯示給使用者，說明要怎麼修正。
  */
 export function validateContactSubmission(raw: Record<string, unknown>): ContactValidation {
@@ -72,10 +72,6 @@ export function validateContactSubmission(raw: Record<string, unknown>): Contact
     if (!errors[field] && data[field].length > CONTACT_LIMITS[field]) {
       errors[field] = `${CONTACT_LABELS[field]}最多 ${CONTACT_LIMITS[field]} 字，目前 ${data[field].length} 字。`;
     }
-  }
-
-  if (raw.consent !== true && raw.consent !== 'on' && raw.consent !== 'true') {
-    errors.consent = '請勾選同意後再送出。';
   }
 
   return Object.keys(errors).length > 0 ? { ok: false, errors } : { ok: true, data };

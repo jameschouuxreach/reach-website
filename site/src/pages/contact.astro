@@ -1,12 +1,13 @@
 ---
 /**
  * 聯絡我們（2026-10-06 表單上線）：送出到 Cloudflare Function /api/contact，寫入 Notion 並寄通知信。
- * - 欄位（精簡版）：必填 姓名、Email、想討論的問題、個資同意；選填 組織名稱、電話。規則見 src/lib/contactForm.ts。
+ * - 欄位（精簡版）：必填 姓名、Email、想討論的問題；選填 組織名稱、電話（個資同意勾選欄 2026-10-07 依業主指示移除）。規則見 src/lib/contactForm.ts。
  * - 從服務頁「專案類型評估」結果過來時，scripts/contact-form.ts 會顯示評估摘要，由使用者決定是否一併送出。
  * - 送出需要 JavaScript（Turnstile 人機驗證）；無 JS 時送出鈕維持停用並顯示說明，不會把個資以網址參數送出。
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
+import ContactInfo from '../components/ContactInfo.astro';
 import { CONTACT_FALLBACK_EMAIL, TURNSTILE_SITE_KEY } from '../config';
 import { CONTACT_LIMITS } from '../lib/contactForm';
 import { PROJECT_TYPES } from '../data/services';
@@ -50,15 +51,12 @@ const projectTitles = JSON.stringify(Object.fromEntries(PROJECT_TYPES.map((item)
             ))
           }
         </ul>
-        {
-          CONTACT_FALLBACK_EMAIL ? (
-            <p class="mt-8 text-sm text-ink-muted">
-              也可以直接寫信給我們：<a href={`mailto:${CONTACT_FALLBACK_EMAIL}`} class="font-semibold text-link underline underline-offset-4">{CONTACT_FALLBACK_EMAIL}</a>
-            </p>
-          ) : (
-            <p class="mt-8 text-sm text-ink-muted">正式 email、電話與地址確認後將公布於本頁。</p>
-          )
-        }
+        <div class="mt-10 border-t border-line pt-8">
+          <h2 class="text-lg font-bold">聯絡資訊</h2>
+          <div class="mt-4">
+            <ContactInfo />
+          </div>
+        </div>
       </div>
 
       <div class="card p-6 md:p-8" data-contact-root data-project-titles={projectTitles} data-fallback-email={CONTACT_FALLBACK_EMAIL}>
@@ -117,16 +115,6 @@ const projectTitles = JSON.stringify(Object.fromEntries(PROJECT_TYPES.map((item)
             <div class="cf-trap" aria-hidden="true">
               <label for="contact-website">網站</label>
               <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off" />
-            </div>
-
-            <div class="cf-field">
-              <label class="cf-check">
-                <input type="checkbox" name="consent" required aria-describedby="contact-consent-error" />
-                <span>
-                  我同意致遠體驗設計蒐集上述資料，僅用於回覆本次詢問與後續合作聯繫。<span class="cf-required" aria-hidden="true">*</span>
-                </span>
-              </label>
-              <p id="contact-consent-error" class="cf-error" data-error-for="consent" hidden></p>
             </div>
 
             <div class="cf-field">

@@ -19,7 +19,7 @@ import {
   type AssessmentAnswers,
 } from '../src/data/projectAssessment.ts';
 
-const valid = { name: '王小明', email: 'ming@example.com', org: '', phone: '', message: '想改善網站', consent: true };
+const valid = { name: '王小明', email: 'ming@example.com', org: '', phone: '', message: '想改善網站' };
 
 describe('validateContactSubmission', () => {
   it('必填齊全即通過，並去除頭尾空白', () => {
@@ -31,10 +31,10 @@ describe('validateContactSubmission', () => {
     }
   });
 
-  it('缺必填欄位與未勾同意時逐欄回報', () => {
-    const result = validateContactSubmission({ name: ' ', email: '', message: '', consent: false });
+  it('缺必填欄位時逐欄回報（不再需要同意勾選）', () => {
+    const result = validateContactSubmission({ name: ' ', email: '', message: '' });
     assert.equal(result.ok, false);
-    if (!result.ok) assert.deepEqual(Object.keys(result.errors).sort(), ['consent', 'email', 'message', 'name']);
+    if (!result.ok) assert.deepEqual(Object.keys(result.errors).sort(), ['email', 'message', 'name']);
   });
 
   it('Email 格式與電話字元', () => {
@@ -53,9 +53,8 @@ describe('validateContactSubmission', () => {
     if (!result.ok) assert.match(result.errors.message ?? '', /最多 2000 字/);
   });
 
-  it('非字串欄位與表單式勾選值', () => {
+  it('非字串欄位視為空白', () => {
     assert.equal(validateContactSubmission({ ...valid, name: 123 }).ok, false);
-    assert.ok(validateContactSubmission({ ...valid, consent: 'on' }).ok);
   });
 });
 

@@ -1,15 +1,13 @@
 ---
 /**
  * 企業與服務團隊內頁（2026-10-01 規格 doc/開發規格/business-v1）：
- * Hero → 痛點 3 列圖文 → 解法 3 列圖文 → 相關案例 → 單一 CTA。
+ * Hero → 痛點 3 列圖文 → 解法 3 列圖文 → 單一 CTA（相關案例區塊 2026-10-07 依業主指示移除）。
  * 版面比照公共服務頁的逐列圖文與 CTA；本頁單一受眾，不設 Tab，也不需要額外 JavaScript。
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
-import CaseCard from '../components/CaseCard.astro';
 import IllustratedPoint from '../components/business/IllustratedPoint.astro';
 import BusinessCta from '../components/business/BusinessCta.astro';
-import { CASES } from '../data/cases';
 import {
   BUSINESS_HERO,
   BUSINESS_PAIN_HEADING,
@@ -17,12 +15,6 @@ import {
   BUSINESS_SOLUTION_HEADING,
   BUSINESS_SOLUTIONS,
 } from '../data/business';
-
-// 相關案例：好齡居（A 版）→ 合作金庫銀行。資料不存在的項目略過；全部不存在時整區不輸出
-const relatedCases = [
-  CASES.find((item) => item.href === '/work/nexdo-a/'),
-  CASES.find((item) => item.name === '合作金庫銀行'),
-].filter((item) => item !== undefined);
 ---
 
 <BaseLayout
@@ -48,19 +40,6 @@ const relatedCases = [
       </section>
     </div>
   </div>
-
-  {
-    relatedCases.length > 0 && (
-      <section class="border-t border-line bg-page" data-reveal>
-        <div class="container-site py-16 md:py-24">
-          <h2 class="heading-sub">相關案例</h2>
-          <div class="mt-6 grid gap-x-8 gap-y-14 sm:grid-cols-2">
-            {relatedCases.map((item) => <CaseCard {...item} />)}
-          </div>
-        </div>
-      </section>
-    )
-  }
 
   <BusinessCta />
 </BaseLayout>

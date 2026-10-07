@@ -334,10 +334,8 @@ export const PROJECT_TYPES: ProjectType[] = [
       { title: '整合方向', body: '串連品牌、內容、服務與體驗，形成後續發展與投入的整體方向。' },
     ],
     value: '從受眾、定位到體驗建立整合性理解，讓產品與服務更有把握地進入下一階段。',
-    // 本次唯一已確認可點的關聯案例
-    relatedCases: [
-      { name: '好齡居｜樂齡居住服務品牌及網站優化', href: '/work/nexdo-a/', status: 'published' },
-    ],
+    // 2026-10-06 業主指示：比照其他專案類型改為「案例內容整理中」，不連到專案實例內頁
+    relatedCases: [{ name: '好齡居｜樂齡居住服務品牌及網站優化', status: 'preparing' }],
   },
   {
     slug: 'advisory-partnership',

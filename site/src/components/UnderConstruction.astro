@@ -1,0 +1,23 @@
+---
+/**
+ * 「內容建置中」佔位內頁（2026-10-06 業主指示）：只放頁首標題與「內容建置中」，
+ * 不放假圖片、假摘要或假成果；內容完成後直接改寫該頁即可。
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from './PageHero.astro';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHero title={title} />
+  <section class="container-site py-16 md:py-24">
+    {/* 2026-10-06 業主指示：「內容建置中」改用大標題字級（與頁首 H1 同級，手機 30px → 桌機 48px） */}
+    <h2 class="heading-section text-ink-secondary">內容建置中</h2>
+  </section>
+</BaseLayout>

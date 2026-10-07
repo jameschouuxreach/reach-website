@@ -1,0 +1,87 @@
+---
+/**
+ * 公司聯絡資訊（信箱、Facebook、地址），頁尾與聯絡頁共用；資料來源為 src/config.ts 的 CONTACT_INFO。
+ * size="sm" 用於頁尾，預設用於聯絡頁內文。
+ */
+import { CONTACT_INFO } from '../config';
+
+interface Props {
+  size?: 'sm' | 'md';
+}
+
+const { size = 'md' } = Astro.props;
+
+/** 門牌的連字號改為不斷行連字號（U+2011），避免「10-」與「2號」被拆到兩行 */
+const address = CONTACT_INFO.address.replace(/-/g, '\u2011');
+---
+
+<address class:list={['ci not-italic', size === 'sm' ? 'ci-sm' : 'ci-md']}>
+  <dl class="ci-list">
+    <div class="ci-row">
+      <dt>信箱</dt>
+      <dd><a href={`mailto:${CONTACT_INFO.email}`} class="ci-link">{CONTACT_INFO.email}</a></dd>
+    </div>
+    <div class="ci-row">
+      <dt>Facebook</dt>
+      <dd>
+        <a href={CONTACT_INFO.facebook} class="ci-link" target="_blank" rel="noopener noreferrer">
+          Reach Experience Design<span class="sr-only">（另開新視窗）</span><span aria-hidden="true"> ↗</span>
+        </a>
+      </dd>
+    </div>
+    <div class="ci-row">
+      <dt>地址</dt>
+      <dd>{address}</dd>
+    </div>
+  </dl>
+</address>
+
+<style>
+  .ci-list {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .ci-row {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: baseline;
+  }
+
+  .ci-sm {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .ci-md {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  dt {
+    font-weight: 600;
+    color: var(--neutral-500);
+  }
+
+  dd {
+    color: var(--neutral-700);
+    overflow-wrap: anywhere;
+  }
+
+  .ci-link {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .ci-link:hover {
+    color: var(--reach-blue-700);
+  }
+
+  .ci-link:focus-visible {
+    outline: 2px solid var(--reach-blue-300);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+</style>

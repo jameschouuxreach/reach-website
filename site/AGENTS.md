@@ -81,7 +81,7 @@ Notion 與通知信至少要設定一組，加上 `TURNSTILE_SECRET_KEY`，表�
 
 `astro dev` 不會執行 Functions。要測整個送出流程，先 `npm run build`，再用 `npx wrangler pages dev dist --binding KEY=VALUE …` 帶入環境變數。Turnstile 測試金鑰：Secret `1x0000000000000000000000000000000AA` 一律通過、`2x0000000000000000000000000000000AA` 一律失敗。外接硬碟（exFAT）會在 `functions/` 產生 `._*.ts` 附屬檔，wrangler 會因此編譯失敗，先 `find functions -name '._*' -delete`（這些檔案已被 gitignore，不影響 Cloudflare 上的建置）。
 
-上線前另需：`src/config.ts` 的 `CONTACT_FALLBACK_EMAIL` 填入正式信箱（送出失敗時提示客戶改寫信）；頁尾「隱私權政策」補上內容，並請確認表單的個資同意文字。
+公司聯絡資訊（信箱、Facebook、地址）集中在 `src/config.ts` 的 `CONTACT_INFO`，頁尾與聯絡頁共用，送出失敗時也提示客戶改寫信到這個信箱。表單的個資同意勾選欄已於 2026-10-07 依業主指示移除；上線前仍需補上頁尾「隱私權政策」內容。
 
 ## Documentation
 

@@ -168,7 +168,6 @@ function initContactForm(): void {
     const formData = new FormData(form);
     const raw: Record<string, unknown> = {};
     for (const field of CONTACT_FIELDS) raw[field] = formData.get(field) ?? '';
-    raw.consent = formData.get('consent') === 'on';
 
     const validation = validateContactSubmission(raw);
     if (!validation.ok) {
@@ -189,7 +188,6 @@ function initContactForm(): void {
 
     const payload: Record<string, unknown> = {
       ...validation.data,
-      consent: true,
       website: formData.get('website') ?? '',
       turnstileToken: token,
     };

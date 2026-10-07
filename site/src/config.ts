@@ -35,5 +35,12 @@ export const ROUTES = [
 export const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA';
 export const TURNSTILE_SITE_KEY: string = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || TURNSTILE_TEST_SITE_KEY;
 
-/** 表單送不出去時提示的備用聯絡信箱；留空則不顯示（正式 email 確認後填入） */
-export const CONTACT_FALLBACK_EMAIL = '';
+/** 公司聯絡資訊（2026-10-07 業主提供）：頁尾與聯絡頁共用，改這裡即全站更新 */
+export const CONTACT_INFO = {
+  email: 'cho@uxreach.com',
+  facebook: 'https://www.facebook.com/ReachExperienceDesign/',
+  address: '臺北市中山區興亞里松江路64巷10-2號',
+} as const;
+
+/** 表單送不出去時提示的備用聯絡信箱 */
+export const CONTACT_FALLBACK_EMAIL: string = CONTACT_INFO.email;

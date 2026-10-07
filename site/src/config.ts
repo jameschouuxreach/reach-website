@@ -44,3 +44,9 @@ export const CONTACT_INFO = {
 
 /** 表單送不出去時提示的備用聯絡信箱 */
 export const CONTACT_FALLBACK_EMAIL: string = CONTACT_INFO.email;
+
+/**
+ * 案例內容開關（2026-10-07 業主指示，main／正式站）：false 時首頁「我們的經驗」與專案實例頁都不輸出案例卡片，
+ * 改顯示「內容建置中」。案例資料與卡片程式都保留，內容準備好後改回 true 即可恢復。
+ */
+export const SHOW_CASES: boolean = false;

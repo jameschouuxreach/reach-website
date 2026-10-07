@@ -7,6 +7,7 @@ import CaseCard from '../components/CaseCard.astro';
 import PartnerLogos from '../components/PartnerLogos.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { CASES } from '../data/cases';
+import { SHOW_CASES } from '../config';
 import { SITE_NAME, SITE_NAME_EN } from '../config';
 ---
 
@@ -288,14 +289,21 @@ import { SITE_NAME, SITE_NAME_EN } from '../config';
 
   {/* ---- 5. 精選案例／我們的經驗 ---- */}
   <section class="border-t border-line bg-page">
-    <div class="container-site sec-full">
+    <div class:list={['container-site', SHOW_CASES ? 'sec-full' : 'py-20 md:py-28']}>
       <div class="flex flex-wrap items-baseline justify-between gap-4" data-reveal>
         <SectionLabel zh="我們的經驗" en="OUR EXPERIENCE" />
-        <TextLink href="/cases/" label="所有案例" />
+        {SHOW_CASES && <TextLink href="/cases/" label="所有案例" />}
       </div>
-      <div class="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2" data-reveal>
-        {CASES.map((item) => <CaseCard {...item} />)}
-      </div>
+      {/* 案例內容開關見 config.ts 的 SHOW_CASES（2026-10-07 起正式站先隱藏） */}
+      {
+        SHOW_CASES ? (
+          <div class="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2" data-reveal>
+            {CASES.map((item) => <CaseCard {...item} />)}
+          </div>
+        ) : (
+          <p class="heading-section mt-10 text-ink-secondary" data-reveal>內容建置中</p>
+        )
+      }
     </div>
   </section>
 

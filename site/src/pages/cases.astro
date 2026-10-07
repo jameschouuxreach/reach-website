@@ -9,6 +9,12 @@ import { CASES, NEXDO_D_CASE, NEXDO_E_CASE } from '../data/cases';
 const cIndex = CASES.findIndex((item) => item.href === '/work/nexdo-c/');
 const casesBeforeD = CASES.slice(0, cIndex + 1);
 const casesAfterD = CASES.slice(cIndex + 1);
+
+/**
+ * 2026-10-07 業主指示（main／正式站）：案例內容先隱藏，改顯示「內容建置中」。
+ * 案例資料與卡片程式都保留，內容準備好後把 SHOW_CASES 改回 true 即可恢復。
+ */
+const SHOW_CASES = false;
 ---
 
 <BaseLayout
@@ -21,25 +27,37 @@ const casesAfterD = CASES.slice(cIndex + 1);
     introLead
   />
 
-  <section class="container-site py-16 md:py-24">
-    <h2 class="sr-only">案例列表</h2>
-    <div class="mb-8 flex flex-wrap gap-2" data-reveal>
-      {/* 篩選為預留位置，正式案例資料建立後啟用（v1 不實作） */}
-      {
-        ['全部', '政府與公共服務', '企業與服務團隊'].map((tag) => (
-          <span class="rounded-full border border-line bg-surface px-4 py-1.5 text-sm text-ink-muted">{tag}</span>
-        ))
-      }
-      <span class="self-center text-xs text-ink-muted">（篩選功能將於案例內容建立後啟用）</span>
-    </div>
+  {
+    SHOW_CASES ? null : (
+      <section class="container-site py-16 md:py-24">
+        <h2 class="heading-section text-ink-secondary">內容建置中</h2>
+      </section>
+    )
+  }
 
-    <div class="grid gap-x-8 gap-y-14 sm:grid-cols-2" data-reveal>
-      {casesBeforeD.map((item) => <CaseCard {...item} />)}
-      <CaseCard {...NEXDO_D_CASE} />
-      <CaseCard {...NEXDO_E_CASE} />
-      {casesAfterD.map((item) => <CaseCard {...item} />)}
-    </div>
-  </section>
+  {
+    SHOW_CASES && (
+      <section class="container-site py-16 md:py-24">
+        <h2 class="sr-only">案例列表</h2>
+        <div class="mb-8 flex flex-wrap gap-2" data-reveal>
+          {/* 篩選為預留位置，正式案例資料建立後啟用（v1 不實作） */}
+          {
+            ['全部', '政府與公共服務', '企業與服務團隊'].map((tag) => (
+              <span class="rounded-full border border-line bg-surface px-4 py-1.5 text-sm text-ink-muted">{tag}</span>
+            ))
+          }
+          <span class="self-center text-xs text-ink-muted">（篩選功能將於案例內容建立後啟用）</span>
+        </div>
+
+        <div class="grid gap-x-8 gap-y-14 sm:grid-cols-2" data-reveal>
+          {casesBeforeD.map((item) => <CaseCard {...item} />)}
+          <CaseCard {...NEXDO_D_CASE} />
+          <CaseCard {...NEXDO_E_CASE} />
+          {casesAfterD.map((item) => <CaseCard {...item} />)}
+        </div>
+      </section>
+    )
+  }
 
   <ContactCta />
 </BaseLayout>
